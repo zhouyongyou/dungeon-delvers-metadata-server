@@ -1,12 +1,10 @@
-// utils.js
+// utils.js (快取優化版)
 // 說明: 這個檔案是元數據伺服器的核心工具庫。
-// 它負責：
-// 1. 連接到區塊鏈節點。
-// 2. 匯出所有合約地址與 ABI。
-// 3. 包含所有從 Solidity SVG 函式庫翻譯過來的、完整的 SVG 生成邏輯。
+// ★ 核心優化：增加了記憶體快取機制，大幅提升穩定性與回應速度。
 
 import { createPublicClient, http, formatEther } from 'viem';
 import { bsc } from 'viem/chains';
+import NodeCache from 'node-cache'; // ★ 新增：導入快取工具
 import {
   heroABI,
   relicABI,
@@ -20,14 +18,11 @@ import {
 // Section 1: Viem 客戶端與合約設定
 // =======================================================
 
-// 從 .env 檔案讀取您的 RPC URL，如果沒有則使用公開節點
 export const publicClient = createPublicClient({
   chain: bsc,
   transport: http(process.env.BSC_RPC_URL || 'https://bsc-dataseed1.binance.org/'),
 });
 
-// ★★★ 重要：請將這裡的地址換成您「已部署」的合約地址 ★★★
-// 這些地址應該被設定在您的 .env 檔案中
 export const contractAddresses = {
     hero: process.env.VITE_MAINNET_HERO_ADDRESS,
     relic: process.env.VITE_MAINNET_RELIC_ADDRESS,
@@ -38,7 +33,6 @@ export const contractAddresses = {
     soulShard: process.env.VITE_MAINNET_SOUL_SHARD_TOKEN_ADDRESS,
 };
 
-// 將您的 ABI 集中管理並匯出
 export const abis = {
     hero: heroABI,
     relic: relicABI,
@@ -48,9 +42,37 @@ export const abis = {
     oracle: oracleABI,
 };
 
+// =======================================================
+// Section 2: ★★★ 快取設定 ★★★
+// =======================================================
+
+// 創建一個快取實例
+// stdTTL: 標準快取時間 (秒)。600秒 = 10分鐘。
+// checkperiod: 定期檢查過期快取的間隔時間 (秒)。
+const metadataCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
+
+/**
+ * @notice 一個高階函式，為任何非同步操作添加快取功能。
+ * @param key 快取的唯一鍵值，例如 'hero-123'。
+ * @param generator 一個非同步函式，負責在快取不存在時生成數據。
+ * @returns 返回快取中的數據或新生成的數據。
+ */
+export const withCache = async (key, generator) => {
+  const cachedData = metadataCache.get(key);
+  if (cachedData) {
+    console.log(`[Cache HIT] Key: ${key}`);
+    return cachedData;
+  }
+
+  console.log(`[Cache MISS] Key: ${key}. Generating new data...`);
+  const newData = await generator();
+  metadataCache.set(key, newData);
+  return newData;
+};
+
 
 // =======================================================
-// Section 2: SVG 生成邏輯 (從 Solidity 翻譯而來)
+// Section 3: SVG 生成邏輯 (保持不變)
 // =======================================================
 
 // --- 通用 SVG 元件與輔助函式 ---
