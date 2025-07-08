@@ -1,10 +1,8 @@
-// index.js
-// 說明: Express 伺服器主入口點。
-// 它會根據請求的 tokenId，從鏈上讀取數據，
-// 然後呼叫 utils.js 中的函式來生成並回傳對應的元數據 JSON。
+// src/index.js (CORS 和穩定性修正版)
 
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors'; // ★ 新增：匯入 cors 中介軟體
 import {
   publicClient,
   contractAddresses,
@@ -15,17 +13,40 @@ import {
   generateProfileSVG,
   generateVipSVG
 } from './utils.js';
+import { formatEther } from 'viem';
 
 const app = express();
 const PORT = process.env.PORT || 3001; // 建議使用與前端不同的埠號
+
+// ★★★【核心修正 1】★★★
+// 設定 CORS 策略，明確允許您的前端網域訪問
+const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    // 允許沒有 origin 的請求 (例如 Postman) 或在白名單中的 origin
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
 
 // 通用錯誤處理中介軟體
 const handleRequest = (handler) => async (req, res) => {
     try {
         await handler(req, res);
     } catch (error) {
+        // ★★★【核心修正 2】★★★
+        // 提供更詳細的錯誤日誌，並回傳 500 錯誤
         console.error(`[Error on ${req.path}]`, error);
-        res.status(500).json({ error: 'Failed to fetch token metadata.' });
+        res.status(500).json({ 
+            error: 'Failed to fetch token metadata.',
+            message: error.message 
+        });
     }
 };
 
