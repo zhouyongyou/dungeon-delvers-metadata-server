@@ -1,0 +1,24 @@
+# Dependencies
+# 忽略所有 node_modules 資料夾
+/node_modules
+
+# Environment variables
+# 忽略所有環境變數檔案，避免洩漏私鑰或 API Keys
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# Log files
+# 忽略日誌檔
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System files
+# 忽略作業系統產生的暫存檔
+.DS_Store
+Thumbs.db

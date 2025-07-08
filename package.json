@@ -1,0 +1,25 @@
+{
+  "name": "dungeon-delvers-metadata-server",
+  "version": "1.0.0",
+  "description": "A dedicated server to generate dynamic on-chain SVG metadata for Dungeon Delvers NFTs.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "nft",
+    "metadata",
+    "svg",
+    "on-chain",
+    "dungeon-delvers"
+  ],
+  "author": "Z",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.1.0",
+    "express": "^5.1.0",
+    "viem": "^2.31.7"
+  }
+}

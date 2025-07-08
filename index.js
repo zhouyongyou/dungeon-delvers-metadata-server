@@ -1,0 +1,173 @@
+// index.js
+// 說明: Express 伺服器主入口點。
+// 它會根據請求的 tokenId，從鏈上讀取數據，
+// 然後呼叫 utils.js 中的函式來生成並回傳對應的元數據 JSON。
+
+import 'dotenv/config';
+import express from 'express';
+import {
+  publicClient,
+  contractAddresses,
+  abis,
+  generateHeroSVG,
+  generateRelicSVG,
+  generatePartySVG,
+  generateProfileSVG,
+  generateVipSVG
+} from './utils.js';
+
+const app = express();
+const PORT = process.env.PORT || 3001; // 建議使用與前端不同的埠號
+
+// 通用錯誤處理中介軟體
+const handleRequest = (handler) => async (req, res) => {
+    try {
+        await handler(req, res);
+    } catch (error) {
+        console.error(`[Error on ${req.path}]`, error);
+        res.status(500).json({ error: 'Failed to fetch token metadata.' });
+    }
+};
+
+// API 端點: /api/hero/:tokenId
+app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
+    const { tokenId } = req.params;
+    const [rarity, power] = await publicClient.readContract({
+        address: contractAddresses.hero,
+        abi: abis.hero,
+        functionName: 'getHeroProperties',
+        args: [BigInt(tokenId)],
+    });
+
+    const svgString = generateHeroSVG({ rarity, power }, BigInt(tokenId));
+    const image_data = Buffer.from(svgString).toString('base64');
+    
+    const metadata = {
+        name: `Dungeon Delvers Hero #${tokenId}`,
+        description: "A brave hero from the world of Dungeon Delvers, ready for adventure.",
+        image: `data:image/svg+xml;base64,${image_data}`,
+        attributes: [
+            { trait_type: "Rarity", value: rarity },
+            { trait_type: "Power", value: Number(power) },
+        ],
+    };
+    res.json(metadata);
+}));
+
+// API 端點: /api/relic/:tokenId
+app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
+    const { tokenId } = req.params;
+    const [rarity, capacity] = await publicClient.readContract({
+        address: contractAddresses.relic,
+        abi: abis.relic,
+        functionName: 'getRelicProperties',
+        args: [BigInt(tokenId)],
+    });
+
+    const svgString = generateRelicSVG({ rarity, capacity }, BigInt(tokenId));
+    const image_data = Buffer.from(svgString).toString('base64');
+
+    const metadata = {
+        name: `Dungeon Delvers Relic #${tokenId}`,
+        description: "An ancient relic imbued with mysterious powers.",
+        image: `data:image/svg+xml;base64,${image_data}`,
+        attributes: [
+            { trait_type: "Rarity", value: rarity },
+            { trait_type: "Capacity", value: capacity },
+        ],
+    };
+    res.json(metadata);
+}));
+
+// API 端點: /api/party/:tokenId
+app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
+    const { tokenId } = req.params;
+    const composition = await publicClient.readContract({
+        address: contractAddresses.party,
+        abi: abis.party,
+        functionName: 'getPartyComposition',
+        args: [BigInt(tokenId)],
+    });
+    
+    const svgString = generatePartySVG(composition, BigInt(tokenId));
+    const image_data = Buffer.from(svgString).toString('base64');
+
+    const metadata = {
+        name: `Dungeon Delvers Party #${tokenId}`,
+        description: "A brave party of delvers, united for a common goal.",
+        image: `data:image/svg+xml;base64,${image_data}`,
+        attributes: [
+            { trait_type: "Total Power", value: Number(composition.totalPower) },
+            { trait_type: "Total Capacity", value: Number(composition.totalCapacity) },
+            { trait_type: "Party Rarity", value: composition.partyRarity },
+        ],
+    };
+    res.json(metadata);
+}));
+
+// API 端點: /api/profile/:tokenId
+app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
+    const { tokenId } = req.params;
+    const owner = await publicClient.readContract({
+        address: contractAddresses.playerProfile,
+        abi: abis.playerProfile,
+        functionName: 'ownerOf',
+        args: [BigInt(tokenId)],
+    });
+    const [level, experience] = await Promise.all([
+        publicClient.readContract({ address: contractAddresses.playerProfile, abi: abis.playerProfile, functionName: 'getLevel', args: [owner] }),
+        publicClient.readContract({ address: contractAddresses.playerProfile, abi: abis.playerProfile, functionName: 'getExperience', args: [owner] })
+    ]);
+
+    const svgString = generateProfileSVG({ level: Number(level), experience }, BigInt(tokenId));
+    const image_data = Buffer.from(svgString).toString('base64');
+
+    const metadata = {
+        name: `Dungeon Delvers Profile #${tokenId}`,
+        description: "A soul-bound achievement token for Dungeon Delvers.",
+        image: `data:image/svg+xml;base64,${image_data}`,
+        attributes: [
+            { trait_type: "Level", value: Number(level) },
+            { display_type: "number", trait_type: "Experience", value: Number(experience) },
+        ],
+    };
+    res.json(metadata);
+}));
+
+// API 端點: /api/vip/:tokenId
+app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
+    const { tokenId } = req.params;
+    const owner = await publicClient.readContract({
+        address: contractAddresses.vipStaking,
+        abi: abis.vipStaking,
+        functionName: 'ownerOf',
+        args: [BigInt(tokenId)],
+    });
+    const [level, stakeInfo] = await Promise.all([
+        publicClient.readContract({ address: contractAddresses.vipStaking, abi: abis.vipStaking, functionName: 'getVipLevel', args: [owner] }),
+        publicClient.readContract({ address: contractAddresses.vipStaking, abi: abis.vipStaking, functionName: 'userStakes', args: [owner] })
+    ]);
+    const stakedAmount = stakeInfo[0];
+    const stakedValueUSD = await publicClient.readContract({
+        address: contractAddresses.oracle,
+        abi: abis.oracle,
+        functionName: 'getAmountOut',
+        args: [contractAddresses.soulShard, stakedAmount]
+    });
+
+    const svgString = generateVipSVG({ level, stakedValueUSD }, BigInt(tokenId));
+    const image_data = Buffer.from(svgString).toString('base64');
+
+    const metadata = {
+        name: `Dungeon Delvers VIP #${tokenId}`,
+        description: "A soul-bound VIP card that provides in-game bonuses based on the staked value.",
+        image: `data:image/svg+xml;base64,${image_data}`,
+        attributes: [
+            { trait_type: "Level", value: level },
+            { display_type: "number", trait_type: "Staked Value (USD)", value: Number(formatEther(stakedValueUSD)) },
+        ],
+    };
+    res.json(metadata);
+}));
+
+app.listen(PORT, () => console.log(`Metadata server listening on port ${PORT}`));
