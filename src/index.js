@@ -1,19 +1,19 @@
-// index.js (The Graph 終極優化版 - 已修正查詢邏輯)
+// index.js (API 路由修正版)
 
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import {
-  publicClient,
-  contractAddresses,
-  abis,
-  generateHeroSVG,
-  generateRelicSVG,
-  generatePartySVG,
-  generateProfileSVG,
-  generateVipSVG,
-  withCache,
-  graphClient
+    publicClient,
+    contractAddresses,
+    abis,
+    generateHeroSVG,
+    generateRelicSVG,
+    generatePartySVG,
+    generateProfileSVG,
+    generateVipSVG,
+    withCache,
+    graphClient
 } from './utils.js';
 import { gql } from 'graphql-request';
 import { formatEther } from 'viem';
@@ -23,14 +23,14 @@ const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  optionsSuccessStatus: 200
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
@@ -46,7 +46,7 @@ const handleRequest = (handler) => async (req, res) => {
     }
 };
 
-// ... (Hero, Relic, Party 的 API 端點與上一版相同，此處省略) ...
+// --- Hero, Relic, Party 端點 (保持不變) ---
 app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `hero-${tokenId}`;
@@ -115,15 +115,14 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
 }));
 
 
-// ★★★ 核心修正：Player Profile 和 VIP 的查詢邏輯 ★★★
+// --- Profile 和 VIP 端點 (已修正路由) ---
 
-// API 端點: /api/profile/:tokenId
-app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
+// ★ 核心修正：將路由從 /api/profile/ 改為 /api/playerprofile/
+app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `profile-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        // 1. 先從鏈上查詢擁有者是誰 (這是唯一必要的鏈上呼叫)
         const owner = await publicClient.readContract({
             address: contractAddresses.playerProfile,
             abi: abis.playerProfile,
@@ -131,7 +130,6 @@ app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
             args: [BigInt(tokenId)],
         });
 
-        // 2. 使用擁有者地址作為 ID 去查詢 The Graph
         const query = gql`
             query GetProfile($id: Bytes!) {
                 player(id: $id) {
@@ -160,13 +158,12 @@ app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
     res.json(metadata);
 }));
 
-// API 端點: /api/vip/:tokenId
-app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
+// ★ 核心修正：將路由從 /api/vip/ 改為 /api/vipstaking/
+app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `vip-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        // 1. 先從鏈上查詢擁有者是誰
         const owner = await publicClient.readContract({
             address: contractAddresses.vipStaking,
             abi: abis.vipStaking,
@@ -174,7 +171,6 @@ app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
             args: [BigInt(tokenId)],
         });
 
-        // 2. 使用擁有者地址作為 ID 去查詢 The Graph
         const query = gql`
             query GetVip($id: Bytes!) {
                 player(id: $id) {
@@ -188,7 +184,6 @@ app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
         const vip = player?.vip;
         if (!vip) throw new Error('VIP not found in The Graph for owner');
 
-        // 3. 唯一仍然需要即時鏈上呼叫的地方，是獲取質押物的即時美元價值
         const stakedValueUSD = await publicClient.readContract({
             address: contractAddresses.oracle,
             abi: abis.oracle,
