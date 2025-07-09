@@ -75,6 +75,9 @@ const allowedOrigins = [
     'https://element.market',
     'https://x2y2.io',
     'https://looksrare.org',
+    'https://www.okx.com',
+    'https://okx.com',
+    'https://nft.okx.com',
     // 開發環境
     'http://localhost:5173',
     'http://localhost:3000',

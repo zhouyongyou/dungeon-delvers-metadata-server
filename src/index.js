@@ -96,6 +96,9 @@ const allowedOrigins = [
     'https://element.market',
     'https://x2y2.io',
     'https://looksrare.org',
+    'https://www.okx.com',
+    'https://okx.com',
+    'https://nft.okx.com',
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:3001'
