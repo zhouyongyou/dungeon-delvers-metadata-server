@@ -24,9 +24,42 @@ export const publicClient = createPublicClient({
   transport: http(process.env.BSC_RPC_URL || 'https://bsc-dataseed1.binance.org/'),
 });
 
-// ★ 新增：The Graph 客戶端
+// ★ 新增：The Graph 客戶端 (帶重試機制)
 const THE_GRAPH_API_URL = process.env.VITE_THE_GRAPH_STUDIO_API_URL;
-export const graphClient = new GraphQLClient(THE_GRAPH_API_URL);
+const baseGraphClient = new GraphQLClient(THE_GRAPH_API_URL);
+
+// 帶重試機制的 GraphQL 客戶端
+export const graphClient = {
+  async request(query, variables, maxRetries = 3) {
+    let lastError;
+    
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const result = await baseGraphClient.request(query, variables);
+        if (i > 0) {
+          logger.info('GraphQL request succeeded after retry', { 
+            attempt: i + 1, 
+            variables 
+          });
+        }
+        return result;
+      } catch (error) {
+        lastError = error;
+        logger.error(`GraphQL request failed (attempt ${i + 1}/${maxRetries})`, error, { 
+          query: query.definitions?.[0]?.name?.value || 'unknown',
+          variables 
+        });
+        
+        if (i < maxRetries - 1) {
+          const delay = Math.min(1000 * Math.pow(2, i), 5000); // 指數退避，最大5秒
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+    
+    throw lastError;
+  }
+};
 
 export const contractAddresses = {
     hero: process.env.VITE_MAINNET_HERO_ADDRESS,
@@ -48,20 +81,100 @@ export const abis = {
 };
 
 // =======================================================
-// Section 2: 快取設定 (保持不變)
+// Section 2: 分層快取設定 (優化版)
 // =======================================================
-const metadataCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
+const cacheConfigs = {
+  hero: { ttl: 3600, checkperiod: 600 },      // 1小時 - 相對靜態
+  relic: { ttl: 3600, checkperiod: 600 },     // 1小時 - 相對靜態
+  party: { ttl: 1800, checkperiod: 300 },     // 30分鐘 - 中等動態
+  profile: { ttl: 300, checkperiod: 60 },     // 5分鐘 - 高動態
+  vip: { ttl: 600, checkperiod: 120 }         // 10分鐘 - 中等動態
+};
 
-export const withCache = async (key, generator) => {
-  const cachedData = metadataCache.get(key);
+const caches = {};
+Object.keys(cacheConfigs).forEach(type => {
+  caches[type] = new NodeCache(cacheConfigs[type]);
+});
+
+// 結構化日誌工具
+const logger = {
+  info: (message, meta = {}) => {
+    console.log(JSON.stringify({
+      level: 'info',
+      message,
+      meta,
+      timestamp: new Date().toISOString()
+    }));
+  },
+  error: (message, error, meta = {}) => {
+    console.error(JSON.stringify({
+      level: 'error',
+      message,
+      error: error?.message || error,
+      stack: error?.stack,
+      meta,
+      timestamp: new Date().toISOString()
+    }));
+  }
+};
+
+// 導出 logger 供其他模組使用
+export { logger };
+
+// 降級策略 - 當 GraphQL 失敗時返回基本元數據
+export const fallbackMetadata = (tokenId, type) => {
+  const typeConfig = {
+    hero: { name: 'Hero', description: 'A brave hero from the world of Dungeon Delvers.', emoji: '⚔️' },
+    relic: { name: 'Relic', description: 'An ancient relic imbued with mysterious powers.', emoji: '💎' },
+    party: { name: 'Party', description: 'A brave party of delvers, united for a common goal.', emoji: '🛡️' },
+    profile: { name: 'Profile', description: 'A soul-bound achievement token for Dungeon Delvers.', emoji: '👤' },
+    vip: { name: 'VIP', description: 'A soul-bound VIP card that provides in-game bonuses.', emoji: '👑' }
+  };
+  
+  const config = typeConfig[type] || typeConfig.hero;
+  const fallbackSVG = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="400" fill="#1a1a1a"/>
+    <text x="200" y="180" text-anchor="middle" font-family="Arial" font-size="64" fill="#666">${config.emoji}</text>
+    <text x="200" y="250" text-anchor="middle" font-family="Arial" font-size="24" fill="#999">Loading...</text>
+  </svg>`;
+  
+  return {
+    name: `Dungeon Delvers ${config.name} #${tokenId}`,
+    description: config.description,
+    image: `data:image/svg+xml;base64,${Buffer.from(fallbackSVG).toString('base64')}`,
+    attributes: [
+      { trait_type: "Status", value: "Temporarily Unavailable" }
+    ]
+  };
+};
+
+export const withCache = async (key, generator, type = 'hero') => {
+  const cache = caches[type] || caches.hero;
+  const cachedData = cache.get(key);
+  
   if (cachedData) {
-    console.log(`[Cache HIT] Key: ${key}`);
+    logger.info('Cache hit', { key, type });
     return cachedData;
   }
-  console.log(`[Cache MISS] Key: ${key}. Generating new data...`);
-  const newData = await generator();
-  metadataCache.set(key, newData);
-  return newData;
+  
+  logger.info('Cache miss - generating new data', { key, type });
+  const startTime = Date.now();
+  
+  try {
+    const newData = await generator();
+    cache.set(key, newData);
+    
+    logger.info('Data generated successfully', { 
+      key, 
+      type, 
+      duration: Date.now() - startTime 
+    });
+    
+    return newData;
+  } catch (error) {
+    logger.error('Failed to generate data', error, { key, type });
+    throw error;
+  }
 };
 
 // =======================================================
