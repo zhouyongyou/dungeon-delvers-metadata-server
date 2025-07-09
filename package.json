@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "build": "echo 'Build completed. This is a Node.js server project.' && exit 0"
   },
   "keywords": [
     "nft",
@@ -25,5 +26,8 @@
     "graphql-request": "^7.2.0",
     "node-cache": "^5.1.2",
     "viem": "^2.31.7"
+  },
+  "devDependencies": {
+    "terser": "^5.43.1"
   }
 }
