@@ -99,6 +99,7 @@ const allowedOrigins = [
     'https://www.okx.com',
     'https://okx.com',
     'https://nft.okx.com',
+    'https://web3.okx.com',
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:3001'
