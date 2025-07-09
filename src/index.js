@@ -3,6 +3,9 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import compression from 'compression';
+import helmet from 'helmet';
 import {
     publicClient,
     contractAddresses,
@@ -41,6 +44,29 @@ if (missingEnvVars.length > 0) {
   process.exit(1);
 }
 
+// 基本安全設置
+app.use(helmet({
+  contentSecurityPolicy: false, // 允許 SVG 內容
+  crossOriginEmbedderPolicy: false // 允許跨域嵌入
+}));
+
+// 數據壓縮
+app.use(compression());
+
+// 基本 rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 分鐘
+  max: 100, // 每個 IP 最多 100 次請求
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: 15 * 60 // 15 分鐘後重試
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api', limiter);
+
 // 性能監控中間件
 const performanceMiddleware = (req, res, next) => {
   const start = Date.now();
@@ -61,15 +87,30 @@ const performanceMiddleware = (req, res, next) => {
 
 app.use(performanceMiddleware);
 
-const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
+// 更新 CORS 設置以支持 NFT 市場
+const allowedOrigins = [
+    'https://www.soulshard.fun',
+    'https://opensea.io',
+    'https://marketplace.axieinfinity.com',
+    'https://nft.gamfi.io',
+    'https://element.market',
+    'https://x2y2.io',
+    'https://looksrare.org',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:3001'
+];
+
 const corsOptions = {
     origin: function (origin, callback) {
+        // 允許無來源 (Postman, curl, etc) 或允許的來源
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
+    credentials: true,
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
