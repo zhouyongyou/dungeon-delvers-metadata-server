@@ -1,4 +1,4 @@
-// index.js (CORS 和快取優化版)
+// index.js (The Graph 終極優化版 - 已修正查詢邏輯)
 
 import 'dotenv/config';
 import express from 'express';
@@ -12,8 +12,10 @@ import {
   generatePartySVG,
   generateProfileSVG,
   generateVipSVG,
-  withCache // ★ 新增：導入快取函式
+  withCache,
+  graphClient
 } from './utils.js';
+import { gql } from 'graphql-request';
 import { formatEther } from 'viem';
 
 const app = express();
@@ -32,7 +34,6 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// 通用錯誤處理中介軟體
 const handleRequest = (handler) => async (req, res) => {
     try {
         await handler(req, res);
@@ -45,161 +46,164 @@ const handleRequest = (handler) => async (req, res) => {
     }
 };
 
-// API 端點: /api/hero/:tokenId (★ 快取優化)
+// ... (Hero, Relic, Party 的 API 端點與上一版相同，此處省略) ...
 app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `hero-${tokenId}`;
+    const id = `${contractAddresses.hero.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const [rarity, power] = await publicClient.readContract({
-            address: contractAddresses.hero,
-            abi: abis.hero,
-            functionName: 'getHeroProperties',
-            args: [BigInt(tokenId)],
-        });
+        const query = gql`query GetHero($id: ID!) { hero(id: $id) { rarity power } }`;
+        const { hero } = await graphClient.request(query, { id });
+        if (!hero) throw new Error('Hero not found in The Graph');
 
-        const svgString = generateHeroSVG({ rarity, power }, BigInt(tokenId));
+        const svgString = generateHeroSVG({ rarity: hero.rarity, power: BigInt(hero.power) }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
-        
         return {
             name: `Dungeon Delvers Hero #${tokenId}`,
             description: "A brave hero from the world of Dungeon Delvers, ready for adventure.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [
-                { trait_type: "Rarity", value: rarity },
-                { trait_type: "Power", value: Number(power) },
-            ],
+            attributes: [ { trait_type: "Rarity", value: hero.rarity }, { trait_type: "Power", value: Number(hero.power) } ],
         };
     });
     res.json(metadata);
 }));
 
-// API 端點: /api/relic/:tokenId (★ 快取優化)
 app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `relic-${tokenId}`;
+    const id = `${contractAddresses.relic.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const [rarity, capacity] = await publicClient.readContract({
-            address: contractAddresses.relic,
-            abi: abis.relic,
-            functionName: 'getRelicProperties',
-            args: [BigInt(tokenId)],
-        });
+        const query = gql`query GetRelic($id: ID!) { relic(id: $id) { rarity capacity } }`;
+        const { relic } = await graphClient.request(query, { id });
+        if (!relic) throw new Error('Relic not found in The Graph');
 
-        const svgString = generateRelicSVG({ rarity, capacity }, BigInt(tokenId));
+        const svgString = generateRelicSVG(relic, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
-
         return {
             name: `Dungeon Delvers Relic #${tokenId}`,
             description: "An ancient relic imbued with mysterious powers.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [
-                { trait_type: "Rarity", value: rarity },
-                { trait_type: "Capacity", value: capacity },
-            ],
+            attributes: [ { trait_type: "Rarity", value: relic.rarity }, { trait_type: "Capacity", value: relic.capacity } ],
         };
     });
     res.json(metadata);
 }));
 
-// API 端點: /api/party/:tokenId (★ 快取優化)
 app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `party-${tokenId}`;
+    const id = `${contractAddresses.party.toLowerCase()}-${tokenId}`;
     
     const metadata = await withCache(cacheKey, async () => {
-        const composition = await publicClient.readContract({
-            address: contractAddresses.party,
-            abi: abis.party,
-            functionName: 'getPartyComposition',
-            args: [BigInt(tokenId)],
-        });
+        const query = gql`query GetParty($id: ID!) { party(id: $id) { totalPower totalCapacity partyRarity heroes { id } } }`;
+        const { party } = await graphClient.request(query, { id });
+        if (!party) throw new Error('Party not found in The Graph');
         
-        const svgString = generatePartySVG(composition, BigInt(tokenId));
+        const partyData = { ...party, heroCount: party.heroes.length, totalPower: BigInt(party.totalPower), totalCapacity: BigInt(party.totalCapacity) };
+        const svgString = generatePartySVG(partyData, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
-
         return {
             name: `Dungeon Delvers Party #${tokenId}`,
             description: "A brave party of delvers, united for a common goal.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [
-                { trait_type: "Total Power", value: Number(composition.totalPower) },
-                { trait_type: "Total Capacity", value: Number(composition.totalCapacity) },
-                { trait_type: "Party Rarity", value: composition.partyRarity },
-            ],
+            attributes: [ { trait_type: "Total Power", value: Number(party.totalPower) }, { trait_type: "Total Capacity", value: Number(party.totalCapacity) }, { trait_type: "Party Rarity", value: party.partyRarity } ],
         };
     });
     res.json(metadata);
 }));
 
-// API 端點: /api/profile/:tokenId (★ 快取優化)
+
+// ★★★ 核心修正：Player Profile 和 VIP 的查詢邏輯 ★★★
+
+// API 端點: /api/profile/:tokenId
 app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
-    // 對於動態 NFT，我們可以設定較短的快取時間，例如 60 秒
     const cacheKey = `profile-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
+        // 1. 先從鏈上查詢擁有者是誰 (這是唯一必要的鏈上呼叫)
         const owner = await publicClient.readContract({
             address: contractAddresses.playerProfile,
             abi: abis.playerProfile,
             functionName: 'ownerOf',
             args: [BigInt(tokenId)],
         });
-        const [level, experience] = await Promise.all([
-            publicClient.readContract({ address: contractAddresses.playerProfile, abi: abis.playerProfile, functionName: 'getLevel', args: [owner] }),
-            publicClient.readContract({ address: contractAddresses.playerProfile, abi: abis.playerProfile, functionName: 'getExperience', args: [owner] })
-        ]);
 
-        const svgString = generateProfileSVG({ level: Number(level), experience }, BigInt(tokenId));
+        // 2. 使用擁有者地址作為 ID 去查詢 The Graph
+        const query = gql`
+            query GetProfile($id: Bytes!) {
+                player(id: $id) {
+                    profile {
+                        experience
+                        level
+                    }
+                }
+            }`;
+        const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
+        const profile = player?.profile;
+        if (!profile) throw new Error('Profile not found in The Graph for owner');
+
+        const svgString = generateProfileSVG({ level: Number(profile.level), experience: BigInt(profile.experience) }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
-
         return {
             name: `Dungeon Delvers Profile #${tokenId}`,
             description: "A soul-bound achievement token for Dungeon Delvers.",
             image: `data:image/svg+xml;base64,${image_data}`,
             attributes: [
-                { trait_type: "Level", value: Number(level) },
-                { display_type: "number", trait_type: "Experience", value: Number(experience) },
+                { trait_type: "Level", value: Number(profile.level) },
+                { display_type: "number", trait_type: "Experience", value: Number(profile.experience) },
             ],
         };
     });
     res.json(metadata);
 }));
 
-// API 端點: /api/vip/:tokenId (★ 快取優化)
+// API 端點: /api/vip/:tokenId
 app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `vip-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
+        // 1. 先從鏈上查詢擁有者是誰
         const owner = await publicClient.readContract({
             address: contractAddresses.vipStaking,
             abi: abis.vipStaking,
             functionName: 'ownerOf',
             args: [BigInt(tokenId)],
         });
-        const [level, stakeInfo] = await Promise.all([
-            publicClient.readContract({ address: contractAddresses.vipStaking, abi: abis.vipStaking, functionName: 'getVipLevel', args: [owner] }),
-            publicClient.readContract({ address: contractAddresses.vipStaking, abi: abis.vipStaking, functionName: 'userStakes', args: [owner] })
-        ]);
-        const stakedAmount = stakeInfo[0];
+
+        // 2. 使用擁有者地址作為 ID 去查詢 The Graph
+        const query = gql`
+            query GetVip($id: Bytes!) {
+                player(id: $id) {
+                    vip {
+                        level
+                        stakedAmount
+                    }
+                }
+            }`;
+        const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
+        const vip = player?.vip;
+        if (!vip) throw new Error('VIP not found in The Graph for owner');
+
+        // 3. 唯一仍然需要即時鏈上呼叫的地方，是獲取質押物的即時美元價值
         const stakedValueUSD = await publicClient.readContract({
             address: contractAddresses.oracle,
             abi: abis.oracle,
             functionName: 'getAmountOut',
-            args: [contractAddresses.soulShard, stakedAmount]
+            args: [contractAddresses.soulShard, BigInt(vip.stakedAmount)]
         });
 
-        const svgString = generateVipSVG({ level, stakedValueUSD }, BigInt(tokenId));
+        const svgString = generateVipSVG({ level: vip.level, stakedValueUSD }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
-
         return {
             name: `Dungeon Delvers VIP #${tokenId}`,
             description: "A soul-bound VIP card that provides in-game bonuses based on the staked value.",
             image: `data:image/svg+xml;base64,${image_data}`,
             attributes: [
-                { trait_type: "Level", value: level },
+                { trait_type: "Level", value: vip.level },
                 { display_type: "number", trait_type: "Staked Value (USD)", value: Number(formatEther(stakedValueUSD)) },
             ],
         };
@@ -207,4 +211,4 @@ app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
     res.json(metadata);
 }));
 
-app.listen(PORT, () => console.log(`Metadata server with cache listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`Metadata server with cache and The Graph integration listening on port ${PORT}`));

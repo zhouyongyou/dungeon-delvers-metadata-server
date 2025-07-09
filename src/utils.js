@@ -1,10 +1,10 @@
-// utils.js (快取優化版)
-// 說明: 這個檔案是元數據伺服器的核心工具庫。
-// ★ 核心優化：增加了記憶體快取機制，大幅提升穩定性與回應速度。
+// utils.js (The Graph 終極優化版)
+// 說明: 此版本全面改用 The Graph 作為主要數據來源，以實現最高的穩定性和效能。
 
 import { createPublicClient, http, formatEther } from 'viem';
 import { bsc } from 'viem/chains';
-import NodeCache from 'node-cache'; // ★ 新增：導入快取工具
+import NodeCache from 'node-cache';
+import { GraphQLClient, gql } from 'graphql-request'; // ★ 新增：導入 GraphQL 工具
 import {
   heroABI,
   relicABI,
@@ -15,13 +15,18 @@ import {
 } from './abis.js';
 
 // =======================================================
-// Section 1: Viem 客戶端與合約設定
+// Section 1: 客戶端與合約設定
 // =======================================================
 
+// Viem client 仍然需要，用於呼叫 Oracle 等少數即時數據
 export const publicClient = createPublicClient({
   chain: bsc,
   transport: http(process.env.BSC_RPC_URL || 'https://bsc-dataseed1.binance.org/'),
 });
+
+// ★ 新增：The Graph 客戶端
+const THE_GRAPH_API_URL = process.env.VITE_THE_GRAPH_STUDIO_API_URL;
+export const graphClient = new GraphQLClient(THE_GRAPH_API_URL);
 
 export const contractAddresses = {
     hero: process.env.VITE_MAINNET_HERO_ADDRESS,
@@ -43,39 +48,26 @@ export const abis = {
 };
 
 // =======================================================
-// Section 2: ★★★ 快取設定 ★★★
+// Section 2: 快取設定 (保持不變)
 // =======================================================
-
-// 創建一個快取實例
-// stdTTL: 標準快取時間 (秒)。600秒 = 10分鐘。
-// checkperiod: 定期檢查過期快取的間隔時間 (秒)。
 const metadataCache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 
-/**
- * @notice 一個高階函式，為任何非同步操作添加快取功能。
- * @param key 快取的唯一鍵值，例如 'hero-123'。
- * @param generator 一個非同步函式，負責在快取不存在時生成數據。
- * @returns 返回快取中的數據或新生成的數據。
- */
 export const withCache = async (key, generator) => {
   const cachedData = metadataCache.get(key);
   if (cachedData) {
     console.log(`[Cache HIT] Key: ${key}`);
     return cachedData;
   }
-
   console.log(`[Cache MISS] Key: ${key}. Generating new data...`);
   const newData = await generator();
   metadataCache.set(key, newData);
   return newData;
 };
 
-
 // =======================================================
 // Section 3: SVG 生成邏輯 (保持不變)
 // =======================================================
-
-// --- 通用 SVG 元件與輔助函式 ---
+// (此處省略所有 SVG 生成函式，它們與之前版本相同，無需修改)
 
 const _getSVGHeader = () => `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">`;
 const _getGlobalStyles = () => `<style>.base{font-family: 'Georgia', serif; fill: #e0e0e0;}.title{font-size: 20px; font-weight: bold;}.subtitle{font-size: 14px; opacity: 0.7;}.stat-label{font-size: 12px; font-weight: bold; text-transform: uppercase; opacity: 0.6;}.stat-value{font-size: 16px; font-weight: bold;}.main-stat-value{font-size: 42px; font-weight: bold;}.footer-text{font-size: 12px; opacity: 0.5;}</style>`;
@@ -88,11 +80,11 @@ const _getPrimaryStat = (label, value) => `<text x="50%" y="245" class="base sta
 const _getSecondaryStats = (label1, value1, label2, value2) => `<line x1="20" y1="320" x2="380" y2="320" stroke="#444" stroke-width="1"/><g text-anchor="middle"><text x="120" y="345" class="base stat-label">${label1}</text><text x="120" y="365" class="base stat-value">${value1}</text><text x="280" y="345" class="base stat-label">${label2}</text><text x="280" y="365" class="base stat-value">${value2}</text></g>`;
 const _getFooter = (text) => `<text x="50%" y="390" class="base footer-text" text-anchor="middle">${text}</text>`;
 const _getRarityColor = (rarity) => {
-    if (rarity == 5) return "#E040FB"; // Legendary
-    if (rarity == 4) return "#00B0FF"; // Epic
-    if (rarity == 3) return "#FFD600"; // Rare
-    if (rarity == 2) return "#CFD8DC"; // Uncommon
-    return "#D7CCC8"; // Common
+    if (rarity == 5) return "#E040FB";
+    if (rarity == 4) return "#00B0FF";
+    if (rarity == 3) return "#FFD600";
+    if (rarity == 2) return "#CFD8DC";
+    return "#D7CCC8";
 };
 const _getRarityStars = (rarity) => {
     let stars = '';
@@ -103,7 +95,6 @@ const _getRarityStars = (rarity) => {
     return stars;
 };
 
-// --- Hero & Relic SVG ---
 export function generateHeroSVG(data, tokenId) {
     const [primaryColor, accentColor] = ["#B71C1C", "#F44336"];
     const svgString = [
@@ -130,7 +121,6 @@ export function generateRelicSVG(data, tokenId) {
     return svgString;
 }
 
-// --- Party SVG ---
 const _getPartyStyles = (rarity) => {
     if (rarity == 5) return ["#4A148C", "#E1BEE7", "Diamond Tier"];
     if (rarity == 4) return ["#0D47A1", "#BBDEFB", "Platinum Tier"];
@@ -150,20 +140,15 @@ export function generatePartySVG(data, tokenId) {
     ].join('');
     return svgString;
 }
-
-// --- Profile SVG (完整版) ---
 export function generateProfileSVG(data, tokenId) {
     const { level, experience } = data;
-
     const getExpForNextLevel = (lvl) => (lvl > 0 ? BigInt(lvl) * BigInt(lvl) * 100n : 0n);
     const expForNextLevel = getExpForNextLevel(level);
     const expForCurrentLevel = getExpForNextLevel(level - 1);
-    
     let progress = 0;
     if (expForNextLevel > expForCurrentLevel) {
        progress = Number((experience - expForCurrentLevel) * 100n / (expForNextLevel - expForCurrentLevel));
     }
-
     const getTierColors = (_level) => {
         if (_level >= 30) return ["#4A3F6D", "#A78BFA", "#7C3AED"];
         if (_level >= 20) return ["#4D4223", "#FBBF24", "#F59E0B"];
@@ -171,7 +156,6 @@ export function generateProfileSVG(data, tokenId) {
         return ["#422C1A", "#D97706", "#F59E0B"];
     };
     const [bgColor, highlightColor, gradientStop2] = getTierColors(level);
-    
     const _generateSVGDefs = (highlight, stop2) => `<defs><style>.text{font-family:Georgia,serif;fill:#F3EFE0;text-shadow:0 0 5px rgba(0,0,0,0.5);}.header{font-size:24px;font-weight:bold;}.level-text{font-size:56px;font-weight:bold;}.exp-text{font-size:14px;fill-opacity:0.9;}</style><linearGradient id="border-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${highlight}"/><stop offset="100%" stop-color="${stop2}"/><animateTransform attributeName="gradientTransform" type="rotate" from="0 200 200" to="360 200 200" dur="5s" repeatCount="indefinite"/></linearGradient><linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${stop2}"/><stop offset="100%" stop-color="${highlight}"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="3.5" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
     const _generateStars = () => `<g opacity="0.7"><circle cx="50" cy="50" r="1" fill="white" fill-opacity="0.5"><animate attributeName="fill-opacity" values="0.5;1;0.5" dur="4s" repeatCount="indefinite" begin="-2s"/></circle><circle cx="300" cy="80" r="0.8" fill="white" fill-opacity="0.8"><animate attributeName="fill-opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/></circle><circle cx="150" cy="320" r="1.2" fill="white" fill-opacity="0.6"><animate attributeName="fill-opacity" values="0.6;1;0.6" dur="5s" repeatCount="indefinite" begin="-1s"/></circle></g>`;
     const _generateArcs = (_level, highlight) => {
@@ -193,12 +177,9 @@ export function generateProfileSVG(data, tokenId) {
         return `<circle cx="200" cy="200" r="${activeRadius}" fill="none" stroke="white" stroke-width="5" stroke-opacity="0.3"/><circle cx="200" cy="200" r="${activeRadius}" fill="none" stroke="url(#progress-gradient)" stroke-width="5" stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}" transform="rotate(-90 200 200)"><animateTransform attributeName="transform" type="rotate" from="-90 200 200" to="270 200 200" dur="10s" repeatCount="indefinite"/></circle>`;
     };
     const _generateTextContent = (_tokenId, _level, currentExpInLevel, expNeededForNext, highlight) => `<g><text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="text level-text" fill="${highlight}">${_level}</text><text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" class="text" style="font-size:16px;opacity:0.8;">LEVEL</text><text x="50%" y="12%" text-anchor="middle" class="text header">PLAYER PROFILE #${_tokenId}</text><text x="50%" y="90%" text-anchor="middle" class="text exp-text">${currentExpInLevel.toString()} / ${expNeededForNext.toString()} EXP</text></g>`;
-
     const svgString = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">${_generateSVGDefs(highlightColor, gradientStop2)}<rect width="100%" height="100%" rx="20" fill="${bgColor}"/>${_generateStars()}<g filter="url(#glow)">${_generateArcs(level, highlightColor)}${_generateProgressArc(level, progress)}</g>${_generateTextContent(tokenId, level, experience - expForCurrentLevel, expForNextLevel - expForCurrentLevel, highlightColor)}<rect x="2" y="2" width="396" height="396" rx="18" fill="none" stroke="url(#border-gradient)" stroke-width="4"/></svg>`;
     return svgString;
 }
-
-// --- VIP SVG (完整版) ---
 export function generateVipSVG(data, tokenId) {
     const { level, stakedValueUSD } = data;
     const getTierStyles = (_level) => {
@@ -210,11 +191,9 @@ export function generateVipSVG(data, tokenId) {
         return { highlightColor: "#6B7280", tierName: "STANDARD" };
     };
     const { highlightColor, tierName } = getTierStyles(level);
-
     const getLevelRequirement = (lvl) => (lvl > 0 ? BigInt(lvl) * BigInt(lvl) * 100n * BigInt(1e18) : 0n);
     const currentTierRequirementUSD = getLevelRequirement(level);
     const nextTierRequirementUSD = getLevelRequirement(level + 1);
-
     let progress = 0;
     if (nextTierRequirementUSD > currentTierRequirementUSD) {
         const range = nextTierRequirementUSD - currentTierRequirementUSD;
@@ -227,18 +206,15 @@ export function generateVipSVG(data, tokenId) {
         progress = 100;
     }
     const progressWidth = progress * 330 / 100;
-
     let progressLabel = "MAX TIER REACHED";
     if (nextTierRequirementUSD > currentTierRequirementUSD) {
         progressLabel = `${formatEther(stakedValueUSD)} / ${formatEther(nextTierRequirementUSD)} USD`;
     }
-
     const _generateVIPDefs = (highlight) => `<defs><radialGradient id="bg-gradient" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2d2d2d" /><stop offset="100%" stop-color="#111111" /></radialGradient><pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#ffffff" stroke-width="0.2" opacity="0.05"/></pattern><style>@keyframes breathing-glow { 0% { text-shadow: 0 0 8px ${highlight}; } 50% { text-shadow: 0 0 16px ${highlight}, 0 0 24px ${highlight}; } 100% { text-shadow: 0 0 8px ${highlight}; } }.title-plat { font-family: Georgia, serif; font-size: 22px; fill: #ffd700; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; }.level-plat { font-family: sans-serif; font-size: 96px; fill: ${highlight}; font-weight: bold; animation: breathing-glow 5s ease-in-out infinite; }.bonus-plat { font-family: sans-serif; font-size: 20px; fill: ${highlight}; opacity: 0.9; animation: breathing-glow 5s ease-in-out infinite; animation-delay: -0.2s;}.card-id-plat { font-family: "Lucida Console", monospace; font-size: 12px; fill: #ffffff; opacity: 0.6;}.progress-text { font-family: "Lucida Console", monospace; font-size: 11px; fill-opacity: 0.8; }</style></defs>`;
     const _generateVIPStars = () => `<g opacity="0.7"><circle cx="50" cy="100" r="1.5" fill="white" fill-opacity="0.1"><animate attributeName="opacity" values="0.1;0.3;0.1" dur="5s" repeatCount="indefinite" begin="0s"/></circle><circle cx="320" cy="80" r="0.8" fill="white" fill-opacity="0.2"><animate attributeName="opacity" values="0.2;0.5;0.2" dur="7s" repeatCount="indefinite" begin="-2s"/></circle><circle cx="150" cy="350" r="1.2" fill="white" fill-opacity="0.1"><animate attributeName="opacity" values="0.1;0.4;0.1" dur="6s" repeatCount="indefinite" begin="-1s"/></circle><circle cx="250" cy="280" r="1" fill="white" fill-opacity="0.3"><animate attributeName="opacity" values="0.3;0.1;0.3" dur="8s" repeatCount="indefinite" begin="-3s"/></circle></g>`;
     const _generateProgressBar = (color) => `<g transform="translate(35, 280)"><rect x="0" y="0" width="330" height="18" rx="9" fill="#374151"/><rect x="0" y="0" width="${progressWidth}" height="18" rx="9" fill="${color}"/><text x="165" y="35" text-anchor="middle" class="progress-text" fill="white">${progressLabel}</text><text x="165" y="50" text-anchor="middle" class="progress-text" fill="#9ca3af" style="font-size: 9px;">(Value of staked $SOUL)</text></g>`;
     const _generateVIPFooter = () => `<text x="35" y="370" class="card-id-plat">CARD #${tokenId}</text><text x="365" y="370" text-anchor="end" class="card-id-plat" font-weight="bold">Dungeon Delvers</text>`;
     const _generateVIPBorders = (color) => `<g stroke="${color}" stroke-width="1.5" opacity="0.3"><path d="M 30 20 L 20 20 L 20 30" fill="none" /><path d="M 370 20 L 380 20 L 380 30" fill="none" /><path d="M 30 380 L 20 380 L 20 370" fill="none" /><path d="M 370 380 L 380 380 L 380 370" fill="none" /></g>`;
-
     const svgString = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">${_generateVIPDefs(highlightColor)}<rect width="100%" height="100%" rx="20" fill="url(#bg-gradient)"/><rect width="100%" height="100%" rx="20" fill="url(#grid-pattern)"/>${_generateVIPStars()}<text x="50%" y="60" text-anchor="middle" class="title-plat">${tierName} VIP PRIVILEGE</text><g text-anchor="middle"><text x="50%" y="190" class="level-plat">${level > 0 ? level : "-"}</text><text x="50%" y="235" class="bonus-plat">SUCCESS RATE +${level}%</text></g>${_generateProgressBar(highlightColor)}${_generateVIPFooter()}${_generateVIPBorders(highlightColor)}</svg>`;
     return svgString;
 }
