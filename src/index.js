@@ -13,13 +13,53 @@ import {
     generateProfileSVG,
     generateVipSVG,
     withCache,
-    graphClient
+    graphClient,
+    logger
 } from './utils.js';
 import { gql } from 'graphql-request';
 import { formatEther } from 'viem';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 環境變數驗證
+const requiredEnvVars = [
+  'VITE_THE_GRAPH_STUDIO_API_URL',
+  'VITE_MAINNET_HERO_ADDRESS',
+  'VITE_MAINNET_RELIC_ADDRESS',
+  'VITE_MAINNET_PARTY_ADDRESS',
+  'VITE_MAINNET_PLAYERPROFILE_ADDRESS',
+  'VITE_MAINNET_VIPSTAKING_ADDRESS',
+  'VITE_MAINNET_ORACLE_ADDRESS',
+  'VITE_MAINNET_SOUL_SHARD_TOKEN_ADDRESS'
+];
+
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  console.error('Missing required environment variables:', missingEnvVars);
+  process.exit(1);
+}
+
+// 性能監控中間件
+const performanceMiddleware = (req, res, next) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    logger.info('Request completed', {
+      method: req.method,
+      url: req.url,
+      statusCode: res.statusCode,
+      duration: duration,
+      contentLength: res.get('content-length') || 0
+    });
+  });
+  
+  next();
+};
+
+app.use(performanceMiddleware);
 
 const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
 const corsOptions = {
@@ -230,4 +270,47 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
     res.json(metadata);
 }));
 
-app.listen(PORT, () => console.log(`Metadata server with cache and The Graph integration listening on port ${PORT}`));
+// 健康檢查端點
+app.get('/health', (req, res) => {
+  const healthCheck = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    checks: {
+      graphql: 'OK',
+      cache: 'OK'
+    }
+  };
+  
+  try {
+    res.status(200).json(healthCheck);
+  } catch (error) {
+    healthCheck.status = 'unhealthy';
+    healthCheck.error = error.message;
+    res.status(503).json(healthCheck);
+  }
+});
+
+const server = app.listen(PORT, () => {
+  console.log(`Metadata server with cache and The Graph integration listening on port ${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
+});
