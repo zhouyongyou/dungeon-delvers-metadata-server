@@ -38,6 +38,15 @@ const handleRequest = (handler) => async (req, res) => {
     try {
         await handler(req, res);
     } catch (error) {
+        // ★ 優化：捕捉到已知錯誤類型並回傳特定狀態碼
+        if (error.message.includes('not found')) {
+            console.warn(`[Not Found on ${req.path}]`, error.message);
+            return res.status(404).json({ 
+                error: 'Resource not found.',
+                message: error.message 
+            });
+        }
+        
         console.error(`[Error on ${req.path}]`, error);
         res.status(500).json({ 
             error: 'Failed to fetch token metadata.',
@@ -55,7 +64,9 @@ app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
     const metadata = await withCache(cacheKey, async () => {
         const query = gql`query GetHero($id: ID!) { hero(id: $id) { rarity power } }`;
         const { hero } = await graphClient.request(query, { id });
-        if (!hero) throw new Error('Hero not found in The Graph');
+        
+        // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
+        if (!hero) throw new Error(`Hero #${tokenId} not found in The Graph`);
 
         const svgString = generateHeroSVG({ rarity: hero.rarity, power: BigInt(hero.power) }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
@@ -77,7 +88,9 @@ app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
     const metadata = await withCache(cacheKey, async () => {
         const query = gql`query GetRelic($id: ID!) { relic(id: $id) { rarity capacity } }`;
         const { relic } = await graphClient.request(query, { id });
-        if (!relic) throw new Error('Relic not found in The Graph');
+        
+        // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
+        if (!relic) throw new Error(`Relic #${tokenId} not found in The Graph`);
 
         const svgString = generateRelicSVG(relic, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
@@ -99,9 +112,10 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
     const metadata = await withCache(cacheKey, async () => {
         const query = gql`query GetParty($id: ID!) { party(id: $id) { totalPower totalCapacity partyRarity heroes { id } } }`;
         const { party } = await graphClient.request(query, { id });
-        if (!party) throw new Error('Party not found in The Graph');
+        // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
+        if (!party) throw new Error(`Party #${tokenId} not found in The Graph`);
         
-        const partyData = { ...party, heroCount: party.heroes.length, totalPower: BigInt(party.totalPower), totalCapacity: BigInt(party.totalCapacity) };
+        const partyData = { ...party, heroIds: party.heroes, totalPower: BigInt(party.totalPower), totalCapacity: BigInt(party.totalCapacity) };
         const svgString = generatePartySVG(partyData, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
         return {
@@ -128,6 +142,9 @@ app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
             abi: abis.playerProfile,
             functionName: 'ownerOf',
             args: [BigInt(tokenId)],
+        }).catch(() => {
+            // ★ 優化：如果 ownerOf 失敗 (例如 token 不存在)，拋出錯誤
+            throw new Error(`PlayerProfile #${tokenId} not found or has no owner.`);
         });
 
         const query = gql`
@@ -141,7 +158,9 @@ app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
             }`;
         const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
         const profile = player?.profile;
-        if (!profile) throw new Error('Profile not found in The Graph for owner');
+        
+        // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
+        if (!profile) throw new Error(`Profile data not found in The Graph for owner ${owner}`);
 
         const svgString = generateProfileSVG({ level: Number(profile.level), experience: BigInt(profile.experience) }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
@@ -169,6 +188,9 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
             abi: abis.vipStaking,
             functionName: 'ownerOf',
             args: [BigInt(tokenId)],
+        }).catch(() => {
+            // ★ 優化：如果 ownerOf 失敗 (例如 token 不存在)，拋出錯誤
+            throw new Error(`VIPStaking NFT #${tokenId} not found or has no owner.`);
         });
 
         const query = gql`
@@ -182,7 +204,9 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
             }`;
         const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
         const vip = player?.vip;
-        if (!vip) throw new Error('VIP not found in The Graph for owner');
+
+        // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
+        if (!vip) throw new Error(`VIP data not found in The Graph for owner ${owner}`);
 
         const stakedValueUSD = await publicClient.readContract({
             address: contractAddresses.oracle,

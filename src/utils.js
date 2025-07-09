@@ -97,28 +97,32 @@ const _getRarityStars = (rarity) => {
 
 export function generateHeroSVG(data, tokenId) {
     const [primaryColor, accentColor] = ["#B71C1C", "#F44336"];
-    const svgString = [
-        _getSVGHeader(), _getGlobalStyles(), _getGradientDefs(primaryColor, accentColor),
-        _getBackgroundPattern(primaryColor), _getBorder(data.rarity),
-        _getHeader("Hero", "", tokenId), _getCentralImage("⚔️"),
-        _getPrimaryStat("POWER", data.power.toString()),
-        _getSecondaryStats("RARITY", _getRarityStars(data.rarity), "", ""),
-        _getFooter("Dungeon Delvers"), '</svg>'
-    ].join('');
-    return svgString;
+    return `${_getSVGHeader()}
+        ${_getGlobalStyles()}
+        ${_getGradientDefs(primaryColor, accentColor)}
+        ${_getBackgroundPattern(primaryColor)}
+        ${_getBorder(data.rarity)}
+        ${_getHeader("Hero", "", tokenId)}
+        ${_getCentralImage("⚔️")}
+        ${_getPrimaryStat("POWER", data.power.toString())}
+        ${_getSecondaryStats("RARITY", _getRarityStars(data.rarity), "", "")}
+        ${_getFooter("Dungeon Delvers")}
+    </svg>`;
 }
 
 export function generateRelicSVG(data, tokenId) {
     const [primaryColor, accentColor] = ["#1A237E", "#3F51B5"];
-    const svgString = [
-        _getSVGHeader(), _getGlobalStyles(), _getGradientDefs(primaryColor, accentColor),
-        _getBackgroundPattern(primaryColor), _getBorder(data.rarity),
-        _getHeader("Relic", "", tokenId), _getCentralImage("💎"),
-        _getPrimaryStat("CAPACITY", data.capacity.toString()),
-        _getSecondaryStats("RARITY", _getRarityStars(data.rarity), "", ""),
-        _getFooter("Ancient Artifact"), '</svg>'
-    ].join('');
-    return svgString;
+    return `${_getSVGHeader()}
+        ${_getGlobalStyles()}
+        ${_getGradientDefs(primaryColor, accentColor)}
+        ${_getBackgroundPattern(primaryColor)}
+        ${_getBorder(data.rarity)}
+        ${_getHeader("Relic", "", tokenId)}
+        ${_getCentralImage("💎")}
+        ${_getPrimaryStat("CAPACITY", data.capacity.toString())}
+        ${_getSecondaryStats("RARITY", _getRarityStars(data.rarity), "", "")}
+        ${_getFooter("Ancient Artifact")}
+    </svg>`;
 }
 
 const _getPartyStyles = (rarity) => {
@@ -130,16 +134,19 @@ const _getPartyStyles = (rarity) => {
 };
 export function generatePartySVG(data, tokenId) {
     const [primaryColor, accentColor, rarityTierName] = _getPartyStyles(data.partyRarity);
-    const svgString = [
-        _getSVGHeader(), _getGlobalStyles(), _getGradientDefs(primaryColor, accentColor),
-        _getBackgroundPattern(primaryColor), _getBorder(data.partyRarity),
-        _getHeader("Delvers", " PARTY", tokenId), _getCentralImage("🛡️"),
-        _getPrimaryStat("TOTAL POWER", data.totalPower.toString()),
-        _getSecondaryStats(rarityTierName, `${data.heroIds.length} / ${data.totalCapacity} SLOTS`, "", ""),
-        _getFooter("United We Stand"), '</svg>'
-    ].join('');
-    return svgString;
+    return `${_getSVGHeader()}
+        ${_getGlobalStyles()}
+        ${_getGradientDefs(primaryColor, accentColor)}
+        ${_getBackgroundPattern(primaryColor)}
+        ${_getBorder(data.partyRarity)}
+        ${_getHeader("Delvers", " PARTY", tokenId)}
+        ${_getCentralImage("🛡️")}
+        ${_getPrimaryStat("TOTAL POWER", data.totalPower.toString())}
+        ${_getSecondaryStats(rarityTierName, `${data.heroIds.length} / ${data.totalCapacity} SLOTS`, "", "")}
+        ${_getFooter("United We Stand")}
+    </svg>`;
 }
+
 export function generateProfileSVG(data, tokenId) {
     const { level, experience } = data;
     const getExpForNextLevel = (lvl) => (lvl > 0 ? BigInt(lvl) * BigInt(lvl) * 100n : 0n);
@@ -177,9 +184,20 @@ export function generateProfileSVG(data, tokenId) {
         return `<circle cx="200" cy="200" r="${activeRadius}" fill="none" stroke="white" stroke-width="5" stroke-opacity="0.3"/><circle cx="200" cy="200" r="${activeRadius}" fill="none" stroke="url(#progress-gradient)" stroke-width="5" stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}" transform="rotate(-90 200 200)"><animateTransform attributeName="transform" type="rotate" from="-90 200 200" to="270 200 200" dur="10s" repeatCount="indefinite"/></circle>`;
     };
     const _generateTextContent = (_tokenId, _level, currentExpInLevel, expNeededForNext, highlight) => `<g><text x="50%" y="45%" text-anchor="middle" dominant-baseline="middle" class="text level-text" fill="${highlight}">${_level}</text><text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" class="text" style="font-size:16px;opacity:0.8;">LEVEL</text><text x="50%" y="12%" text-anchor="middle" class="text header">PLAYER PROFILE #${_tokenId}</text><text x="50%" y="90%" text-anchor="middle" class="text exp-text">${currentExpInLevel.toString()} / ${expNeededForNext.toString()} EXP</text></g>`;
-    const svgString = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">${_generateSVGDefs(highlightColor, gradientStop2)}<rect width="100%" height="100%" rx="20" fill="${bgColor}"/>${_generateStars()}<g filter="url(#glow)">${_generateArcs(level, highlightColor)}${_generateProgressArc(level, progress)}</g>${_generateTextContent(tokenId, level, experience - expForCurrentLevel, expForNextLevel - expForCurrentLevel, highlightColor)}<rect x="2" y="2" width="396" height="396" rx="18" fill="none" stroke="url(#border-gradient)" stroke-width="4"/></svg>`;
-    return svgString;
+
+    return `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        ${_generateSVGDefs(highlightColor, gradientStop2)}
+        <rect width="100%" height="100%" rx="20" fill="${bgColor}"/>
+        ${_generateStars()}
+        <g filter="url(#glow)">
+            ${_generateArcs(level, highlightColor)}
+            ${_generateProgressArc(level, progress)}
+        </g>
+        ${_generateTextContent(tokenId, level, experience - expForCurrentLevel, expForNextLevel - expForCurrentLevel, highlightColor)}
+        <rect x="2" y="2" width="396" height="396" rx="18" fill="none" stroke="url(#border-gradient)" stroke-width="4"/>
+    </svg>`;
 }
+
 export function generateVipSVG(data, tokenId) {
     const { level, stakedValueUSD } = data;
     const getTierStyles = (_level) => {
@@ -215,6 +233,19 @@ export function generateVipSVG(data, tokenId) {
     const _generateProgressBar = (color) => `<g transform="translate(35, 280)"><rect x="0" y="0" width="330" height="18" rx="9" fill="#374151"/><rect x="0" y="0" width="${progressWidth}" height="18" rx="9" fill="${color}"/><text x="165" y="35" text-anchor="middle" class="progress-text" fill="white">${progressLabel}</text><text x="165" y="50" text-anchor="middle" class="progress-text" fill="#9ca3af" style="font-size: 9px;">(Value of staked $SOUL)</text></g>`;
     const _generateVIPFooter = () => `<text x="35" y="370" class="card-id-plat">CARD #${tokenId}</text><text x="365" y="370" text-anchor="end" class="card-id-plat" font-weight="bold">Dungeon Delvers</text>`;
     const _generateVIPBorders = (color) => `<g stroke="${color}" stroke-width="1.5" opacity="0.3"><path d="M 30 20 L 20 20 L 20 30" fill="none" /><path d="M 370 20 L 380 20 L 380 30" fill="none" /><path d="M 30 380 L 20 380 L 20 370" fill="none" /><path d="M 370 380 L 380 380 L 380 370" fill="none" /></g>`;
-    const svgString = `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">${_generateVIPDefs(highlightColor)}<rect width="100%" height="100%" rx="20" fill="url(#bg-gradient)"/><rect width="100%" height="100%" rx="20" fill="url(#grid-pattern)"/>${_generateVIPStars()}<text x="50%" y="60" text-anchor="middle" class="title-plat">${tierName} VIP PRIVILEGE</text><g text-anchor="middle"><text x="50%" y="190" class="level-plat">${level > 0 ? level : "-"}</text><text x="50%" y="235" class="bonus-plat">SUCCESS RATE +${level}%</text></g>${_generateProgressBar(highlightColor)}${_generateVIPFooter()}${_generateVIPBorders(highlightColor)}</svg>`;
-    return svgString;
+    
+    return `<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        ${_generateVIPDefs(highlightColor)}
+        <rect width="100%" height="100%" rx="20" fill="url(#bg-gradient)"/>
+        <rect width="100%" height="100%" rx="20" fill="url(#grid-pattern)"/>
+        ${_generateVIPStars()}
+        <text x="50%" y="60" text-anchor="middle" class="title-plat">${tierName} VIP PRIVILEGE</text>
+        <g text-anchor="middle">
+            <text x="50%" y="190" class="level-plat">${level > 0 ? level : "-"}</text>
+            <text x="50%" y="235" class="bonus-plat">SUCCESS RATE +${level}%</text>
+        </g>
+        ${_generateProgressBar(highlightColor)}
+        ${_generateVIPFooter()}
+        ${_generateVIPBorders(highlightColor)}
+    </svg>`;
 }
