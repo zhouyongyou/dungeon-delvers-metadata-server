@@ -14,7 +14,13 @@ import {
     generateVipSVG,
     withCache,
     graphClient,
-    logger
+    logger,
+    heroLoader,
+    relicLoader,
+    partyLoader,
+    cacheManager,
+    performanceMetrics,
+    redis
 } from './utils.js';
 import {
     GET_HERO_QUERY,
@@ -108,7 +114,8 @@ app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.hero.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const { hero } = await graphClient.request(GET_HERO_QUERY, { id });
+        // ★ 優化：使用 DataLoader 批量查詢
+        const hero = await heroLoader.load(id);
         
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!hero) throw new Error(`Hero #${tokenId} not found in The Graph`);
@@ -125,7 +132,7 @@ app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
                 { trait_type: "Created At", value: Number(hero.createdAt), display_type: "date" }
             ],
         };
-    });
+    }, 'hero');
     res.json(metadata);
 }));
 
@@ -135,7 +142,8 @@ app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.relic.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const { relic } = await graphClient.request(GET_RELIC_QUERY, { id });
+        // ★ 優化：使用 DataLoader 批量查詢
+        const relic = await relicLoader.load(id);
         
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!relic) throw new Error(`Relic #${tokenId} not found in The Graph`);
@@ -152,7 +160,7 @@ app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
                 { trait_type: "Created At", value: Number(relic.createdAt), display_type: "date" }
             ],
         };
-    });
+    }, 'relic');
     res.json(metadata);
 }));
 
@@ -162,7 +170,8 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.party.toLowerCase()}-${tokenId}`;
     
     const metadata = await withCache(cacheKey, async () => {
-        const { party } = await graphClient.request(GET_PARTY_QUERY, { id });
+        // ★ 優化：使用 DataLoader 批量查詢
+        const party = await partyLoader.load(id);
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!party) throw new Error(`Party #${tokenId} not found in The Graph`);
         
@@ -189,7 +198,7 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
                 { trait_type: "Created At", value: Number(party.createdAt), display_type: "date" }
             ],
         };
-    });
+    }, 'party');
     res.json(metadata);
 }));
 
@@ -255,6 +264,14 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!vip) throw new Error(`VIP data not found in The Graph for owner ${owner}`);
 
+        // ★ 修正：從智能合約讀取實際的 VIP 等級，而不是依賴 GraphQL 數據
+        const vipLevel = await publicClient.readContract({
+            address: contractAddresses.vipStaking,
+            abi: abis.vipStaking,
+            functionName: 'getVipLevel',
+            args: [owner]
+        });
+
         const stakedValueUSD = await publicClient.readContract({
             address: contractAddresses.oracle,
             abi: abis.oracle,
@@ -262,14 +279,14 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
             args: [contractAddresses.soulShard, BigInt(vip.stakedAmount)]
         });
 
-        const svgString = generateVipSVG({ level: vip.level, stakedValueUSD }, BigInt(tokenId));
+        const svgString = generateVipSVG({ level: Number(vipLevel), stakedValueUSD }, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
         return {
             name: `Dungeon Delvers VIP #${tokenId}`,
             description: "A soul-bound VIP card that provides in-game bonuses based on the staked value.",
             image: `data:image/svg+xml;base64,${image_data}`,
             attributes: [
-                { trait_type: "Level", value: vip.level },
+                { trait_type: "Level", value: Number(vipLevel) },
                 { display_type: "number", trait_type: "Staked Value (USD)", value: Number(formatEther(stakedValueUSD)) },
             ],
         };
@@ -277,8 +294,8 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
     res.json(metadata);
 }));
 
-// 健康檢查端點
-app.get('/health', (req, res) => {
+// ★ 優化：增強健康檢查端點
+app.get('/health', async (req, res) => {
   const healthCheck = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -286,14 +303,45 @@ app.get('/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development',
     uptime: process.uptime(),
     memory: process.memoryUsage(),
-    checks: {
-      graphql: 'OK',
-      cache: 'OK'
-    }
+    checks: {}
   };
   
   try {
-    res.status(200).json(healthCheck);
+    // GraphQL 健康檢查
+    try {
+      const testQuery = `query { _meta { block { number } } }`;
+      await graphClient.request(testQuery);
+      healthCheck.checks.graphql = { status: 'OK', responseTime: '< 1s' };
+    } catch (error) {
+      healthCheck.checks.graphql = { status: 'ERROR', error: error.message };
+      healthCheck.status = 'degraded';
+    }
+    
+    // Redis 健康檢查
+    try {
+      const pingResult = await redis.ping();
+      healthCheck.checks.redis = { 
+        status: pingResult === 'PONG' ? 'OK' : 'ERROR',
+        responseTime: '< 100ms'
+      };
+    } catch (error) {
+      healthCheck.checks.redis = { status: 'ERROR', error: error.message };
+      healthCheck.status = 'degraded';
+    }
+    
+    // 快取統計
+    const cacheStats = await cacheManager.getCacheStats();
+    healthCheck.checks.cache = { 
+      status: 'OK', 
+      hitRate: `${performanceMetrics.getCacheHitRate().toFixed(2)}%`,
+      stats: cacheStats
+    };
+    
+    // 性能指標
+    healthCheck.performance = performanceMetrics.getMetrics();
+    
+    const statusCode = healthCheck.status === 'healthy' ? 200 : 503;
+    res.status(statusCode).json(healthCheck);
   } catch (error) {
     healthCheck.status = 'unhealthy';
     healthCheck.error = error.message;
@@ -301,23 +349,84 @@ app.get('/health', (req, res) => {
   }
 });
 
+// ★ 新增：快取管理端點
+app.get('/admin/cache/stats', async (req, res) => {
+  try {
+    const stats = await cacheManager.getCacheStats();
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/admin/cache/clear', async (req, res) => {
+  try {
+    const { pattern = '*' } = req.body;
+    await cacheManager.clearCache(pattern);
+    res.json({ success: true, message: `Cache cleared for pattern: ${pattern}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/admin/cache/preload', async (req, res) => {
+  try {
+    const { tokenIds, type } = req.body;
+    if (!tokenIds || !type) {
+      return res.status(400).json({ error: 'tokenIds and type are required' });
+    }
+    
+    await cacheManager.preloadCache(tokenIds, type);
+    res.json({ 
+      success: true, 
+      message: `Preload initiated for ${tokenIds.length} ${type} tokens` 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ★ 新增：性能指標端點
+app.get('/admin/metrics', (req, res) => {
+  const metrics = performanceMetrics.getMetrics();
+  res.json(metrics);
+});
+
 const server = app.listen(PORT, () => {
   console.log(`Metadata server with cache and The Graph integration listening on port ${PORT}`);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
-  server.close(() => {
-    console.log('Process terminated');
-    process.exit(0);
+// ★ 優化：Graceful shutdown with Redis cleanup
+const gracefulShutdown = async (signal) => {
+  console.log(`${signal} received, shutting down gracefully...`);
+  
+  // 停止接受新連接
+  server.close(async () => {
+    try {
+      // 關閉 Redis 連接
+      await redis.quit();
+      console.log('Redis connection closed');
+      
+      // 清理 DataLoader 緩存
+      heroLoader.clearAll();
+      relicLoader.clearAll();
+      partyLoader.clearAll();
+      console.log('DataLoader cache cleared');
+      
+      console.log('Process terminated gracefully');
+      process.exit(0);
+    } catch (error) {
+      console.error('Error during shutdown:', error);
+      process.exit(1);
+    }
   });
-});
+  
+  // 強制退出超時
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 30000); // 30秒超時
+};
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully...');
-  server.close(() => {
-    console.log('Process terminated');
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
