@@ -3,9 +3,6 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import compression from 'compression';
-import helmet from 'helmet';
 import {
     publicClient,
     contractAddresses,
@@ -19,7 +16,13 @@ import {
     graphClient,
     logger
 } from './utils.js';
-import { gql } from 'graphql-request';
+import {
+    GET_HERO_QUERY,
+    GET_RELIC_QUERY,
+    GET_PARTY_QUERY,
+    GET_PLAYER_PROFILE_QUERY,
+    GET_VIP_QUERY
+} from './queries.js';
 import { formatEther } from 'viem';
 
 const app = express();
@@ -44,29 +47,6 @@ if (missingEnvVars.length > 0) {
   process.exit(1);
 }
 
-// 基本安全設置
-app.use(helmet({
-  contentSecurityPolicy: false, // 允許 SVG 內容
-  crossOriginEmbedderPolicy: false // 允許跨域嵌入
-}));
-
-// 數據壓縮
-app.use(compression());
-
-// 基本 rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 分鐘
-  max: 100, // 每個 IP 最多 100 次請求
-  message: {
-    error: 'Too many requests from this IP, please try again later.',
-    retryAfter: 15 * 60 // 15 分鐘後重試
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use('/api', limiter);
-
 // 性能監控中間件
 const performanceMiddleware = (req, res, next) => {
   const start = Date.now();
@@ -87,34 +67,15 @@ const performanceMiddleware = (req, res, next) => {
 
 app.use(performanceMiddleware);
 
-// 更新 CORS 設置以支持 NFT 市場
-const allowedOrigins = [
-    'https://www.soulshard.fun',
-    'https://opensea.io',
-    'https://marketplace.axieinfinity.com',
-    'https://nft.gamfi.io',
-    'https://element.market',
-    'https://x2y2.io',
-    'https://looksrare.org',
-    'https://www.okx.com',
-    'https://okx.com',
-    'https://nft.okx.com',
-    'https://web3.okx.com',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://localhost:3001'
-];
-
+const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
 const corsOptions = {
     origin: function (origin, callback) {
-        // 允許無來源 (Postman, curl, etc) 或允許的來源
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true,
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -147,8 +108,7 @@ app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.hero.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const query = gql`query GetHero($id: ID!) { hero(id: $id) { rarity power } }`;
-        const { hero } = await graphClient.request(query, { id });
+        const { hero } = await graphClient.request(GET_HERO_QUERY, { id });
         
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!hero) throw new Error(`Hero #${tokenId} not found in The Graph`);
@@ -159,7 +119,11 @@ app.get('/api/hero/:tokenId', handleRequest(async (req, res) => {
             name: `Dungeon Delvers Hero #${tokenId}`,
             description: "A brave hero from the world of Dungeon Delvers, ready for adventure.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [ { trait_type: "Rarity", value: hero.rarity }, { trait_type: "Power", value: Number(hero.power) } ],
+            attributes: [ 
+                { trait_type: "Rarity", value: hero.rarity }, 
+                { trait_type: "Power", value: Number(hero.power) },
+                { trait_type: "Created At", value: Number(hero.createdAt), display_type: "date" }
+            ],
         };
     });
     res.json(metadata);
@@ -171,8 +135,7 @@ app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.relic.toLowerCase()}-${tokenId}`;
 
     const metadata = await withCache(cacheKey, async () => {
-        const query = gql`query GetRelic($id: ID!) { relic(id: $id) { rarity capacity } }`;
-        const { relic } = await graphClient.request(query, { id });
+        const { relic } = await graphClient.request(GET_RELIC_QUERY, { id });
         
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!relic) throw new Error(`Relic #${tokenId} not found in The Graph`);
@@ -183,7 +146,11 @@ app.get('/api/relic/:tokenId', handleRequest(async (req, res) => {
             name: `Dungeon Delvers Relic #${tokenId}`,
             description: "An ancient relic imbued with mysterious powers.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [ { trait_type: "Rarity", value: relic.rarity }, { trait_type: "Capacity", value: relic.capacity } ],
+            attributes: [ 
+                { trait_type: "Rarity", value: relic.rarity }, 
+                { trait_type: "Capacity", value: relic.capacity },
+                { trait_type: "Created At", value: Number(relic.createdAt), display_type: "date" }
+            ],
         };
     });
     res.json(metadata);
@@ -195,19 +162,32 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
     const id = `${contractAddresses.party.toLowerCase()}-${tokenId}`;
     
     const metadata = await withCache(cacheKey, async () => {
-        const query = gql`query GetParty($id: ID!) { party(id: $id) { totalPower totalCapacity partyRarity heroes { id } } }`;
-        const { party } = await graphClient.request(query, { id });
+        const { party } = await graphClient.request(GET_PARTY_QUERY, { id });
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
         if (!party) throw new Error(`Party #${tokenId} not found in The Graph`);
         
-        const partyData = { ...party, heroIds: party.heroes, totalPower: BigInt(party.totalPower), totalCapacity: BigInt(party.totalCapacity) };
+        const partyData = { 
+            ...party, 
+            heroIds: party.heroes, 
+            totalPower: BigInt(party.totalPower), 
+            totalCapacity: BigInt(party.totalCapacity) 
+        };
         const svgString = generatePartySVG(partyData, BigInt(tokenId));
         const image_data = Buffer.from(svgString).toString('base64');
         return {
             name: `Dungeon Delvers Party #${tokenId}`,
             description: "A brave party of delvers, united for a common goal.",
             image: `data:image/svg+xml;base64,${image_data}`,
-            attributes: [ { trait_type: "Total Power", value: Number(party.totalPower) }, { trait_type: "Total Capacity", value: Number(party.totalCapacity) }, { trait_type: "Party Rarity", value: party.partyRarity } ],
+            attributes: [ 
+                { trait_type: "Total Power", value: Number(party.totalPower) }, 
+                { trait_type: "Total Capacity", value: Number(party.totalCapacity) }, 
+                { trait_type: "Party Rarity", value: party.partyRarity },
+                { trait_type: "Heroes Count", value: party.heroes.length },
+                { trait_type: "Relics Count", value: party.relics.length },
+                { trait_type: "Fatigue Level", value: party.fatigueLevel },
+                { trait_type: "Provisions Remaining", value: party.provisionsRemaining },
+                { trait_type: "Created At", value: Number(party.createdAt), display_type: "date" }
+            ],
         };
     });
     res.json(metadata);
@@ -232,16 +212,7 @@ app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
             throw new Error(`PlayerProfile #${tokenId} not found or has no owner.`);
         });
 
-        const query = gql`
-            query GetProfile($id: Bytes!) {
-                player(id: $id) {
-                    profile {
-                        experience
-                        level
-                    }
-                }
-            }`;
-        const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
+        const { player } = await graphClient.request(GET_PLAYER_PROFILE_QUERY, { playerId: owner.toLowerCase() });
         const profile = player?.profile;
         
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
@@ -278,16 +249,7 @@ app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
             throw new Error(`VIPStaking NFT #${tokenId} not found or has no owner.`);
         });
 
-        const query = gql`
-            query GetVip($id: Bytes!) {
-                player(id: $id) {
-                    vip {
-                        level
-                        stakedAmount
-                    }
-                }
-            }`;
-        const { player } = await graphClient.request(query, { id: owner.toLowerCase() });
+        const { player } = await graphClient.request(GET_VIP_QUERY, { playerId: owner.toLowerCase() });
         const vip = player?.vip;
 
         // ★ 優化：如果 The Graph 找不到資料，拋出特定錯誤
