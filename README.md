@@ -49,8 +49,9 @@
 
 伺服器提供以下端點來獲取各類 NFT 的元數據：
 
--   `GET /api/hero/:tokenId`
--   `GET /api/relic/:tokenId`
--   `GET /api/party/:tokenId`
--   `GET /api/profile/:tokenId`
--   `GET /api/vip/:tokenId`
+-   `GET /api/hero/:tokenId` - 獲取英雄NFT元數據
+-   `GET /api/relic/:tokenId` - 獲取聖物NFT元數據
+-   `GET /api/party/:tokenId` - 獲取隊伍NFT元數據
+-   `GET /api/profile/:tokenId` - 獲取玩家資料NFT元數據（對應 PlayerProfile 合約）
+-   `GET /api/vip/:tokenId` - 獲取VIP卡NFT元數據（對應 VipStaking 合約）
+-   `GET /health` - 伺服器健康檢查
