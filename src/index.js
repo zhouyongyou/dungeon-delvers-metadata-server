@@ -67,7 +67,7 @@ const performanceMiddleware = (req, res, next) => {
 
 app.use(performanceMiddleware);
 
-const allowedOrigins = ['https://www.soulshard.fun', 'http://localhost:5173'];
+const allowedOrigins = ['https://www.dungeondelvers.xyz', 'http://localhost:5173'];
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
