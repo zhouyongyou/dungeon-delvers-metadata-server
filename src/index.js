@@ -196,8 +196,8 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
 
 // --- Profile 和 VIP 端點 (已修正路由) ---
 
-// ★ 核心修正：將路由從 /api/profile/ 改為 /api/playerprofile/
-app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
+// ★ 核心修正：修復Profile路由以符合文檔
+app.get('/api/profile/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `profile-${tokenId}`;
 
@@ -233,8 +233,8 @@ app.get('/api/playerprofile/:tokenId', handleRequest(async (req, res) => {
     res.json(metadata);
 }));
 
-// ★ 核心修正：將路由從 /api/vip/ 改為 /api/vipstaking/
-app.get('/api/vipstaking/:tokenId', handleRequest(async (req, res) => {
+// ★ 核心修正：修復VIP路由以符合文檔
+app.get('/api/vip/:tokenId', handleRequest(async (req, res) => {
     const { tokenId } = req.params;
     const cacheKey = `vip-${tokenId}`;
 
