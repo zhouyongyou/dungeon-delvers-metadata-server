@@ -27,7 +27,7 @@ export const publicClient = createPublicClient({
 });
 
 // ★ 新增：The Graph 客戶端 (帶重試機制)
-const THE_GRAPH_API_URL = process.env.VITE_THE_GRAPH_STUDIO_API_URL;
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || process.env.VITE_THE_GRAPH_STUDIO_API_URL;
 const baseGraphClient = new GraphQLClient(THE_GRAPH_API_URL);
 
 // ★ 新增：Redis 客戶端配置
