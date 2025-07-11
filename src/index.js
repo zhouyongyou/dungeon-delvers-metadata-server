@@ -1,9 +1,9 @@
-// index.js (API 路由修正版)
+// index.js (靜態 JSON 讀取版)
 
 const express = require('express');
 const cors = require('cors');
-const { gql } = require('graphql-request');
-const { GraphQLClient } = require('graphql-request');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,111 +12,117 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// 簡化的 GraphQL 客戶端
-const graphqlClient = new GraphQLClient(process.env.VITE_THE_GRAPH_STUDIO_API_URL || 'https://api.studio.thegraph.com/query/your-subgraph-url');
+// JSON 文件路徑配置
+const JSON_BASE_PATH = path.join(__dirname, '../../api');
 
-// 簡化的查詢
-const HERO_QUERY = gql`
-  query GetHero($id: ID!) {
-    hero(id: $id) {
-      id
-      owner
-      power
-      rarity
-      createdAt
-    }
+// 讀取 JSON 文件的工具函數
+function readJSONFile(filePath) {
+  try {
+    const data = fs.readFileSync(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Error reading JSON file ${filePath}:`, error);
+    return null;
   }
-`;
+}
 
-const RELIC_QUERY = gql`
-  query GetRelic($id: ID!) {
-    relic(id: $id) {
-      id
-      owner
-      capacity
-      rarity
-      createdAt
+// 獲取 fallback metadata 的函數
+function getFallbackMetadata(type, tokenId) {
+  const fallbacks = {
+    hero: {
+      name: `Hero #${tokenId}`,
+      description: `A powerful hero ready for adventure`,
+      image: `https://www.dungeondelvers.xyz/images/hero/hero-${((parseInt(tokenId) - 1) % 5) + 1}.png`,
+      attributes: [
+        { trait_type: 'Rarity', value: 'Common' },
+        { trait_type: 'Power', value: 25 },
+        { trait_type: 'Token ID', value: parseInt(tokenId) }
+      ]
+    },
+    relic: {
+      name: `Relic #${tokenId}`,
+      description: `A mystical relic with magical properties`,
+      image: `https://www.dungeondelvers.xyz/images/relic/relic-${((parseInt(tokenId) - 1) % 5) + 1}.png`,
+      attributes: [
+        { trait_type: 'Rarity', value: 'Common' },
+        { trait_type: 'Capacity', value: 1 },
+        { trait_type: 'Token ID', value: parseInt(tokenId) }
+      ]
+    },
+    party: {
+      name: `Party #${tokenId}`,
+      description: `An adventuring party ready for dungeons`,
+      image: `https://www.dungeondelvers.xyz/images/party/party.png`,
+      attributes: [
+        { trait_type: 'Category', value: 'Party' },
+        { trait_type: 'Token ID', value: parseInt(tokenId) }
+      ]
+    },
+    vip: {
+      name: `VIP Membership #${tokenId}`,
+      description: `A VIP membership NFT with special privileges`,
+      image: `https://www.dungeondelvers.xyz/assets/images/collections/vip-logo.png`,
+      attributes: [
+        { trait_type: 'Category', value: 'VIP' },
+        { trait_type: 'Token ID', value: parseInt(tokenId) }
+      ]
+    },
+    profile: {
+      name: `Player Profile #${tokenId}`,
+      description: `A player profile tracking achievements`,
+      image: `https://www.dungeondelvers.xyz/assets/images/collections/profile-logo.png`,
+      attributes: [
+        { trait_type: 'Category', value: 'Profile' },
+        { trait_type: 'Token ID', value: parseInt(tokenId) }
+      ]
     }
-  }
-`;
+  };
 
-const PARTY_QUERY = gql`
-  query GetParty($id: ID!) {
-    party(id: $id) {
-      id
-      owner
-      totalPower
-      totalCapacity
-      partyRarity
-      heros {
-        id
-        power
-        rarity
-      }
-      relics {
-        id
-        capacity
-        rarity
-      }
-    }
-  }
-`;
+  return fallbacks[type] || {
+    name: `Unknown NFT #${tokenId}`,
+    description: `An unknown NFT`,
+    image: `https://www.dungeondelvers.xyz/assets/images/collections/hero-logo.png`,
+    attributes: [{ trait_type: 'Token ID', value: parseInt(tokenId) }]
+  };
+}
 
 // 簡化的健康檢查
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    service: 'dungeon-delvers-metadata-server'
+    service: 'dungeon-delvers-metadata-server',
+    version: '2.0.0-static'
   });
 });
 
-// 簡化的 Hero Metadata
+// Hero Metadata - 直接讀取 JSON
 app.get('/api/hero/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x2cf5429ddbd2df730a6668b50200233c76c1116f-${tokenId}`;
+    const heroId = ((parseInt(tokenId) - 1) % 5) + 1; // 映射到 1-5
+    const jsonPath = path.join(JSON_BASE_PATH, 'hero', `${heroId}.json`);
     
-    let data;
-    try {
-      data = await graphqlClient.request(HERO_QUERY, { id: graphqlId });
-    } catch (graphqlError) {
-      console.warn(`GraphQL query failed for hero ${tokenId}, using fallback data:`, graphqlError.message);
-      // 使用 fallback 數據
-      data = { hero: null };
-    }
+    let metadata = readJSONFile(jsonPath);
     
-    if (!data.hero) {
-      // 返回靜態 metadata
-      const heroId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
-      const rarity = Math.min(Math.ceil(parseInt(tokenId) / 20), 5); // 根據 tokenId 計算稀有度
-      const power = [0, 32, 75, 125, 175, 227][rarity] || 100;
+    if (!metadata) {
+      console.warn(`Hero JSON not found for tokenId ${tokenId}, using fallback`);
+      metadata = getFallbackMetadata('hero', tokenId);
+    } else {
+      // 更新 token ID 相關信息
+      metadata.name = `${metadata.name} #${tokenId}`;
+      metadata.attributes = metadata.attributes.map(attr => {
+        if (attr.trait_type === 'Token ID') {
+          return { ...attr, value: parseInt(tokenId) };
+        }
+        return attr;
+      });
       
-      const metadata = {
-        name: `Hero #${tokenId}`,
-        description: `A powerful hero with ${power} power and rarity ${rarity}`,
-        image: `https://dungeondelvers.xyz/images/hero/hero-${heroId}.png`,
-        attributes: [
-          { trait_type: 'Power', value: power },
-          { trait_type: 'Rarity', value: rarity },
-          { trait_type: 'Token ID', value: parseInt(tokenId) }
-        ]
-      };
-
-      return res.json(metadata);
+      // 如果沒有 Token ID 屬性，添加一個
+      if (!metadata.attributes.find(attr => attr.trait_type === 'Token ID')) {
+        metadata.attributes.push({ trait_type: 'Token ID', value: parseInt(tokenId) });
+      }
     }
-
-    const heroId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
-    const metadata = {
-      name: `Hero #${tokenId}`,
-      description: `A powerful hero with ${data.hero.power} power and rarity ${data.hero.rarity}`,
-      image: `https://dungeondelvers.xyz/images/hero/hero-${heroId}.png`,
-      attributes: [
-        { trait_type: 'Power', value: data.hero.power },
-        { trait_type: 'Rarity', value: data.hero.rarity },
-        { trait_type: 'Created At', value: new Date(data.hero.createdAt * 1000).toISOString() }
-      ]
-    };
 
     res.json(metadata);
   } catch (error) {
@@ -125,51 +131,33 @@ app.get('/api/hero/:tokenId', async (req, res) => {
   }
 });
 
-// 簡化的 Relic Metadata
+// Relic Metadata - 直接讀取 JSON
 app.get('/api/relic/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x548ea33d0dec74bbe9a3f0d1b5e4c660bf59e5a5-${tokenId}`;
+    const relicId = ((parseInt(tokenId) - 1) % 5) + 1; // 映射到 1-5
+    const jsonPath = path.join(JSON_BASE_PATH, 'relic', `${relicId}.json`);
     
-    let data;
-    try {
-      data = await graphqlClient.request(RELIC_QUERY, { id: graphqlId });
-    } catch (graphqlError) {
-      console.warn(`GraphQL query failed for relic ${tokenId}, using fallback data:`, graphqlError.message);
-      data = { relic: null };
-    }
+    let metadata = readJSONFile(jsonPath);
     
-    if (!data.relic) {
-      // 返回靜態 metadata
-      const relicId = (parseInt(tokenId) % 5) + 1;
-      const rarity = Math.min(Math.ceil(parseInt(tokenId) / 20), 5);
-      const capacity = rarity;
+    if (!metadata) {
+      console.warn(`Relic JSON not found for tokenId ${tokenId}, using fallback`);
+      metadata = getFallbackMetadata('relic', tokenId);
+    } else {
+      // 更新 token ID 相關信息
+      metadata.name = `${metadata.name} #${tokenId}`;
+      metadata.attributes = metadata.attributes.map(attr => {
+        if (attr.trait_type === 'Token ID') {
+          return { ...attr, value: parseInt(tokenId) };
+        }
+        return attr;
+      });
       
-      const metadata = {
-        name: `Relic #${tokenId}`,
-        description: `A mystical relic with ${capacity} capacity and rarity ${rarity}`,
-        image: `https://dungeondelvers.xyz/images/relic/relic-${relicId}.png`,
-        attributes: [
-          { trait_type: 'Capacity', value: capacity },
-          { trait_type: 'Rarity', value: rarity },
-          { trait_type: 'Token ID', value: parseInt(tokenId) }
-        ]
-      };
-
-      return res.json(metadata);
+      // 如果沒有 Token ID 屬性，添加一個
+      if (!metadata.attributes.find(attr => attr.trait_type === 'Token ID')) {
+        metadata.attributes.push({ trait_type: 'Token ID', value: parseInt(tokenId) });
+      }
     }
-
-    const relicId = (parseInt(tokenId) % 5) + 1;
-    const metadata = {
-      name: `Relic #${tokenId}`,
-      description: `A mystical relic with ${data.relic.capacity} capacity and rarity ${data.relic.rarity}`,
-      image: `https://dungeondelvers.xyz/images/relic/relic-${relicId}.png`,
-      attributes: [
-        { trait_type: 'Capacity', value: data.relic.capacity },
-        { trait_type: 'Rarity', value: data.relic.rarity },
-        { trait_type: 'Created At', value: new Date(data.relic.createdAt * 1000).toISOString() }
-      ]
-    };
 
     res.json(metadata);
   } catch (error) {
@@ -178,30 +166,32 @@ app.get('/api/relic/:tokenId', async (req, res) => {
   }
 });
 
-// 簡化的 Party Metadata
+// Party Metadata - 直接讀取 JSON
 app.get('/api/party/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x78dba7671753191ffeebeed702aab4f2816d70d-${tokenId}`;
+    const jsonPath = path.join(JSON_BASE_PATH, 'party', 'party.json');
     
-    const data = await graphqlClient.request(PARTY_QUERY, { id: graphqlId });
+    let metadata = readJSONFile(jsonPath);
     
-    if (!data.party) {
-      return res.status(404).json({ error: 'Party not found' });
+    if (!metadata) {
+      console.warn(`Party JSON not found for tokenId ${tokenId}, using fallback`);
+      metadata = getFallbackMetadata('party', tokenId);
+    } else {
+      // 更新 token ID 相關信息
+      metadata.name = `${metadata.name} #${tokenId}`;
+      metadata.attributes = metadata.attributes.map(attr => {
+        if (attr.trait_type === 'Token ID') {
+          return { ...attr, value: parseInt(tokenId) };
+        }
+        return attr;
+      });
+      
+      // 如果沒有 Token ID 屬性，添加一個
+      if (!metadata.attributes.find(attr => attr.trait_type === 'Token ID')) {
+        metadata.attributes.push({ trait_type: 'Token ID', value: parseInt(tokenId) });
+      }
     }
-
-    const metadata = {
-      name: `Party #${tokenId}`,
-      description: `A legendary party with ${data.party.totalPower} total power and ${data.party.totalCapacity} capacity`,
-      image: `https://dungeondelvers.xyz/images/party/party.png`,
-      attributes: [
-        { trait_type: 'Total Power', value: data.party.totalPower },
-        { trait_type: 'Total Capacity', value: data.party.totalCapacity },
-        { trait_type: 'Party Rarity', value: data.party.partyRarity },
-        { trait_type: 'Heroes Count', value: data.party.heros?.length || 0 },
-        { trait_type: 'Relics Count', value: data.party.relics?.length || 0 }
-      ]
-    };
 
     res.json(metadata);
   } catch (error) {
@@ -210,20 +200,32 @@ app.get('/api/party/:tokenId', async (req, res) => {
   }
 });
 
-// 簡化的 VIP Metadata
+// VIP Metadata - 直接讀取 JSON
 app.get('/api/vipstaking/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
+    const jsonPath = path.join(JSON_BASE_PATH, 'vip', 'vip.json');
     
-    const metadata = {
-      name: `VIP Card #${tokenId}`,
-      description: `An exclusive VIP membership card`,
-      image: `https://dungeondelvers.xyz/images/vip-placeholder.png`,
-      attributes: [
-        { trait_type: 'VIP Level', value: 1 },
-        { trait_type: 'Token ID', value: parseInt(tokenId) }
-      ]
-    };
+    let metadata = readJSONFile(jsonPath);
+    
+    if (!metadata) {
+      console.warn(`VIP JSON not found for tokenId ${tokenId}, using fallback`);
+      metadata = getFallbackMetadata('vip', tokenId);
+    } else {
+      // 更新 token ID 相關信息
+      metadata.name = `${metadata.name} #${tokenId}`;
+      metadata.attributes = metadata.attributes.map(attr => {
+        if (attr.trait_type === 'Token ID') {
+          return { ...attr, value: parseInt(tokenId) };
+        }
+        return attr;
+      });
+      
+      // 如果沒有 Token ID 屬性，添加一個
+      if (!metadata.attributes.find(attr => attr.trait_type === 'Token ID')) {
+        metadata.attributes.push({ trait_type: 'Token ID', value: parseInt(tokenId) });
+      }
+    }
 
     res.json(metadata);
   } catch (error) {
@@ -232,20 +234,32 @@ app.get('/api/vipstaking/:tokenId', async (req, res) => {
   }
 });
 
-// 簡化的 Player Profile Metadata
+// Player Profile Metadata - 直接讀取 JSON
 app.get('/api/playerprofile/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
+    const jsonPath = path.join(JSON_BASE_PATH, 'profile', 'profile.json');
     
-    const metadata = {
-      name: `Player Profile #${tokenId}`,
-      description: `A player's achievement profile`,
-      image: `https://dungeondelvers.xyz/assets/images/collections/profile-logo.png`,
-      attributes: [
-        { trait_type: 'Level', value: 1 },
-        { trait_type: 'Experience', value: 0 }
-      ]
-    };
+    let metadata = readJSONFile(jsonPath);
+    
+    if (!metadata) {
+      console.warn(`Profile JSON not found for tokenId ${tokenId}, using fallback`);
+      metadata = getFallbackMetadata('profile', tokenId);
+    } else {
+      // 更新 token ID 相關信息
+      metadata.name = `${metadata.name} #${tokenId}`;
+      metadata.attributes = metadata.attributes.map(attr => {
+        if (attr.trait_type === 'Token ID') {
+          return { ...attr, value: parseInt(tokenId) };
+        }
+        return attr;
+      });
+      
+      // 如果沒有 Token ID 屬性，添加一個
+      if (!metadata.attributes.find(attr => attr.trait_type === 'Token ID')) {
+        metadata.attributes.push({ trait_type: 'Token ID', value: parseInt(tokenId) });
+      }
+    }
 
     res.json(metadata);
   } catch (error) {
@@ -254,6 +268,44 @@ app.get('/api/playerprofile/:tokenId', async (req, res) => {
   }
 });
 
+// 集合級別的 metadata
+app.get('/api/collection/:contractName', async (req, res) => {
+  try {
+    const { contractName } = req.params;
+    const collectionPath = path.join(__dirname, '../../public/metadata', `${contractName}-collection.json`);
+    
+    let metadata = readJSONFile(collectionPath);
+    
+    if (!metadata) {
+      return res.status(404).json({ error: 'Collection metadata not found' });
+    }
+
+    res.json(metadata);
+  } catch (error) {
+    console.error('Collection metadata error:', error);
+    res.status(500).json({ error: 'Failed to fetch collection metadata' });
+  }
+});
+
+// 根路徑
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Dungeon Delvers Metadata Server',
+    version: '2.0.0-static',
+    description: 'Static JSON-based metadata server for Dungeon Delvers NFTs',
+    endpoints: [
+      '/api/hero/:tokenId',
+      '/api/relic/:tokenId',
+      '/api/party/:tokenId',
+      '/api/vipstaking/:tokenId',
+      '/api/playerprofile/:tokenId',
+      '/api/collection/:contractName',
+      '/health'
+    ]
+  });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Simplified Metadata Server running on port ${PORT}`);
+  console.log(`🚀 Static Metadata Server running on port ${PORT}`);
+  console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
 });
