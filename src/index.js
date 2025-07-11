@@ -34,12 +34,12 @@ function readJSONFile(filePath) {
 }
 
 // 獲取 fallback metadata 的函數
-function getFallbackMetadata(type, tokenId) {
+function getFallbackMetadata(type, tokenId, rarity = 1) {
   const fallbacks = {
     hero: {
       name: `Hero #${tokenId}`,
       description: `A powerful hero ready for adventure`,
-      image: `https://www.dungeondelvers.xyz/images/hero/hero-${((parseInt(tokenId) - 1) % 5) + 1}.png`,
+      image: `https://www.dungeondelvers.xyz/images/hero/hero-${Math.max(1, Math.min(5, rarity))}.png`,
       attributes: [
         { trait_type: 'Rarity', value: 'Common' },
         { trait_type: 'Power', value: 25 },
@@ -49,7 +49,7 @@ function getFallbackMetadata(type, tokenId) {
     relic: {
       name: `Relic #${tokenId}`,
       description: `A mystical relic with magical properties`,
-      image: `https://www.dungeondelvers.xyz/images/relic/relic-${((parseInt(tokenId) - 1) % 5) + 1}.png`,
+      image: `https://www.dungeondelvers.xyz/images/relic/relic-${Math.max(1, Math.min(5, rarity))}.png`,
       attributes: [
         { trait_type: 'Rarity', value: 'Common' },
         { trait_type: 'Capacity', value: 1 },
@@ -103,18 +103,48 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Hero Metadata - 直接讀取 JSON
+// Hero Metadata - 根據稀有度選擇圖片
 app.get('/api/hero/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const heroId = ((parseInt(tokenId) - 1) % 5) + 1; // 映射到 1-5
+    
+    // 從子圖獲取稀有度信息
+    let rarity = 1; // 默認稀有度
+    try {
+      const graphqlResponse = await fetch(process.env.THE_GRAPH_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
+            query GetHeroRarity($tokenId: String!) {
+              hero(id: $tokenId) {
+                rarity
+              }
+            }
+          `,
+          variables: { tokenId: tokenId }
+        })
+      });
+      
+      if (graphqlResponse.ok) {
+        const { data } = await graphqlResponse.json();
+        if (data?.hero?.rarity) {
+          rarity = parseInt(data.hero.rarity);
+        }
+      }
+    } catch (error) {
+      console.warn(`無法從子圖獲取英雄稀有度，使用默認值: ${error.message}`);
+    }
+    
+    // 根據稀有度選擇圖片 (1-5)
+    const heroId = Math.max(1, Math.min(5, rarity));
     const jsonPath = path.join(JSON_BASE_PATH, 'hero', `${heroId}.json`);
     
     let metadata = readJSONFile(jsonPath);
     
     if (!metadata) {
-      console.warn(`Hero JSON not found for tokenId ${tokenId}, using fallback`);
-      metadata = getFallbackMetadata('hero', tokenId);
+      console.warn(`Hero JSON not found for rarity ${heroId}, using fallback`);
+      metadata = getFallbackMetadata('hero', tokenId, rarity);
     } else {
       // 更新 token ID 相關信息
       metadata.name = `${metadata.name} #${tokenId}`;
@@ -138,18 +168,48 @@ app.get('/api/hero/:tokenId', async (req, res) => {
   }
 });
 
-// Relic Metadata - 直接讀取 JSON
+// Relic Metadata - 根據稀有度選擇圖片
 app.get('/api/relic/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const relicId = ((parseInt(tokenId) - 1) % 5) + 1; // 映射到 1-5
+    
+    // 從子圖獲取稀有度信息
+    let rarity = 1; // 默認稀有度
+    try {
+      const graphqlResponse = await fetch(process.env.THE_GRAPH_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
+            query GetRelicRarity($tokenId: String!) {
+              relic(id: $tokenId) {
+                rarity
+              }
+            }
+          `,
+          variables: { tokenId: tokenId }
+        })
+      });
+      
+      if (graphqlResponse.ok) {
+        const { data } = await graphqlResponse.json();
+        if (data?.relic?.rarity) {
+          rarity = parseInt(data.relic.rarity);
+        }
+      }
+    } catch (error) {
+      console.warn(`無法從子圖獲取聖物稀有度，使用默認值: ${error.message}`);
+    }
+    
+    // 根據稀有度選擇圖片 (1-5)
+    const relicId = Math.max(1, Math.min(5, rarity));
     const jsonPath = path.join(JSON_BASE_PATH, 'relic', `${relicId}.json`);
     
     let metadata = readJSONFile(jsonPath);
     
     if (!metadata) {
-      console.warn(`Relic JSON not found for tokenId ${tokenId}, using fallback`);
-      metadata = getFallbackMetadata('relic', tokenId);
+      console.warn(`Relic JSON not found for rarity ${relicId}, using fallback`);
+      metadata = getFallbackMetadata('relic', tokenId, rarity);
     } else {
       // 更新 token ID 相關信息
       metadata.name = `${metadata.name} #${tokenId}`;
