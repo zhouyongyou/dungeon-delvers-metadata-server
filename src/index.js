@@ -12,8 +12,15 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// JSON 文件路徑配置
-const JSON_BASE_PATH = path.join(__dirname, '../../../api');
+// 開發環境下提供靜態文件服務（可選）
+if (process.env.NODE_ENV === 'development') {
+  console.log('🔧 Development mode: Serving static files locally');
+  app.use('/images', express.static(path.join(__dirname, '../../public/images')));
+  app.use('/assets', express.static(path.join(__dirname, '../../public/assets')));
+}
+
+// JSON 文件路徑配置 - 使用相對路徑
+const JSON_BASE_PATH = path.join(__dirname, '../../api');
 
 // 讀取 JSON 文件的工具函數
 function readJSONFile(filePath) {
@@ -306,6 +313,16 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Static Metadata Server running on port ${PORT}`);
+  console.log(`🚀 Metadata Server running on port ${PORT}`);
   console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
+  console.log(`🌐 Using full HTTPS URLs for images: https://www.dungeondelvers.xyz/images/`);
+  
+  // 調試路徑解析
+  console.log(`🔍 Current working directory: ${process.cwd()}`);
+  console.log(`🔍 __dirname: ${__dirname}`);
+  console.log(`🔍 Resolved JSON path: ${path.resolve(JSON_BASE_PATH)}`);
+  
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🔧 Development mode: Local static files available at /images and /assets`);
+  }
 });
