@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // JSON 文件路徑配置
-const JSON_BASE_PATH = path.join(__dirname, '../../api');
+const JSON_BASE_PATH = path.join(__dirname, '../../../api');
 
 // 讀取 JSON 文件的工具函數
 function readJSONFile(filePath) {
