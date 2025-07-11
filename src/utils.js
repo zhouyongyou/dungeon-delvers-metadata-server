@@ -173,7 +173,7 @@ const createDataLoader = (queryFn, keyField = 'id') => {
 const batchHeroQuery = async (ids) => {
   const query = gql`
     query GetHeroes($ids: [ID!]!) {
-      heroes(where: { id_in: $ids }) {
+      heros(where: { id_in: $ids }) {
         id
         tokenId
         power
@@ -184,8 +184,8 @@ const batchHeroQuery = async (ids) => {
       }
     }
   `;
-  const { heroes } = await graphClient.request(query, { ids });
-  return heroes;
+  const { heros } = await graphClient.request(query, { ids });
+  return heros;
 };
 
 const batchRelicQuery = async (ids) => {
