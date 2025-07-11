@@ -177,7 +177,7 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
         
         const partyData = { 
             ...party, 
-            heroIds: party.heroes, 
+            heroIds: party.heros, 
             totalPower: BigInt(party.totalPower), 
             totalCapacity: BigInt(party.totalCapacity) 
         };
@@ -191,7 +191,7 @@ app.get('/api/party/:tokenId', handleRequest(async (req, res) => {
                 { trait_type: "Total Power", value: Number(party.totalPower) }, 
                 { trait_type: "Total Capacity", value: Number(party.totalCapacity) }, 
                 { trait_type: "Party Rarity", value: party.partyRarity },
-                { trait_type: "Heroes Count", value: party.heroes.length },
+                { trait_type: "Heroes Count", value: party.heros.length },
                 { trait_type: "Relics Count", value: party.relics.length },
                 { trait_type: "Fatigue Level", value: party.fatigueLevel },
                 { trait_type: "Provisions Remaining", value: party.provisionsRemaining },

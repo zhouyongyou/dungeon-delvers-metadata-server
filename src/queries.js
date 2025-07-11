@@ -45,7 +45,7 @@ export const GET_PARTY_QUERY = gql`
       totalCapacity
       partyRarity
       contractAddress
-      heroes {
+      heros {
         tokenId
         power
         rarity
@@ -100,7 +100,7 @@ export const GET_PLAYER_ASSETS_QUERY = gql`
   query GetPlayerAssets($owner: ID!) {
     player(id: $owner) {
       id
-      heroes { 
+      heros { 
         id 
         tokenId 
         power 
@@ -123,7 +123,7 @@ export const GET_PLAYER_ASSETS_QUERY = gql`
         totalCapacity
         partyRarity
         contractAddress
-        heroes { tokenId }
+        heros { tokenId }
         relics { tokenId }
         fatigueLevel
         provisionsRemaining
