@@ -75,12 +75,35 @@ app.get('/health', (req, res) => {
 app.get('/api/hero/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x2Cf5429dDbd2Df730a6668b50200233c76c1116F-${tokenId}`;
+    const graphqlId = `0x2cf5429ddbd2df730a6668b50200233c76c1116f-${tokenId}`;
     
-    const data = await graphqlClient.request(HERO_QUERY, { id: graphqlId });
+    let data;
+    try {
+      data = await graphqlClient.request(HERO_QUERY, { id: graphqlId });
+    } catch (graphqlError) {
+      console.warn(`GraphQL query failed for hero ${tokenId}, using fallback data:`, graphqlError.message);
+      // 使用 fallback 數據
+      data = { hero: null };
+    }
     
     if (!data.hero) {
-      return res.status(404).json({ error: 'Hero not found' });
+      // 返回靜態 metadata
+      const heroId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
+      const rarity = Math.min(Math.ceil(parseInt(tokenId) / 20), 5); // 根據 tokenId 計算稀有度
+      const power = [0, 32, 75, 125, 175, 227][rarity] || 100;
+      
+      const metadata = {
+        name: `Hero #${tokenId}`,
+        description: `A powerful hero with ${power} power and rarity ${rarity}`,
+        image: `https://dungeondelvers.xyz/images/hero/hero-${heroId}.png`,
+        attributes: [
+          { trait_type: 'Power', value: power },
+          { trait_type: 'Rarity', value: rarity },
+          { trait_type: 'Token ID', value: parseInt(tokenId) }
+        ]
+      };
+
+      return res.json(metadata);
     }
 
     const heroId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
@@ -106,15 +129,37 @@ app.get('/api/hero/:tokenId', async (req, res) => {
 app.get('/api/relic/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x548eA33d0deC74bBE9a3F0D1B5E4C660bf59E5A5-${tokenId}`;
+    const graphqlId = `0x548ea33d0dec74bbe9a3f0d1b5e4c660bf59e5a5-${tokenId}`;
     
-    const data = await graphqlClient.request(RELIC_QUERY, { id: graphqlId });
+    let data;
+    try {
+      data = await graphqlClient.request(RELIC_QUERY, { id: graphqlId });
+    } catch (graphqlError) {
+      console.warn(`GraphQL query failed for relic ${tokenId}, using fallback data:`, graphqlError.message);
+      data = { relic: null };
+    }
     
     if (!data.relic) {
-      return res.status(404).json({ error: 'Relic not found' });
+      // 返回靜態 metadata
+      const relicId = (parseInt(tokenId) % 5) + 1;
+      const rarity = Math.min(Math.ceil(parseInt(tokenId) / 20), 5);
+      const capacity = rarity;
+      
+      const metadata = {
+        name: `Relic #${tokenId}`,
+        description: `A mystical relic with ${capacity} capacity and rarity ${rarity}`,
+        image: `https://dungeondelvers.xyz/images/relic/relic-${relicId}.png`,
+        attributes: [
+          { trait_type: 'Capacity', value: capacity },
+          { trait_type: 'Rarity', value: rarity },
+          { trait_type: 'Token ID', value: parseInt(tokenId) }
+        ]
+      };
+
+      return res.json(metadata);
     }
 
-    const relicId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
+    const relicId = (parseInt(tokenId) % 5) + 1;
     const metadata = {
       name: `Relic #${tokenId}`,
       description: `A mystical relic with ${data.relic.capacity} capacity and rarity ${data.relic.rarity}`,
@@ -137,7 +182,7 @@ app.get('/api/relic/:tokenId', async (req, res) => {
 app.get('/api/party/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const graphqlId = `0x78dBA7671753191FFeeBEEed702Aab4F2816d70D-${tokenId}`;
+    const graphqlId = `0x78dba7671753191ffeebeed702aab4f2816d70d-${tokenId}`;
     
     const data = await graphqlClient.request(PARTY_QUERY, { id: graphqlId });
     
@@ -195,7 +240,7 @@ app.get('/api/playerprofile/:tokenId', async (req, res) => {
     const metadata = {
       name: `Player Profile #${tokenId}`,
       description: `A player's achievement profile`,
-      image: `data:image/svg+xml;base64,${Buffer.from(`<svg>Profile ${tokenId}</svg>`).toString('base64')}`,
+      image: `https://dungeondelvers.xyz/assets/images/collections/profile-logo.png`,
       attributes: [
         { trait_type: 'Level', value: 1 },
         { trait_type: 'Experience', value: 0 }

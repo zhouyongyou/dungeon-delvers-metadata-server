@@ -1,14 +1,14 @@
 # Dungeon Delvers - 元數據伺服器
 
-這是一個專門為 Dungeon Delvers 專案提供動態鏈上 SVG 元數據的後端伺服器。
+這是一個專門為 Dungeon Delvers 專案提供靜態圖片元數據的後端伺服器。
 
 ## 專案目的
 
 當 NFT 在 OpenSea、錢包或其他第三方平台顯示時，這些平台會呼叫 NFT 合約的 `tokenURI` 函式來獲取元數據。為了讓 NFT 的圖片能夠即時反映鏈上的最新狀態（例如玩家等級、VIP 等級等），我們需要一個能夠：
 1.  接收 API 請求 (例如 `/api/profile/123`)。
 2.  即時讀取區塊鏈上的數據。
-3.  根據最新數據動態生成 SVG 圖像。
-4.  將包含 SVG 的元數據 JSON 回傳。
+3.  根據最新數據提供靜態圖片路徑。
+4.  將包含靜態圖片的元數據 JSON 回傳。
 
 這個伺服器正是為此而生。
 
@@ -49,9 +49,8 @@
 
 伺服器提供以下端點來獲取各類 NFT 的元數據：
 
--   `GET /api/hero/:tokenId` - 獲取英雄NFT元數據
--   `GET /api/relic/:tokenId` - 獲取聖物NFT元數據
--   `GET /api/party/:tokenId` - 獲取隊伍NFT元數據
--   `GET /api/profile/:tokenId` - 獲取玩家資料NFT元數據（對應 PlayerProfile 合約）
--   `GET /api/vip/:tokenId` - 獲取VIP卡NFT元數據（對應 VipStaking 合約）
--   `GET /health` - 伺服器健康檢查
+-   `GET /api/hero/:tokenId`
+-   `GET /api/relic/:tokenId`
+-   `GET /api/party/:tokenId`
+-   `GET /api/profile/:tokenId`
+-   `GET /api/vip/:tokenId`
