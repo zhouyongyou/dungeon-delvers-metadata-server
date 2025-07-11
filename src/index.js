@@ -75,18 +75,19 @@ app.get('/health', (req, res) => {
 app.get('/api/hero/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const heroId = `0x2Cf5429dDbd2Df730a6668b50200233c76c1116F-${tokenId}`;
+    const graphqlId = `0x2Cf5429dDbd2Df730a6668b50200233c76c1116F-${tokenId}`;
     
-    const data = await graphqlClient.request(HERO_QUERY, { id: heroId });
+    const data = await graphqlClient.request(HERO_QUERY, { id: graphqlId });
     
     if (!data.hero) {
       return res.status(404).json({ error: 'Hero not found' });
     }
 
+    const heroId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
     const metadata = {
       name: `Hero #${tokenId}`,
       description: `A powerful hero with ${data.hero.power} power and rarity ${data.hero.rarity}`,
-      image: `data:image/svg+xml;base64,${Buffer.from(`<svg>Hero ${tokenId}</svg>`).toString('base64')}`,
+      image: `https://dungeondelvers.xyz/images/hero/hero-${heroId}.png`,
       attributes: [
         { trait_type: 'Power', value: data.hero.power },
         { trait_type: 'Rarity', value: data.hero.rarity },
@@ -105,18 +106,19 @@ app.get('/api/hero/:tokenId', async (req, res) => {
 app.get('/api/relic/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const relicId = `0x548eA33d0deC74bBE9a3F0D1B5E4C660bf59E5A5-${tokenId}`;
+    const graphqlId = `0x548eA33d0deC74bBE9a3F0D1B5E4C660bf59E5A5-${tokenId}`;
     
-    const data = await graphqlClient.request(RELIC_QUERY, { id: relicId });
+    const data = await graphqlClient.request(RELIC_QUERY, { id: graphqlId });
     
     if (!data.relic) {
       return res.status(404).json({ error: 'Relic not found' });
     }
 
+    const relicId = (parseInt(tokenId) % 5) + 1; // 確保在 1-5 範圍內
     const metadata = {
       name: `Relic #${tokenId}`,
       description: `A mystical relic with ${data.relic.capacity} capacity and rarity ${data.relic.rarity}`,
-      image: `data:image/svg+xml;base64,${Buffer.from(`<svg>Relic ${tokenId}</svg>`).toString('base64')}`,
+      image: `https://dungeondelvers.xyz/images/relic/relic-${relicId}.png`,
       attributes: [
         { trait_type: 'Capacity', value: data.relic.capacity },
         { trait_type: 'Rarity', value: data.relic.rarity },
@@ -135,9 +137,9 @@ app.get('/api/relic/:tokenId', async (req, res) => {
 app.get('/api/party/:tokenId', async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const partyId = `0x78dBA7671753191FFeeBEEed702Aab4F2816d70D-${tokenId}`;
+    const graphqlId = `0x78dBA7671753191FFeeBEEed702Aab4F2816d70D-${tokenId}`;
     
-    const data = await graphqlClient.request(PARTY_QUERY, { id: partyId });
+    const data = await graphqlClient.request(PARTY_QUERY, { id: graphqlId });
     
     if (!data.party) {
       return res.status(404).json({ error: 'Party not found' });
@@ -146,7 +148,7 @@ app.get('/api/party/:tokenId', async (req, res) => {
     const metadata = {
       name: `Party #${tokenId}`,
       description: `A legendary party with ${data.party.totalPower} total power and ${data.party.totalCapacity} capacity`,
-      image: `data:image/svg+xml;base64,${Buffer.from(`<svg>Party ${tokenId}</svg>`).toString('base64')}`,
+      image: `https://dungeondelvers.xyz/images/party/party.png`,
       attributes: [
         { trait_type: 'Total Power', value: data.party.totalPower },
         { trait_type: 'Total Capacity', value: data.party.totalCapacity },
@@ -171,7 +173,7 @@ app.get('/api/vipstaking/:tokenId', async (req, res) => {
     const metadata = {
       name: `VIP Card #${tokenId}`,
       description: `An exclusive VIP membership card`,
-      image: `data:image/svg+xml;base64,${Buffer.from(`<svg>VIP ${tokenId}</svg>`).toString('base64')}`,
+      image: `https://dungeondelvers.xyz/images/vip-placeholder.png`,
       attributes: [
         { trait_type: 'VIP Level', value: 1 },
         { trait_type: 'Token ID', value: parseInt(tokenId) }
