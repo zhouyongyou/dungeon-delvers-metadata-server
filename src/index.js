@@ -59,7 +59,7 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v1.2.7';
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/1.2.7';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 使用相對路徑
@@ -131,9 +131,9 @@ const GRAPHQL_QUERIES = {
   // 查詢統計數據
   getStats: `
     query GetStats {
-      stats(id: "global") {
+      globalStats(id: "global") {
         totalHeroes totalRelics totalParties totalPlayers
-        totalHeroesMinted totalRelicsMinted totalPartiesCreated
+        totalUpgradeAttempts successfulUpgrades
         lastUpdated
       }
     }
