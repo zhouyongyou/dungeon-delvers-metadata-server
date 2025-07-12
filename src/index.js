@@ -43,15 +43,15 @@ app.use(rateLimiterMiddleware);
 
 // 快取配置
 const cache = new NodeCache({ 
-  stdTTL: 300, // 5分鐘
-  checkperiod: 60, // 1分鐘檢查一次
+  stdTTL: 60, // 1分鐘（減少快取時間以提供更及時的更新）
+  checkperiod: 30, // 30秒檢查一次
   maxKeys: 1000 // 最大快取項目
 });
 
 // 熱門 NFT 快取
 const hotNftCache = new NodeCache({ 
-  stdTTL: 1800, // 30分鐘
-  checkperiod: 300, // 5分鐘檢查一次
+  stdTTL: 300, // 5分鐘（減少快取時間）
+  checkperiod: 60, // 1分鐘檢查一次
   maxKeys: 100 // 最大快取項目
 });
 
@@ -71,12 +71,19 @@ const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.x
 // 測試模式：根據 tokenId 模擬稀有度（僅用於測試）
 const TEST_MODE = process.env.TEST_MODE === 'true';
 
-// 合約地址配置
+// 合約地址配置 - 確保與前端一致
 const CONTRACTS = {
   hero: process.env.HERO_CONTRACT_ADDRESS || process.env.VITE_MAINNET_HERO_ADDRESS || '0xE22C45AcC80BFAEDa4F2Ec17352301a37Fbc0741',
   relic: process.env.RELIC_CONTRACT_ADDRESS || process.env.VITE_MAINNET_RELIC_ADDRESS || '0x5b03165dBD05c82480b69b94F59d0FE942ED9A36',
   party: process.env.PARTY_CONTRACT_ADDRESS || process.env.VITE_MAINNET_PARTY_ADDRESS || '0xaE13E9FE44aB58D6d43014A32Cbd565bAEf01C01',
   vip: process.env.VIP_CONTRACT_ADDRESS || process.env.VITE_MAINNET_VIP_ADDRESS || '0x30a5374bcc612698B4eF1Df1348a21F18cbb3c9D',
+};
+
+// 添加NFT市場API配置（用於獲取最新資料）
+const NFT_MARKET_APIS = {
+  opensea: 'https://api.opensea.io/api/v2',
+  blur: 'https://api.blur.io',
+  // 可以添加更多市場API
 };
 
 // =================================================================
@@ -136,6 +143,21 @@ const GRAPHQL_QUERIES = {
         block {
           number
         }
+      }
+    }
+  `,
+  
+  // 查詢NFT稀有度
+  getNftRarity: `
+    query GetNftRarity($nftId: String!) {
+      hero(id: $nftId) {
+        rarity
+      }
+      relic(id: $nftId) {
+        rarity
+      }
+      party(id: $nftId) {
+        partyRarity
       }
     }
   `
@@ -250,6 +272,46 @@ function generateCacheKey(type, params) {
   return `${type}:${JSON.stringify(params)}`;
 }
 
+// 從NFT市場獲取最新資料
+async function fetchFromNFTMarket(type, tokenId, contractAddress) {
+  try {
+    // 嘗試從OpenSea獲取資料
+    const openseaUrl = `${NFT_MARKET_APIS.opensea}/chain/base/contract/${contractAddress}/nfts/${tokenId}`;
+    const response = await axios.get(openseaUrl, {
+      timeout: 5000,
+      headers: {
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.6'
+      }
+    });
+    
+    if (response.data?.nft) {
+      const nft = response.data.nft;
+      return {
+        name: nft.name || `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+        description: nft.description || 'Dungeon Delvers NFT',
+        image: nft.image_url || `${FRONTEND_DOMAIN}/images/${type}/${type}-1.png`,
+        attributes: nft.traits || [],
+        source: 'opensea',
+        lastUpdated: new Date().toISOString()
+      };
+    }
+  } catch (error) {
+    console.warn(`無法從OpenSea獲取 ${type} #${tokenId}: ${error.message}`);
+  }
+  
+  return null;
+}
+
+// 檢查是否需要從市場更新資料
+function shouldUpdateFromMarket(lastUpdate, cacheAge) {
+  const now = Date.now();
+  const lastUpdateTime = new Date(lastUpdate).getTime();
+  const cacheAgeMs = cacheAge * 1000;
+  
+  // 如果快取超過5分鐘或最後更新超過10分鐘，嘗試從市場更新
+  return (now - lastUpdateTime) > 600000 || cacheAge > 300;
+}
+
 // 開發環境下提供靜態文件服務（可選）
 if (process.env.NODE_ENV === 'development') {
   console.log('🔧 Development mode: Serving static files locally');
@@ -265,14 +327,22 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    version: '1.2.6',
+    version: '1.2.7',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     cache: {
       size: cache.keys().length,
-      hotNftSize: hotNftCache.keys().length
-    }
+      hotNftSize: hotNftCache.keys().length,
+      cacheTTL: '60s',
+      hotCacheTTL: '300s'
+    },
+    features: {
+      marketIntegration: true,
+      graphqlSync: true,
+      autoRefresh: true
+    },
+    contracts: CONTRACTS
   });
 });
 
@@ -354,27 +424,11 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               const contractAddress = CONTRACTS[type];
               const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
               
-              const graphqlResponse = await axios.post(THE_GRAPH_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  query: `
-                    query GetNftRarity($nftId: String!) {
-                      ${type}(id: $nftId) {
-                        rarity
-                      }
-                    }
-                  `,
-                  variables: { nftId }
-                })
-              });
+              const data = await queryGraphQL(GRAPHQL_QUERIES.getNftRarity, { nftId });
               
-              if (graphqlResponse.ok) {
-                const { data } = await graphqlResponse.json();
-                if (data?.[type]?.rarity) {
-                  rarity = parseInt(data[type].rarity);
-                  console.log(`${type} #${tokenId} 稀有度: ${rarity}`);
-                }
+              if (data?.[type]?.rarity || data?.[type]?.partyRarity) {
+                rarity = parseInt(data[type].rarity || data[type].partyRarity);
+                console.log(`${type} #${tokenId} 稀有度: ${rarity}`);
               }
             } catch (error) {
               console.warn(`無法從子圖獲取 ${type} 稀有度，使用默認值: ${error.message}`);
@@ -417,12 +471,29 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           };
         }
         
-        // 快取 5 分鐘
-        cache.set(cacheKey, nftData, 300);
+        // 檢查是否需要從市場更新資料
+        if (nftData.source === 'static' && shouldUpdateFromMarket(nftData.lastUpdated || 0, 60)) {
+          try {
+            const marketData = await fetchFromNFTMarket(type, tokenId, CONTRACTS[type]);
+            if (marketData) {
+              nftData = {
+                ...nftData,
+                ...marketData,
+                source: 'market_enhanced'
+              };
+              console.log(`🔄 從市場更新 ${type} #${tokenId} 資料`);
+            }
+          } catch (error) {
+            console.warn(`市場更新失敗 ${type} #${tokenId}: ${error.message}`);
+          }
+        }
+        
+        // 快取 1 分鐘
+        cache.set(cacheKey, nftData, 60);
         
         // 如果是熱門 NFT，加入熱門快取
         if (parseInt(tokenId) <= 100) {
-          hotNftCache.set(cacheKey, nftData, 1800);
+          hotNftCache.set(cacheKey, nftData, 300);
         }
         
       } catch (error) {
@@ -607,6 +678,48 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
+// 強制刷新特定NFT快取
+app.post('/api/:type/:tokenId/refresh', async (req, res) => {
+  try {
+    const { type, tokenId } = req.params;
+    
+    if (!['hero', 'relic', 'party', 'vip', 'vipstaking', 'playerprofile'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid NFT type' });
+    }
+    
+    const cacheKey = generateCacheKey(`${type}-${tokenId}`, {});
+    
+    // 清除快取
+    cache.del(cacheKey);
+    hotNftCache.del(cacheKey);
+    
+    // 嘗試從市場獲取最新資料
+    try {
+      const marketData = await fetchFromNFTMarket(type, tokenId, CONTRACTS[type]);
+      if (marketData) {
+        res.json({
+          message: 'Cache refreshed successfully',
+          data: marketData,
+          source: 'market'
+        });
+        return;
+      }
+    } catch (error) {
+      console.warn(`市場刷新失敗: ${error.message}`);
+    }
+    
+    res.json({
+      message: 'Cache cleared, will fetch fresh data on next request',
+      source: 'cache_cleared'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to refresh cache',
+      message: error.message
+    });
+  }
+});
+
 // 根路徑
 app.get('/', (req, res) => {
   res.json({
@@ -654,15 +767,18 @@ app.use((error, req, res, next) => {
 // =================================================================
 
 app.listen(PORT, () => {
-  console.log(`🚀 Metadata Server v1.2.6 running on port ${PORT}`);
+  console.log(`🚀 Metadata Server v1.2.7 running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
   console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
+  console.log(`🔄 Refresh API: http://localhost:${PORT}/api/:type/:tokenId/refresh`);
   console.log(`👤 Player assets: http://localhost:${PORT}/api/player/:owner/assets`);
   console.log(`📈 Stats: http://localhost:${PORT}/api/stats`);
   console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
   console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
   console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
+  console.log(`🔄 Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
+  console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
   
   if (process.env.NODE_ENV === 'development') {
     console.log(`🔧 Development mode: Local static files available at /images and /assets`);
