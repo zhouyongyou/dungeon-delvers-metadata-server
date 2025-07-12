@@ -97,14 +97,14 @@ const NFT_MARKET_APIS = {
 const GRAPHQL_QUERIES = {
   // 查詢特定 NFT
   getNftById: `
-    query GetNftById($contractAddress: String!, $tokenId: String!) {
-      hero(id: $contractAddress + "-" + $tokenId) {
+    query GetNftById($nftId: String!) {
+      hero(id: $nftId) {
         id tokenId owner { id } power rarity createdAt
       }
-      relic(id: $contractAddress + "-" + $tokenId) {
+      relic(id: $nftId) {
         id tokenId owner { id } capacity rarity createdAt
       }
-      party(id: $contractAddress + "-" + $tokenId) {
+      party(id: $nftId) {
         id tokenId owner { id } totalPower totalCapacity partyRarity createdAt
       }
     }
@@ -482,18 +482,38 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         // 先嘗試從 subgraph 獲取資料
         if (['hero', 'relic', 'party'].includes(type)) {
           const contractAddress = CONTRACTS[type];
+          const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
           const data = await queryGraphQL(GRAPHQL_QUERIES.getNftById, {
-            contractAddress: contractAddress.toLowerCase(),
-            tokenId
+            nftId
           });
           
           const nft = data[type];
           if (nft) {
+            // 將子圖資料轉換為標準 NFT metadata 格式
+            const rarity = nft.rarity || nft.partyRarity || 1;
+            const rarityIndex = Math.max(1, Math.min(5, rarity));
+            
             nftData = {
-              ...nft,
+              name: `${type === 'hero' ? '英雄' : type === 'relic' ? '聖物' : '隊伍'} #${tokenId}`,
+              description: 'Dungeon Delvers NFT - 從區塊鏈獲取的即時資料',
+              image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
+              attributes: [
+                { trait_type: 'Token ID', value: parseInt(tokenId) },
+                { trait_type: 'Rarity', value: rarity },
+                ...(type === 'hero' ? [
+                  { trait_type: 'Power', value: parseInt(nft.power) }
+                ] : type === 'relic' ? [
+                  { trait_type: 'Capacity', value: parseInt(nft.capacity) }
+                ] : type === 'party' ? [
+                  { trait_type: 'Total Power', value: parseInt(nft.totalPower) },
+                  { trait_type: 'Total Capacity', value: parseInt(nft.totalCapacity) }
+                ] : [])
+              ],
               source: 'subgraph',
               contractAddress,
-              type
+              type,
+              // 保留原始子圖資料供內部使用
+              _subgraphData: nft
             };
           }
         }
