@@ -79,8 +79,12 @@ const CONTRACTS = {
   vip: process.env.VIP_CONTRACT_ADDRESS || process.env.VITE_MAINNET_VIP_ADDRESS || '0x30a5374bcc612698B4eF1Df1348a21F18cbb3c9D',
 };
 
-// 添加NFT市場API配置（用於獲取最新資料）
+// 添加NFT市場API配置（BSC鏈優先）
 const NFT_MARKET_APIS = {
+  // BSC鏈主要市場
+  okx: 'https://www.okx.com/api/v5/nft',
+  element: 'https://api.element.market',
+  // 其他市場
   opensea: 'https://api.opensea.io/api/v2',
   blur: 'https://api.blur.io',
   // 可以添加更多市場API
@@ -272,15 +276,74 @@ function generateCacheKey(type, params) {
   return `${type}:${JSON.stringify(params)}`;
 }
 
-// 從NFT市場獲取最新資料
-async function fetchFromNFTMarket(type, tokenId, contractAddress) {
+// 從OKX NFT市場獲取資料
+async function fetchFromOKX(type, tokenId, contractAddress) {
   try {
-    // 嘗試從OpenSea獲取資料
+    const url = `${NFT_MARKET_APIS.okx}/collection/${contractAddress}/token/${tokenId}`;
+    const response = await axios.get(url, {
+      timeout: 5000,
+      headers: {
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7',
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (response.data?.data?.[0]) {
+      const nft = response.data.data[0];
+      return {
+        name: nft.name || `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+        description: nft.description || 'Dungeon Delvers NFT',
+        image: nft.image_url || nft.image || `${FRONTEND_DOMAIN}/images/${type}/${type}-1.png`,
+        attributes: nft.attributes || [],
+        source: 'okx',
+        lastUpdated: new Date().toISOString()
+      };
+    }
+  } catch (error) {
+    console.warn(`無法從OKX獲取 ${type} #${tokenId}: ${error.message}`);
+  }
+  
+  return null;
+}
+
+// 從Element市場獲取資料
+async function fetchFromElement(type, tokenId, contractAddress) {
+  try {
+    const url = `${NFT_MARKET_APIS.element}/api/v1/nft/${contractAddress}/${tokenId}`;
+    const response = await axios.get(url, {
+      timeout: 5000,
+      headers: {
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7',
+        'Accept': 'application/json'
+      }
+    });
+    
+    const nft = response.data?.nft || response.data?.data;
+    if (nft) {
+      return {
+        name: nft.name || `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+        description: nft.description || 'Dungeon Delvers NFT',
+        image: nft.image_url || nft.image || `${FRONTEND_DOMAIN}/images/${type}/${type}-1.png`,
+        attributes: nft.attributes || [],
+        source: 'element',
+        lastUpdated: new Date().toISOString()
+      };
+    }
+  } catch (error) {
+    console.warn(`無法從Element獲取 ${type} #${tokenId}: ${error.message}`);
+  }
+  
+  return null;
+}
+
+// 從OpenSea獲取資料
+async function fetchFromOpenSea(type, tokenId, contractAddress) {
+  try {
     const openseaUrl = `${NFT_MARKET_APIS.opensea}/chain/base/contract/${contractAddress}/nfts/${tokenId}`;
     const response = await axios.get(openseaUrl, {
       timeout: 5000,
       headers: {
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.6'
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7'
       }
     });
     
@@ -297,6 +360,31 @@ async function fetchFromNFTMarket(type, tokenId, contractAddress) {
     }
   } catch (error) {
     console.warn(`無法從OpenSea獲取 ${type} #${tokenId}: ${error.message}`);
+  }
+  
+  return null;
+}
+
+// 從NFT市場獲取最新資料（BSC鏈優先）
+async function fetchFromNFTMarket(type, tokenId, contractAddress) {
+  // 按優先級嘗試不同的BSC市場
+  const marketSources = [
+    { name: 'okx', fetchFn: () => fetchFromOKX(type, tokenId, contractAddress) },
+    { name: 'element', fetchFn: () => fetchFromElement(type, tokenId, contractAddress) },
+    { name: 'opensea', fetchFn: () => fetchFromOpenSea(type, tokenId, contractAddress) },
+  ];
+
+  for (const source of marketSources) {
+    try {
+      const data = await source.fetchFn();
+      if (data) {
+        console.log(`✅ 從 ${source.name} 獲取到 ${type} #${tokenId} 資料`);
+        return data;
+      }
+    } catch (error) {
+      console.warn(`❌ 從 ${source.name} 獲取 ${type} #${tokenId} 失敗: ${error.message}`);
+      continue;
+    }
   }
   
   return null;
@@ -327,7 +415,7 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    version: '1.2.7',
+    version: '1.2.8',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
@@ -338,9 +426,10 @@ app.get('/health', (req, res) => {
       hotCacheTTL: '300s'
     },
     features: {
-      marketIntegration: true,
+      bscMarketIntegration: true,
       graphqlSync: true,
-      autoRefresh: true
+      autoRefresh: true,
+      marketPriority: ['okx', 'element', 'opensea']
     },
     contracts: CONTRACTS
   });
@@ -767,7 +856,7 @@ app.use((error, req, res, next) => {
 // =================================================================
 
 app.listen(PORT, () => {
-  console.log(`🚀 Metadata Server v1.2.7 running on port ${PORT}`);
+  console.log(`🚀 Metadata Server v1.2.8 running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
   console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
@@ -777,8 +866,9 @@ app.listen(PORT, () => {
   console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
   console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
   console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
-  console.log(`🔄 Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
+  console.log(`🔄 BSC Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
   console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
+  console.log(`🎯 Priority: OKX > Element > OpenSea > Metadata Server`);
   
   if (process.env.NODE_ENV === 'development') {
     console.log(`🔧 Development mode: Local static files available at /images and /assets`);
