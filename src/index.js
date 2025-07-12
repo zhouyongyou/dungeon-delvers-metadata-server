@@ -560,8 +560,8 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           };
         }
         
-        // 檢查是否需要從市場更新資料
-        if (nftData.source === 'static' && shouldUpdateFromMarket(nftData.lastUpdated || 0, 60)) {
+        // 檢查是否需要從市場更新資料（暫時禁用，因為市場 API 有問題）
+        if (false && nftData.source === 'static' && shouldUpdateFromMarket(nftData.lastUpdated || 0, 60)) {
           try {
             const marketData = await fetchFromNFTMarket(type, tokenId, CONTRACTS[type]);
             if (marketData) {
