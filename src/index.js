@@ -59,7 +59,7 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v1.2.6';
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v1.2.7';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 使用相對路徑
@@ -73,10 +73,10 @@ const TEST_MODE = process.env.TEST_MODE === 'true';
 
 // 合約地址配置
 const CONTRACTS = {
-  hero: process.env.HERO_CONTRACT_ADDRESS || process.env.VITE_MAINNET_HERO_ADDRESS || '0xe439b1aC9100732F33C757746AD916ADE6967C79',
-  relic: process.env.RELIC_CONTRACT_ADDRESS || process.env.VITE_MAINNET_RELIC_ADDRESS || '0x0a03BE7555f8B0f1F2299c4C8DCE1b8d82b2B8B4',
-  party: process.env.PARTY_CONTRACT_ADDRESS || process.env.VITE_MAINNET_PARTY_ADDRESS || '0x1234567890123456789012345678901234567890',
-  vip: process.env.VIP_CONTRACT_ADDRESS || process.env.VITE_MAINNET_VIP_ADDRESS || '0x1234567890123456789012345678901234567890',
+  hero: process.env.HERO_CONTRACT_ADDRESS || process.env.VITE_MAINNET_HERO_ADDRESS || '0xE22C45AcC80BFAEDa4F2Ec17352301a37Fbc0741',
+  relic: process.env.RELIC_CONTRACT_ADDRESS || process.env.VITE_MAINNET_RELIC_ADDRESS || '0x5b03165dBD05c82480b69b94F59d0FE942ED9A36',
+  party: process.env.PARTY_CONTRACT_ADDRESS || process.env.VITE_MAINNET_PARTY_ADDRESS || '0xaE13E9FE44aB58D6d43014A32Cbd565bAEf01C01',
+  vip: process.env.VIP_CONTRACT_ADDRESS || process.env.VITE_MAINNET_VIP_ADDRESS || '0x30a5374bcc612698B4eF1Df1348a21F18cbb3c9D',
 };
 
 // =================================================================
