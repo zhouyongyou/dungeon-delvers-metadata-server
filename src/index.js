@@ -71,12 +71,12 @@ const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.x
 // 測試模式：根據 tokenId 模擬稀有度（僅用於測試）
 const TEST_MODE = process.env.TEST_MODE === 'true';
 
-// 合約地址配置 - v1.3.0 更新後的地址
+// 合約地址配置 - v1.3.0 更新後的地址（VIP 平方根修正版）
 const CONTRACTS = {
   hero: '0x648FcDf1f59a2598e9f68aB3210a25A877fAD353',
   relic: '0x6704d55c8736e373B001d54Ba00a80dbb0EC793b',
   party: '0x66EA7C0b2BAA497EAf18bE9f3D4459Ffc20ba491',
-  vip: '0xE9Cb85E3671486054133eC4EfcB19cF7fbF99706',
+  vip: '0xA1830C9E9Acb7356C9FcdF177A81A5B0D90b3062',
 };
 
 // 添加NFT市場API配置（BSC鏈優先）
