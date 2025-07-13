@@ -59,7 +59,7 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/1.2.7';
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v1.3.0';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 指向主專案的 public/api
@@ -71,12 +71,12 @@ const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.x
 // 測試模式：根據 tokenId 模擬稀有度（僅用於測試）
 const TEST_MODE = process.env.TEST_MODE === 'true';
 
-// 合約地址配置 - 確保與前端一致
+// 合約地址配置 - v1.3.0 更新後的地址
 const CONTRACTS = {
-  hero: '0x2a046140668cBb8F598ff3852B08852A8EB23b6a',
-  relic: '0x95F005e2e0d38381576DA36c5CA4619a87da550E',
-  party: '0x11FB68409222B53b04626d382d7e691e640A1DcD',
-  vip: '0xefdfF583944A2c6318d1597AD1E41159fCd8F6dB',
+  hero: '0x648FcDf1f59a2598e9f68aB3210a25A877fAD353',
+  relic: '0x6704d55c8736e373B001d54Ba00a80dbb0EC793b',
+  party: '0x66EA7C0b2BAA497EAf18bE9f3D4459Ffc20ba491',
+  vip: '0xE9Cb85E3671486054133eC4EfcB19cF7fbF99706',
 };
 
 // 添加NFT市場API配置（BSC鏈優先）
@@ -181,7 +181,7 @@ async function queryGraphQL(query, variables = {}) {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.6'
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0'
       }
     });
     
@@ -283,7 +283,7 @@ async function fetchFromOKX(type, tokenId, contractAddress) {
     const response = await axios.get(url, {
       timeout: 5000,
       headers: {
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7',
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0',
         'Accept': 'application/json'
       }
     });
@@ -313,7 +313,7 @@ async function fetchFromElement(type, tokenId, contractAddress) {
     const response = await axios.get(url, {
       timeout: 5000,
       headers: {
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7',
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0',
         'Accept': 'application/json'
       }
     });
@@ -343,7 +343,7 @@ async function fetchFromOpenSea(type, tokenId, contractAddress) {
     const response = await axios.get(openseaUrl, {
       timeout: 5000,
       headers: {
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.2.7'
+        'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0'
       }
     });
     
@@ -415,7 +415,7 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    version: '1.2.8',
+    version: '1.3.0',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
@@ -833,7 +833,7 @@ app.post('/api/:type/:tokenId/refresh', async (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     service: 'Dungeon Delvers Metadata Server',
-    version: '1.2.6',
+    version: '1.3.0',
     description: 'Advanced metadata server with GraphQL integration and caching',
     endpoints: [
       'GET /health',
@@ -876,7 +876,7 @@ app.use((error, req, res, next) => {
 // =================================================================
 
 app.listen(PORT, () => {
-  console.log(`🚀 Metadata Server v1.2.8 running on port ${PORT}`);
+  console.log(`🚀 Metadata Server v1.3.0 running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
   console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
