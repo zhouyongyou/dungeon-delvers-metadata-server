@@ -1,0 +1,17 @@
+{
+  "name": "Eternal Flame Artifact",
+  "description": "A legendary artifact that burns with eternal fire, granting maximum power to any party brave enough to wield it.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-5.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Capacity",
+      "value": 5,
+      "max_value": 5
+    }
+  ]
+}

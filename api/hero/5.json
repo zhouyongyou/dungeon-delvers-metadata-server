@@ -1,0 +1,17 @@
+{
+  "name": "Mythic Champion",
+  "description": "A full body portrait of a Mythic Champion. They wear legendary armor forged from starlight and shadow, wielding twin blades that pulse with cosmic energy, surrounded by swirling galaxies and celestial power.",
+  "image": "https://www.dungeondelvers.xyz/images/hero/hero-5.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Power",
+      "value": 255,
+      "max_value": 255
+    }
+  ]
+}

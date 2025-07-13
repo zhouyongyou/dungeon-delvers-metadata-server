@@ -1,0 +1,17 @@
+{
+  "name": "Orb of Power",
+  "description": "A flawless crystal orb that contains restless magical lightning, ready to empower the party with greater energy.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-3.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Capacity",
+      "value": 3,
+      "max_value": 5
+    }
+  ]
+}

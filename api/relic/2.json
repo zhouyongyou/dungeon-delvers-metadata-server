@@ -1,0 +1,17 @@
+{
+  "name": "Enchanted Amulet",
+  "description": "A silver amulet with a blue gemstone that pulses with magical energy, providing protection to its bearer.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-2.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Capacity",
+      "value": 2,
+      "max_value": 5
+    }
+  ]
+}

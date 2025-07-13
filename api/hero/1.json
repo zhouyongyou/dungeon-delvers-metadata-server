@@ -1,0 +1,17 @@
+{
+  "name": "Iron Votary",
+  "description": "A full body portrait of an Iron Votary. Clad in clean, well-maintained but basic steel chainmail and a helmet, they stand at attention, holding a standard longsword and a simple round shield.",
+  "image": "https://www.dungeondelvers.xyz/images/hero/hero-1.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Power",
+      "value": 25,
+      "max_value": 255
+    }
+  ]
+}

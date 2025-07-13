@@ -1,0 +1,17 @@
+{
+  "name": "Crown of Wisdom",
+  "description": "An ancient crown adorned with mystical gems that enhance the wearer's magical abilities and strategic thinking.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-4.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Capacity",
+      "value": 4,
+      "max_value": 5
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "Runic Guardian",
+  "description": "A full body portrait of a Runic Guardian. They wear standardized plate armor with faint glowing blue runes etched onto the surface, wielding a heavy one-handed axe and a kite shield with a glowing central rune.",
+  "image": "https://www.dungeondelvers.xyz/images/hero/hero-2.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Power",
+      "value": 75,
+      "max_value": 255
+    }
+  ]
+}

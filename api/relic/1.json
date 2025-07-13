@@ -1,0 +1,17 @@
+{
+  "name": "Shattered Runestone",
+  "description": "A broken stone found on an ancient battlefield. It's inscribed with forgotten words and emanates a faint, dim light.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-1.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Common"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Capacity",
+      "value": 1,
+      "max_value": 5
+    }
+  ]
+}

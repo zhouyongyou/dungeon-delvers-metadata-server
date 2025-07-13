@@ -62,8 +62,8 @@ const hotNftCache = new NodeCache({
 const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/1.2.7';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
-// JSON 文件路徑配置 - 使用相對路徑
-const JSON_BASE_PATH = path.join(__dirname, '../../api');
+// JSON 文件路徑配置 - 指向主專案的 public/api
+const JSON_BASE_PATH = path.join(__dirname, '../../../GitHub/DungeonDelvers/public/api');
 
 // 前端域名配置 - 用於圖片 URL
 const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.xyz';
@@ -73,10 +73,10 @@ const TEST_MODE = process.env.TEST_MODE === 'true';
 
 // 合約地址配置 - 確保與前端一致
 const CONTRACTS = {
-  hero: process.env.HERO_CONTRACT_ADDRESS || process.env.VITE_MAINNET_HERO_ADDRESS || '0xE22C45AcC80BFAEDa4F2Ec17352301a37Fbc0741',
-  relic: process.env.RELIC_CONTRACT_ADDRESS || process.env.VITE_MAINNET_RELIC_ADDRESS || '0x5b03165dBD05c82480b69b94F59d0FE942ED9A36',
-  party: process.env.PARTY_CONTRACT_ADDRESS || process.env.VITE_MAINNET_PARTY_ADDRESS || '0xaE13E9FE44aB58D6d43014A32Cbd565bAEf01C01',
-  vip: process.env.VIP_CONTRACT_ADDRESS || process.env.VITE_MAINNET_VIP_ADDRESS || '0x30a5374bcc612698B4eF1Df1348a21F18cbb3c9D',
+  hero: '0x2a046140668cBb8F598ff3852B08852A8EB23b6a',
+  relic: '0x95F005e2e0d38381576DA36c5CA4619a87da550E',
+  party: '0x11FB68409222B53b04626d382d7e691e640A1DcD',
+  vip: '0xefdfF583944A2c6318d1597AD1E41159fCd8F6dB',
 };
 
 // 添加NFT市場API配置（BSC鏈優先）

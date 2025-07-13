@@ -1,0 +1,17 @@
+{
+  "name": "Legendary Paladin",
+  "description": "A full body portrait of a Legendary Paladin. They wear radiant golden armor with divine engravings, wielding a blessed two-handed sword that emanates holy light, with a divine aura surrounding them.",
+  "image": "https://www.dungeondelvers.xyz/images/hero/hero-4.png",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "display_type": "number",
+      "trait_type": "Power",
+      "value": 200,
+      "max_value": 255
+    }
+  ]
+}
