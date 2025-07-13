@@ -54,3 +54,7 @@
 -   `GET /api/party/:tokenId`
 -   `GET /api/profile/:tokenId`
 -   `GET /api/vip/:tokenId`
+
+## 重要設定
+
+- **TEST_MODE**: 設為 `false` 時使用真實 subgraph 數據，設為 `true` 時使用模擬測試數據
