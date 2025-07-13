@@ -73,10 +73,11 @@ const TEST_MODE = process.env.TEST_MODE === 'true';
 
 // 合約地址配置 - v1.3.0 更新後的地址（VIP 平方根修正版）
 const CONTRACTS = {
-  hero: '0x648FcDf1f59a2598e9f68aB3210a25A877fAD353',
-  relic: '0x6704d55c8736e373B001d54Ba00a80dbb0EC793b',
-  party: '0x66EA7C0b2BAA497EAf18bE9f3D4459Ffc20ba491',
-  vip: '0x845dE2d044323161703bb0C6fFb1f2CE287AD5BB',
+  hero: '0x2a046140668cBb8F598ff3852B08852A8EB23b6a',
+  relic: '0x95F005e2e0d38381576DA36c5CA4619a87da550E',
+  party: '0x11FB68409222B53b04626d382d7e691e640A1DcD',
+  vip: '0xefdfF583944A2c6318d1597AD1E41159fCd8F6dB',
+  playerprofile: '0x43a9BE911f1074788A00cE8e6E00732c7364c1F4'
 };
 
 // 添加NFT市場API配置（BSC鏈優先）
@@ -230,6 +231,10 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
   };
   
   const getImageByRarity = (type, rarity) => {
+    // 處理未知稀有度的情況
+    if (!rarity || rarity === 0) {
+      return `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`;
+    }
     const rarityIndex = Math.max(1, Math.min(5, rarity));
     return `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
   };
@@ -264,6 +269,30 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
           { trait_type: 'Total Power', value: '載入中...' },
           { trait_type: 'Heroes Count', value: '載入中...' },
           { trait_type: 'Rarity', value: rarity || '載入中...' }
+        ]
+      };
+    case 'vip':
+    case 'vipstaking':
+      return {
+        ...baseData,
+        name: `VIP Pass #${tokenId}`,
+        description: 'Exclusive VIP membership card for DungeonDelvers. Grants special privileges and reduced fees.',
+        image: `${FRONTEND_DOMAIN}/images/vip/vip.png`,
+        attributes: [
+          { trait_type: 'Type', value: 'VIP Pass' },
+          { trait_type: 'Status', value: 'Active' },
+          { trait_type: 'Benefits', value: 'Fee Reduction' }
+        ]
+      };
+    case 'playerprofile':
+      return {
+        ...baseData,
+        name: `Player Profile #${tokenId}`,
+        description: 'DungeonDelvers Player Profile NFT',
+        image: `${FRONTEND_DOMAIN}/images/profile/profile.png`,
+        attributes: [
+          { trait_type: 'Type', value: 'Player Profile' },
+          { trait_type: 'Status', value: 'Active' }
         ]
       };
     default:

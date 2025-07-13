@@ -1,7 +1,7 @@
 {
   "name": "Player Profile",
   "description": "A dynamic player profile NFT that tracks achievements, stats, and progress in the Dungeon Delvers universe.",
-  "image": "https://www.dungeondelvers.xyz/assets/images/collections/profile-logo.png",
+  "image": "https://www.dungeondelvers.xyz/images/profile/profile.png",
   "attributes": [
     {
       "trait_type": "Category",
