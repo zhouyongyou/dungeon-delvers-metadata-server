@@ -59,7 +59,7 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v1.3.2-vip-fixed';
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.0-new-contracts';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 指向主專案的 public/api
@@ -73,11 +73,11 @@ const TEST_MODE = process.env.TEST_MODE === 'true';
 
 // 合約地址配置 - v1.3.0 更新後的地址（VIP 平方根修正版）
 const CONTRACTS = {
-  hero: '0x4EFc389f5DE5DfBd0c8B158a2ea41B611aA30CDb',
-  relic: '0x235d53Efd9cc5aB66F2C3B1E496Ab25767D673e0',
-  party: '0x5DC3175b6a1a5bB4Ec7846e8413257aB7CF31834',
-  vip: '0x067F289Ae4e76CB61b8a138bF705798a928a12FB',
-  playerprofile: '0xd6385bc4099c2713383eD5cB9C6d10E750ADe312'
+  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0x929a4187a462314fCC480ff547019fA122A283f0',
+  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0x1067295025D21f59C8AcB5E777E42F3866a6D2fF',
+  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0xE0272e1D76de1F789ce0996F3226bCf54a8c7735',
+  vip: process.env.VITE_MAINNET_VIPSTAKING_ADDRESS || '0x7aBEA5b90528a19580A0a2A83e4CF9AD4871880F',
+  playerprofile: process.env.VITE_MAINNET_PLAYERPROFILE_ADDRESS || '0xBba4fE0b9Ac0b16786986aF0F39535B37D09Ff1F'
 };
 
 // 添加NFT市場API配置（BSC鏈優先）
