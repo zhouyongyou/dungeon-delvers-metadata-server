@@ -468,15 +468,18 @@ app.get('/health', (req, res) => {
 // Section: RPC 代理服務
 // =================================================================
 
-// BSC RPC 節點池
+// BSC RPC 節點池 - 優先使用私人節點
 const BSC_RPC_NODES = [
+  // 私人高性能節點 (優先)
+  process.env.BSC_MAINNET_RPC_URL || process.env.ALCHEMY_BSC_RPC_URL,
+  // 備用公共節點
   'https://bsc-dataseed1.binance.org/',
   'https://bsc-dataseed2.binance.org/',
   'https://bsc-dataseed3.binance.org/',
   'https://bsc-dataseed4.binance.org/',
   'https://binance.llamarpc.com',
   'https://rpc.ankr.com/bsc',
-];
+].filter(Boolean); // 移除 null/undefined 值
 
 // RPC 節點健康狀態
 const rpcHealthStatus = new Map();
@@ -523,13 +526,27 @@ async function checkRpcHealth(rpcUrl) {
 function getBestRpcNode() {
   const healthyNodes = Array.from(rpcHealthStatus.entries())
     .filter(([_, status]) => status.healthy)
-    .sort((a, b) => a[1].latency - b[1].latency);
+    .sort((a, b) => {
+      // 私人節點 (包含 API key) 優先級更高
+      const aIsPrivate = a[0].includes('alchemy.com') || a[0].includes('infura.io') || a[0].includes('g.alchemy.com');
+      const bIsPrivate = b[0].includes('alchemy.com') || b[0].includes('infura.io') || b[0].includes('g.alchemy.com');
+      
+      if (aIsPrivate && !bIsPrivate) return -1;
+      if (!aIsPrivate && bIsPrivate) return 1;
+      
+      // 如果都是私人節點或都是公共節點，按延遲排序
+      return a[1].latency - b[1].latency;
+    });
   
   if (healthyNodes.length === 0) {
     return BSC_RPC_NODES[0]; // 返回第一個作為備用
   }
   
-  return healthyNodes[0][0];
+  const bestNode = healthyNodes[0][0];
+  const isPrivate = bestNode.includes('alchemy.com') || bestNode.includes('infura.io') || bestNode.includes('g.alchemy.com');
+  
+  console.log(`🎯 選擇最佳 RPC 節點: ${bestNode} (${isPrivate ? '私人節點' : '公共節點'})`);
+  return bestNode;
 }
 
 // 定期健康檢查（每5分鐘）
