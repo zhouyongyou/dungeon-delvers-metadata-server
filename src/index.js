@@ -464,6 +464,153 @@ app.get('/health', (req, res) => {
   });
 });
 
+// =================================================================
+// Section: RPC 代理服務
+// =================================================================
+
+// BSC RPC 節點池
+const BSC_RPC_NODES = [
+  'https://bsc-dataseed1.binance.org/',
+  'https://bsc-dataseed2.binance.org/',
+  'https://bsc-dataseed3.binance.org/',
+  'https://bsc-dataseed4.binance.org/',
+  'https://binance.llamarpc.com',
+  'https://rpc.ankr.com/bsc',
+];
+
+// RPC 節點健康狀態
+const rpcHealthStatus = new Map();
+
+// 初始化 RPC 健康狀態
+BSC_RPC_NODES.forEach(node => {
+  rpcHealthStatus.set(node, { healthy: true, lastCheck: Date.now(), latency: 0 });
+});
+
+// RPC 健康檢查
+async function checkRpcHealth(rpcUrl) {
+  const start = Date.now();
+  try {
+    const response = await axios.post(rpcUrl, {
+      jsonrpc: '2.0',
+      method: 'eth_blockNumber',
+      params: [],
+      id: 1,
+    }, { timeout: 5000 });
+    
+    const latency = Date.now() - start;
+    const healthy = response.data && response.data.result;
+    
+    rpcHealthStatus.set(rpcUrl, {
+      healthy: !!healthy,
+      lastCheck: Date.now(),
+      latency,
+      blockNumber: healthy ? parseInt(response.data.result, 16) : null
+    });
+    
+    return { healthy: !!healthy, latency };
+  } catch (error) {
+    rpcHealthStatus.set(rpcUrl, {
+      healthy: false,
+      lastCheck: Date.now(),
+      latency: Date.now() - start,
+      error: error.message
+    });
+    return { healthy: false, latency: Date.now() - start };
+  }
+}
+
+// 獲取最佳 RPC 節點
+function getBestRpcNode() {
+  const healthyNodes = Array.from(rpcHealthStatus.entries())
+    .filter(([_, status]) => status.healthy)
+    .sort((a, b) => a[1].latency - b[1].latency);
+  
+  if (healthyNodes.length === 0) {
+    return BSC_RPC_NODES[0]; // 返回第一個作為備用
+  }
+  
+  return healthyNodes[0][0];
+}
+
+// 定期健康檢查（每5分鐘）
+setInterval(async () => {
+  console.log('🔍 執行 RPC 節點健康檢查...');
+  const promises = BSC_RPC_NODES.map(checkRpcHealth);
+  await Promise.all(promises);
+  
+  const healthyCount = Array.from(rpcHealthStatus.values()).filter(s => s.healthy).length;
+  console.log(`✅ RPC 健康檢查完成: ${healthyCount}/${BSC_RPC_NODES.length} 節點健康`);
+}, 5 * 60 * 1000);
+
+// RPC 代理端點
+app.post('/api/rpc', async (req, res) => {
+  try {
+    const rpcRequest = req.body;
+    
+    // 驗證請求格式
+    if (!rpcRequest || !rpcRequest.method) {
+      return res.status(400).json({
+        error: 'Invalid RPC request format'
+      });
+    }
+    
+    // 獲取最佳節點
+    const bestNode = getBestRpcNode();
+    
+    // 轉發請求
+    const response = await axios.post(bestNode, rpcRequest, {
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    // 記錄成功請求
+    console.log(`📡 RPC 請求成功: ${rpcRequest.method} via ${bestNode}`);
+    
+    res.json(response.data);
+    
+  } catch (error) {
+    console.error(`❌ RPC 請求失敗: ${error.message}`);
+    
+    // 如果當前節點失敗，標記為不健康並重試
+    const bestNode = getBestRpcNode();
+    if (rpcHealthStatus.has(bestNode)) {
+      rpcHealthStatus.set(bestNode, {
+        ...rpcHealthStatus.get(bestNode),
+        healthy: false,
+        lastCheck: Date.now(),
+        error: error.message
+      });
+    }
+    
+    res.status(500).json({
+      error: 'RPC request failed',
+      message: error.message
+    });
+  }
+});
+
+// RPC 節點狀態查詢
+app.get('/api/rpc/status', (req, res) => {
+  const status = Array.from(rpcHealthStatus.entries()).map(([url, info]) => ({
+    url,
+    ...info
+  }));
+  
+  const healthyCount = status.filter(s => s.healthy).length;
+  
+  res.json({
+    summary: {
+      total: BSC_RPC_NODES.length,
+      healthy: healthyCount,
+      unhealthy: BSC_RPC_NODES.length - healthyCount
+    },
+    nodes: status,
+    bestNode: getBestRpcNode()
+  });
+});
+
 // 同步狀態 API
 app.get('/api/sync-status', async (req, res) => {
   try {
