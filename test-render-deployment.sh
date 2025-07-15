@@ -16,17 +16,15 @@ echo "📊 檢查 RPC 狀態..."
 RESPONSE=$(curl -s https://dungeon-delvers-metadata-server.onrender.com/api/rpc/status)
 echo "$RESPONSE" | jq '.summary'
 
-# 檢查最佳節點
-BEST_NODE=$(echo "$RESPONSE" | jq -r '.bestNode')
-echo "🎯 當前最佳節點: $BEST_NODE"
-
-# 判斷是否使用私人節點
-if [[ "$BEST_NODE" == *"alchemy.com"* ]]; then
-    echo "✅ 成功！正在使用 Alchemy 私人節點"
-elif [[ "$BEST_NODE" == *"infura.io"* ]]; then
-    echo "✅ 成功！正在使用 Infura 私人節點"
+# 檢查是否使用輪替機制
+MODE=$(echo "$RESPONSE" | jq -r '.summary.mode')
+if [[ "$MODE" == "round-robin" ]]; then
+    echo "✅ 成功！正在使用 Alchemy API Keys 輪替機制"
+    CURRENT_INDEX=$(echo "$RESPONSE" | jq -r '.summary.currentIndex')
+    TOTAL=$(echo "$RESPONSE" | jq -r '.summary.total')
+    echo "📍 當前索引: $CURRENT_INDEX / 總數: $TOTAL"
 else
-    echo "⚠️  當前使用公共節點，請檢查環境變數設置"
+    echo "⚠️  未使用輪替機制，請檢查配置"
 fi
 
 # 測試 RPC 請求

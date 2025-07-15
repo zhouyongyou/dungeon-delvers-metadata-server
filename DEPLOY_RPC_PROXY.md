@@ -51,7 +51,8 @@ VITE_METADATA_SERVER_URL=https://dungeondelvers-backend.onrender.com
 ## 預期結果
 - RPC 請求不再暴露 Alchemy API key
 - 使用私人節點提高性能
-- 自動故障轉移到公共節點
+- 使用輪替機制分散請求負載
+- 已移除公共節點健康檢查，完全依賴 Alchemy 私人節點
 
 ## 故障排除
 1. 如果 404 錯誤：檢查部署是否成功

@@ -551,95 +551,64 @@ if (BSC_RPC_NODES.length === 0) {
 
 console.log(`✅ 已配置 ${BSC_RPC_NODES.length} 個 Alchemy 私人節點`);
 
-// RPC 節點健康狀態
-const rpcHealthStatus = new Map();
+// RPC 節點健康狀態 - 已棄用，現在使用輪替機制
+// const rpcHealthStatus = new Map();
 
-// 初始化 RPC 健康狀態
-BSC_RPC_NODES.forEach(node => {
-  rpcHealthStatus.set(node, { healthy: true, lastCheck: Date.now(), latency: 0 });
-});
+// 初始化 RPC 健康狀態 - 已棄用
+// BSC_RPC_NODES.forEach(node => {
+//   rpcHealthStatus.set(node, { healthy: true, lastCheck: Date.now(), latency: 0 });
+// });
 
-// RPC 健康檢查
-async function checkRpcHealth(rpcUrl) {
-  const start = Date.now();
-  try {
-    const response = await axios.post(rpcUrl, {
-      jsonrpc: '2.0',
-      method: 'eth_blockNumber',
-      params: [],
-      id: 1,
-    }, { timeout: 5000 });
-    
-    const latency = Date.now() - start;
-    const healthy = response.data && response.data.result;
-    
-    rpcHealthStatus.set(rpcUrl, {
-      healthy: !!healthy,
-      lastCheck: Date.now(),
-      latency,
-      blockNumber: healthy ? parseInt(response.data.result, 16) : null
-    });
-    
-    return { healthy: !!healthy, latency };
-  } catch (error) {
-    rpcHealthStatus.set(rpcUrl, {
-      healthy: false,
-      lastCheck: Date.now(),
-      latency: Date.now() - start,
-      error: error.message
-    });
-    return { healthy: false, latency: Date.now() - start };
-  }
-}
+// RPC 健康檢查 - 已棄用，不再需要
+// async function checkRpcHealth(rpcUrl) {
+//   const start = Date.now();
+//   try {
+//     const response = await axios.post(rpcUrl, {
+//       jsonrpc: '2.0',
+//       method: 'eth_blockNumber',
+//       params: [],
+//       id: 1,
+//     }, { timeout: 5000 });
+//     
+//     const latency = Date.now() - start;
+//     const healthy = response.data && response.data.result;
+//     
+//     rpcHealthStatus.set(rpcUrl, {
+//       healthy: !!healthy,
+//       lastCheck: Date.now(),
+//       latency,
+//       blockNumber: healthy ? parseInt(response.data.result, 16) : null
+//     });
+//     
+//     return { healthy: !!healthy, latency };
+//   } catch (error) {
+//     rpcHealthStatus.set(rpcUrl, {
+//       healthy: false,
+//       lastCheck: Date.now(),
+//       latency: Date.now() - start,
+//       error: error.message
+//     });
+//     return { healthy: false, latency: Date.now() - start };
+//   }
+// }
 
-// 獲取最佳 RPC 節點 - 優先使用輪替的 Alchemy 節點
+// 獲取最佳 RPC 節點 - 簡化版本，只使用輪替的 Alchemy 節點
 function getBestRpcNode() {
-  // 首先嘗試使用輪替的 Alchemy URL
+  // 直接使用輪替的 Alchemy URL
   const alchemyUrl = getNextAlchemyUrl();
-  
-  // 檢查該節點是否健康
-  const alchemyStatus = rpcHealthStatus.get(alchemyUrl);
-  if (!alchemyStatus || alchemyStatus.healthy) {
-    console.log(`🎯 使用輪替 Alchemy 節點 #${currentApiKeyIndex}: ${alchemyUrl}`);
-    return alchemyUrl;
-  }
-  
-  // 如果當前 Alchemy 節點不健康，找其他健康的節點
-  const healthyNodes = Array.from(rpcHealthStatus.entries())
-    .filter(([_, status]) => status.healthy)
-    .sort((a, b) => {
-      // 私人節點 (包含 API key) 優先級更高
-      const aIsPrivate = a[0].includes('alchemy.com') || a[0].includes('infura.io') || a[0].includes('g.alchemy.com') || a[0].includes('quicknode.com');
-      const bIsPrivate = b[0].includes('alchemy.com') || b[0].includes('infura.io') || b[0].includes('g.alchemy.com') || b[0].includes('quicknode.com');
-      
-      if (aIsPrivate && !bIsPrivate) return -1;
-      if (!aIsPrivate && bIsPrivate) return 1;
-      
-      // 如果都是私人節點或都是公共節點，按延遲排序
-      return a[1].latency - b[1].latency;
-    });
-  
-  if (healthyNodes.length === 0) {
-    console.log(`⚠️ 沒有健康節點，使用默認 Alchemy`);
-    return getNextAlchemyUrl(); // 返回下一個 Alchemy 作為備用
-  }
-  
-  const bestNode = healthyNodes[0][0];
-  const isPrivate = bestNode.includes('alchemy.com') || bestNode.includes('infura.io') || bestNode.includes('g.alchemy.com') || bestNode.includes('quicknode.com');
-  
-  console.log(`🎯 選擇最佳 RPC 節點: ${bestNode} (${isPrivate ? '私人節點' : '公共節點'})`);
-  return bestNode;
+  console.log(`🎯 使用輪替 Alchemy 節點 #${currentApiKeyIndex}`); // 不再顯示完整 URL 以保護 API key
+  return alchemyUrl;
 }
 
-// 定期健康檢查（每5分鐘）
-setInterval(async () => {
-  console.log('🔍 執行 RPC 節點健康檢查...');
-  const promises = BSC_RPC_NODES.map(checkRpcHealth);
-  await Promise.all(promises);
-  
-  const healthyCount = Array.from(rpcHealthStatus.values()).filter(s => s.healthy).length;
-  console.log(`✅ RPC 健康檢查完成: ${healthyCount}/${BSC_RPC_NODES.length} 節點健康`);
-}, 5 * 60 * 1000);
+// 定期健康檢查（每5分鐘）- 已註釋，因為現在完全使用 RPC 代理
+// setInterval(async () => {
+//   console.log('🔍 執行 RPC 節點健康檢查...');
+//   const promises = BSC_RPC_NODES.map(checkRpcHealth);
+//   await Promise.all(promises);
+//   
+//   const healthyCount = Array.from(rpcHealthStatus.values()).filter(s => s.healthy).length;
+//   console.log(`✅ RPC 健康檢查完成: ${healthyCount}/${BSC_RPC_NODES.length} 節點健康`);
+// }, 5 * 60 * 1000);
 
 // RPC 代理端點
 app.post('/api/rpc', async (req, res) => {
@@ -672,16 +641,8 @@ app.post('/api/rpc', async (req, res) => {
   } catch (error) {
     console.error(`❌ RPC 請求失敗: ${error.message}`);
     
-    // 如果當前節點失敗，標記為不健康並重試
-    const bestNode = getBestRpcNode();
-    if (rpcHealthStatus.has(bestNode)) {
-      rpcHealthStatus.set(bestNode, {
-        ...rpcHealthStatus.get(bestNode),
-        healthy: false,
-        lastCheck: Date.now(),
-        error: error.message
-      });
-    }
+    // 記錄錯誤但不再標記節點狀態，因為我們使用輪替機制
+    console.error(`❌ 當前節點請求失敗，下次將自動切換到另一個節點`);
     
     res.status(500).json({
       error: 'RPC request failed',
@@ -690,23 +651,23 @@ app.post('/api/rpc', async (req, res) => {
   }
 });
 
-// RPC 節點狀態查詢
+// RPC 節點狀態查詢 - 簡化版本
 app.get('/api/rpc/status', (req, res) => {
-  const status = Array.from(rpcHealthStatus.entries()).map(([url, info]) => ({
-    url,
-    ...info
-  }));
-  
-  const healthyCount = status.filter(s => s.healthy).length;
-  
   res.json({
     summary: {
-      total: BSC_RPC_NODES.length,
-      healthy: healthyCount,
-      unhealthy: BSC_RPC_NODES.length - healthyCount
+      total: ALCHEMY_API_KEYS.length,
+      mode: 'round-robin',
+      currentIndex: currentApiKeyIndex,
+      message: '使用 Alchemy API Keys 輪替機制'
     },
-    nodes: status,
-    bestNode: getBestRpcNode()
+    nodes: ALCHEMY_API_KEYS.map((_, index) => ({
+      index,
+      status: 'active',
+      type: 'alchemy-private'
+    })),
+    proxyEnabled: true,
+    healthCheckDisabled: true,
+    note: '已移除公共節點健康檢查，完全使用 RPC 代理'
   });
 });
 

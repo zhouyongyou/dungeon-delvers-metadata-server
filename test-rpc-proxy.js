@@ -14,7 +14,8 @@ async function testRpcProxy() {
     console.log('\n1. 檢查 RPC 節點狀態...');
     const statusResponse = await axios.get(`${BACKEND_URL}/api/rpc/status`);
     console.log('✅ RPC 節點狀態:', statusResponse.data.summary);
-    console.log('🎯 最佳節點:', statusResponse.data.bestNode);
+    console.log('🔄 輪替機制已啟用:', statusResponse.data.summary.mode === 'round-robin' ? '是' : '否');
+    console.log('📍 當前索引:', statusResponse.data.summary.currentIndex, '/', statusResponse.data.summary.total);
     
     // 2. 測試 RPC 代理請求
     console.log('\n2. 測試區塊號查詢...');
