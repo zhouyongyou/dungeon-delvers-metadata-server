@@ -471,7 +471,7 @@ app.get('/health', (req, res) => {
 // BSC RPC 節點池 - 優先使用私人節點
 const BSC_RPC_NODES = [
   // 私人高性能節點 (優先)
-  process.env.BSC_MAINNET_RPC_URL || process.env.ALCHEMY_BSC_RPC_URL,
+  process.env.ALCHEMY_BSC_MAINNET_RPC_URL || process.env.BSC_MAINNET_RPC_URL || process.env.ALCHEMY_BSC_RPC_URL,
   // 備用公共節點
   'https://bsc-dataseed1.binance.org/',
   'https://bsc-dataseed2.binance.org/',
