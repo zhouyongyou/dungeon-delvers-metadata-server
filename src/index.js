@@ -22,7 +22,39 @@ const PORT = process.env.PORT || 3001;
 // 安全中間件
 app.use(helmet());
 app.use(compression());
-app.use(cors());
+
+// CORS 配置 - 允許特定域名
+const corsOptions = {
+  origin: function (origin, callback) {
+    // 允許的域名列表
+    const allowedOrigins = [
+      'https://dungeondelvers.xyz',
+      'https://www.dungeondelvers.xyz',
+      'https://dungeondelvers.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000',
+    ];
+    
+    // 允許環境變數中的額外域名
+    if (process.env.CORS_ORIGIN) {
+      allowedOrigins.push(...process.env.CORS_ORIGIN.split(',').map(o => o.trim()));
+    }
+    
+    // 允許無 origin 的請求（如 Postman）
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true, // 允許攜帶認證信息
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('combined'));
 
@@ -474,6 +506,7 @@ const ALCHEMY_API_KEYS = [
   process.env.ALCHEMY_API_KEY_2,
   process.env.ALCHEMY_API_KEY_3,
   process.env.ALCHEMY_API_KEY_4,
+  process.env.ALCHEMY_API_KEY_5,
   // 向後兼容舊的環境變數名稱
   process.env.ALCHEMY_BSC_MAINNET_RPC_URL?.replace('https://bnb-mainnet.g.alchemy.com/v2/', ''),
 ].filter(Boolean); // 移除 null/undefined 值
