@@ -477,8 +477,8 @@ const BSC_RPC_NODES = [
   'https://bsc-dataseed2.binance.org/',
   'https://bsc-dataseed3.binance.org/',
   'https://bsc-dataseed4.binance.org/',
-  'https://binance.llamarpc.com',
-  'https://rpc.ankr.com/bsc',
+  'https://bsc.publicnode.com',
+  'https://1rpc.io/bnb',
 ].filter(Boolean); // 移除 null/undefined 值
 
 // RPC 節點健康狀態
