@@ -497,9 +497,11 @@ app.get('/health', (req, res) => {
 });
 
 // =================================================================
-// Section: RPC 代理服務
+// Section: RPC 代理服務 (已棄用 - 前端現在使用 Vercel API 路由)
 // =================================================================
 
+// 註釋掉 RPC 代理相關代碼，因為前端已經使用 Vercel 的 /api/rpc
+/*
 // Alchemy API Keys 池 - 從環境變數讀取
 const ALCHEMY_API_KEYS = [
   process.env.ALCHEMY_API_KEY_1,
@@ -550,6 +552,7 @@ if (BSC_RPC_NODES.length === 0) {
 }
 
 console.log(`✅ 已配置 ${BSC_RPC_NODES.length} 個 Alchemy 私人節點`);
+*/
 
 // RPC 節點健康狀態 - 已棄用，現在使用輪替機制
 // const rpcHealthStatus = new Map();
@@ -592,6 +595,8 @@ console.log(`✅ 已配置 ${BSC_RPC_NODES.length} 個 Alchemy 私人節點`);
 //   }
 // }
 
+// 註釋掉 RPC 代理相關功能，因為前端已經使用 Vercel 的 /api/rpc
+/*
 // 獲取最佳 RPC 節點 - 簡化版本，只使用輪替的 Alchemy 節點
 function getBestRpcNode() {
   // 直接使用輪替的 Alchemy URL
@@ -670,6 +675,7 @@ app.get('/api/rpc/status', (req, res) => {
     note: '已移除公共節點健康檢查，完全使用 RPC 代理'
   });
 });
+*/
 
 // 同步狀態 API
 app.get('/api/sync-status', async (req, res) => {
