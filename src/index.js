@@ -528,8 +528,8 @@ function getBestRpcNode() {
     .filter(([_, status]) => status.healthy)
     .sort((a, b) => {
       // 私人節點 (包含 API key) 優先級更高
-      const aIsPrivate = a[0].includes('alchemy.com') || a[0].includes('infura.io') || a[0].includes('g.alchemy.com');
-      const bIsPrivate = b[0].includes('alchemy.com') || b[0].includes('infura.io') || b[0].includes('g.alchemy.com');
+      const aIsPrivate = a[0].includes('alchemy.com') || a[0].includes('infura.io') || a[0].includes('g.alchemy.com') || a[0].includes('quicknode.com');
+      const bIsPrivate = b[0].includes('alchemy.com') || b[0].includes('infura.io') || b[0].includes('g.alchemy.com') || b[0].includes('quicknode.com');
       
       if (aIsPrivate && !bIsPrivate) return -1;
       if (!aIsPrivate && bIsPrivate) return 1;
@@ -543,7 +543,7 @@ function getBestRpcNode() {
   }
   
   const bestNode = healthyNodes[0][0];
-  const isPrivate = bestNode.includes('alchemy.com') || bestNode.includes('infura.io') || bestNode.includes('g.alchemy.com');
+  const isPrivate = bestNode.includes('alchemy.com') || bestNode.includes('infura.io') || bestNode.includes('g.alchemy.com') || bestNode.includes('quicknode.com');
   
   console.log(`🎯 選擇最佳 RPC 節點: ${bestNode} (${isPrivate ? '私人節點' : '公共節點'})`);
   return bestNode;
