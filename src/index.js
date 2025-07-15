@@ -468,18 +468,55 @@ app.get('/health', (req, res) => {
 // Section: RPC 代理服務
 // =================================================================
 
-// BSC RPC 節點池 - 優先使用私人節點
-const BSC_RPC_NODES = [
-  // 私人高性能節點 (優先)
-  process.env.ALCHEMY_BSC_MAINNET_RPC_URL || process.env.BSC_MAINNET_RPC_URL || process.env.ALCHEMY_BSC_RPC_URL,
-  // 備用公共節點
-  'https://bsc-dataseed1.binance.org/',
-  'https://bsc-dataseed2.binance.org/',
-  'https://bsc-dataseed3.binance.org/',
-  'https://bsc-dataseed4.binance.org/',
-  'https://bsc.publicnode.com',
-  'https://1rpc.io/bnb',
+// Alchemy API Keys 池 - 從環境變數讀取
+const ALCHEMY_API_KEYS = [
+  process.env.ALCHEMY_API_KEY_1,
+  process.env.ALCHEMY_API_KEY_2,
+  process.env.ALCHEMY_API_KEY_3,
+  process.env.ALCHEMY_API_KEY_4,
+  // 向後兼容舊的環境變數名稱
+  process.env.ALCHEMY_BSC_MAINNET_RPC_URL?.replace('https://bnb-mainnet.g.alchemy.com/v2/', ''),
 ].filter(Boolean); // 移除 null/undefined 值
+
+// 確保至少有一個 API Key
+if (ALCHEMY_API_KEYS.length === 0) {
+  console.error('❌ 錯誤：未配置 Alchemy API Keys！');
+  console.error('請在環境變數中設置 ALCHEMY_API_KEY_1, ALCHEMY_API_KEY_2 等');
+}
+
+// API Key 輪替索引
+let currentApiKeyIndex = 0;
+
+// 獲取下一個 API Key
+function getNextAlchemyUrl() {
+  const apiKey = ALCHEMY_API_KEYS[currentApiKeyIndex];
+  currentApiKeyIndex = (currentApiKeyIndex + 1) % ALCHEMY_API_KEYS.length;
+  return `https://bnb-mainnet.g.alchemy.com/v2/${apiKey}`;
+}
+
+// BSC RPC 節點池 - 只使用 Alchemy 私人節點
+const BSC_RPC_NODES = [
+  // 所有 Alchemy 節點（輪替使用）
+  ...ALCHEMY_API_KEYS.map(key => `https://bnb-mainnet.g.alchemy.com/v2/${key}`),
+  // 環境變數中的額外私人節點
+  process.env.ALCHEMY_BSC_MAINNET_RPC_URL,
+  process.env.BSC_MAINNET_RPC_URL,
+].filter(url => url && url.includes('alchemy.com')); // 只保留 Alchemy 節點
+
+// 驗證是否有可用的私人節點
+if (BSC_RPC_NODES.length === 0) {
+  console.error('❌ 致命錯誤：沒有配置任何 Alchemy RPC 節點！');
+  console.error('請設置以下環境變數：');
+  console.error('- ALCHEMY_API_KEY_1');
+  console.error('- ALCHEMY_API_KEY_2');
+  console.error('- ALCHEMY_API_KEY_3');
+  console.error('- ALCHEMY_API_KEY_4');
+  console.error('或者：');
+  console.error('- ALCHEMY_BSC_MAINNET_RPC_URL');
+  process.exit(1); // 無私人節點時直接退出
+}
+
+console.log(`✅ 已配置 ${BSC_RPC_NODES.length} 個 Alchemy 私人節點`);
 
 // RPC 節點健康狀態
 const rpcHealthStatus = new Map();
@@ -522,8 +559,19 @@ async function checkRpcHealth(rpcUrl) {
   }
 }
 
-// 獲取最佳 RPC 節點
+// 獲取最佳 RPC 節點 - 優先使用輪替的 Alchemy 節點
 function getBestRpcNode() {
+  // 首先嘗試使用輪替的 Alchemy URL
+  const alchemyUrl = getNextAlchemyUrl();
+  
+  // 檢查該節點是否健康
+  const alchemyStatus = rpcHealthStatus.get(alchemyUrl);
+  if (!alchemyStatus || alchemyStatus.healthy) {
+    console.log(`🎯 使用輪替 Alchemy 節點 #${currentApiKeyIndex}: ${alchemyUrl}`);
+    return alchemyUrl;
+  }
+  
+  // 如果當前 Alchemy 節點不健康，找其他健康的節點
   const healthyNodes = Array.from(rpcHealthStatus.entries())
     .filter(([_, status]) => status.healthy)
     .sort((a, b) => {
@@ -539,7 +587,8 @@ function getBestRpcNode() {
     });
   
   if (healthyNodes.length === 0) {
-    return BSC_RPC_NODES[0]; // 返回第一個作為備用
+    console.log(`⚠️ 沒有健康節點，使用默認 Alchemy`);
+    return getNextAlchemyUrl(); // 返回下一個 Alchemy 作為備用
   }
   
   const bestNode = healthyNodes[0][0];
