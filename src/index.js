@@ -10,6 +10,7 @@ const axios = require('axios');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
 const fs = require('fs');
 const path = require('path');
+const { getRarityFromMapping } = require('./rarityMapping');
 require('dotenv').config();
 
 const app = express();
@@ -241,6 +242,28 @@ function getTestRarity(tokenId) {
   return 5;
 }
 
+// 智能推斷稀有度：使用更精確的映射表
+function inferRarity(type, tokenId) {
+  // 首先嘗試使用精確映射
+  try {
+    return getRarityFromMapping(type, tokenId);
+  } catch (error) {
+    console.warn(`使用映射表失敗，回退到簡單算法: ${error.message}`);
+    
+    // 備用的簡單算法
+    const id = parseInt(tokenId);
+    const hash = id * 2654435761 % 2147483647;
+    const random = (hash % 100) + 1;
+    
+    // 默認分布
+    if (random <= 30) return 1;
+    if (random <= 65) return 2;
+    if (random <= 90) return 3;
+    if (random <= 98) return 4;
+    return 5;
+  }
+}
+
 // 讀取 JSON 文件的工具函數
 function readJSONFile(filePath) {
   try {
@@ -253,7 +276,12 @@ function readJSONFile(filePath) {
 }
 
 // 生成 fallback metadata
-function generateFallbackMetadata(type, tokenId, rarity = 1) {
+function generateFallbackMetadata(type, tokenId, rarity = null) {
+  // 如果沒有提供稀有度，使用智能推斷
+  if (!rarity || rarity === 0) {
+    rarity = inferRarity(type, tokenId);
+    console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
+  }
   const baseData = {
     name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
     description: '正在載入詳細資訊...',
@@ -825,9 +853,17 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               if (data?.[type]?.rarity || data?.[type]?.partyRarity) {
                 rarity = parseInt(data[type].rarity || data[type].partyRarity);
                 console.log(`${type} #${tokenId} 稀有度: ${rarity}`);
+              } else {
+                // 子圖查詢成功但沒有資料，使用智能推斷
+                console.warn(`子圖中沒有 ${type} #${tokenId} 的資料`);
+                rarity = inferRarity(type, tokenId);
+                console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
               }
             } catch (error) {
-              console.warn(`無法從子圖獲取 ${type} 稀有度，使用默認值: ${error.message}`);
+              console.warn(`無法從子圖獲取 ${type} 稀有度: ${error.message}`);
+              // 使用智能推斷而非默認值 1
+              rarity = inferRarity(type, tokenId);
+              console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
             }
           }
           
@@ -894,8 +930,10 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         
       } catch (error) {
         console.error(`Failed to fetch ${type} #${tokenId}:`, error.message);
+        // 如果 URL 參數提供了 rarity 且有效，使用它；否則讓 generateFallbackMetadata 使用智能推斷
+        const providedRarity = rarity ? parseInt(rarity) : null;
         nftData = {
-          ...generateFallbackMetadata(type, tokenId, parseInt(rarity) || 1),
+          ...generateFallbackMetadata(type, tokenId, providedRarity),
           id: tokenId,
           contractAddress: CONTRACTS[type],
           type,
