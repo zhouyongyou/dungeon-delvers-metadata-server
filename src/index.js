@@ -11,6 +11,7 @@ const { RateLimiterMemory } = require('rate-limiter-flexible');
 const fs = require('fs');
 const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
+const { getRarityFromContract } = require('./contractReader');
 require('dotenv').config();
 
 const app = express();
@@ -276,11 +277,23 @@ function readJSONFile(filePath) {
 }
 
 // 生成 fallback metadata
-function generateFallbackMetadata(type, tokenId, rarity = null) {
-  // 如果沒有提供稀有度，使用智能推斷
+async function generateFallbackMetadata(type, tokenId, rarity = null) {
+  // 如果沒有提供稀有度，嘗試從合約讀取
   if (!rarity || rarity === 0) {
-    rarity = inferRarity(type, tokenId);
-    console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
+    try {
+      rarity = await getRarityFromContract(type, tokenId);
+      if (rarity) {
+        console.log(`Fallback: 從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
+      } else {
+        // NFT 不存在
+        console.warn(`Fallback: ${type} #${tokenId} 在合約中不存在`);
+        rarity = 1;
+      }
+    } catch (error) {
+      console.error(`Fallback: 合約讀取失敗 ${error.message}`);
+      // 使用保守的預設值
+      rarity = 1;
+    }
   }
   const baseData = {
     name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
@@ -854,16 +867,39 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                 rarity = parseInt(data[type].rarity || data[type].partyRarity);
                 console.log(`${type} #${tokenId} 稀有度: ${rarity}`);
               } else {
-                // 子圖查詢成功但沒有資料，使用智能推斷
-                console.warn(`子圖中沒有 ${type} #${tokenId} 的資料`);
-                rarity = inferRarity(type, tokenId);
-                console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
+                // 子圖查詢成功但沒有資料，嘗試從合約讀取
+                console.warn(`子圖中沒有 ${type} #${tokenId} 的資料，嘗試從合約讀取`);
+                try {
+                  rarity = await getRarityFromContract(type, tokenId);
+                  if (rarity) {
+                    console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
+                  } else {
+                    // 合約也沒有資料，可能 NFT 不存在
+                    console.warn(`${type} #${tokenId} 在合約中不存在`);
+                    rarity = 1; // 不存在的 NFT 返回最低稀有度
+                  }
+                } catch (contractError) {
+                  console.error(`合約讀取失敗: ${contractError.message}`);
+                  // 最後備選：使用保守的預設值
+                  rarity = 1;
+                }
               }
             } catch (error) {
               console.warn(`無法從子圖獲取 ${type} 稀有度: ${error.message}`);
-              // 使用智能推斷而非默認值 1
-              rarity = inferRarity(type, tokenId);
-              console.log(`使用推斷稀有度 for ${type} #${tokenId}: ${rarity}`);
+              // 嘗試從合約讀取
+              try {
+                rarity = await getRarityFromContract(type, tokenId);
+                if (rarity) {
+                  console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
+                } else {
+                  console.warn(`${type} #${tokenId} 在合約中不存在`);
+                  rarity = 1;
+                }
+              } catch (contractError) {
+                console.error(`合約讀取也失敗: ${contractError.message}`);
+                // 最後備選：使用保守的預設值
+                rarity = 1;
+              }
             }
           }
           
@@ -875,7 +911,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           
           if (!metadata) {
             console.warn(`${type} JSON not found for rarity ${rarityIndex}, using fallback`);
-            metadata = generateFallbackMetadata(type, tokenId, rarity);
+            metadata = await generateFallbackMetadata(type, tokenId, rarity);
           } else {
             // 更新 token ID 相關信息
             metadata.name = `${metadata.name} #${tokenId}`;
@@ -930,10 +966,10 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         
       } catch (error) {
         console.error(`Failed to fetch ${type} #${tokenId}:`, error.message);
-        // 如果 URL 參數提供了 rarity 且有效，使用它；否則讓 generateFallbackMetadata 使用智能推斷
+        // 如果 URL 參數提供了 rarity 且有效，使用它；否則讓 generateFallbackMetadata 從合約讀取
         const providedRarity = rarity ? parseInt(rarity) : null;
         nftData = {
-          ...generateFallbackMetadata(type, tokenId, providedRarity),
+          ...(await generateFallbackMetadata(type, tokenId, providedRarity)),
           id: tokenId,
           contractAddress: CONTRACTS[type],
           type,
