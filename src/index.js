@@ -278,8 +278,8 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
         name: `英雄 #${tokenId}`,
         image: getImageByRarity('hero', rarity),
         attributes: [
-          { trait_type: 'Power', value: '載入中...' },
-          { trait_type: 'Rarity', value: rarity || '載入中...' }
+          { trait_type: 'Power', value: 0 },
+          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
         ]
       };
     case 'relic':
@@ -288,8 +288,8 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
         name: `聖物 #${tokenId}`,
         image: getImageByRarity('relic', rarity),
         attributes: [
-          { trait_type: 'Capacity', value: '載入中...' },
-          { trait_type: 'Rarity', value: rarity || '載入中...' }
+          { trait_type: 'Capacity', value: 0 },
+          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
         ]
       };
     case 'party':
@@ -298,9 +298,9 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
         name: `隊伍 #${tokenId}`,
         image: `${FRONTEND_DOMAIN}/images/party/party.png`,
         attributes: [
-          { trait_type: 'Total Power', value: '載入中...' },
-          { trait_type: 'Heroes Count', value: '載入中...' },
-          { trait_type: 'Rarity', value: rarity || '載入中...' }
+          { trait_type: 'Total Power', value: 0 },
+          { trait_type: 'Heroes Count', value: 0 },
+          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
         ]
       };
     case 'vip':
@@ -330,6 +330,51 @@ function generateFallbackMetadata(type, tokenId, rarity = 1) {
     default:
       return baseData;
   }
+}
+
+// OKX Compatibility Layer
+function ensureOKXCompatibility(metadata, type, tokenId) {
+  // Create a deep copy to avoid modifying the original
+  const fixed = JSON.parse(JSON.stringify(metadata));
+  
+  // Ensure Rarity is numeric
+  if (fixed.attributes && Array.isArray(fixed.attributes)) {
+    fixed.attributes = fixed.attributes.map(attr => {
+      if (attr.trait_type === 'Rarity' && typeof attr.value !== 'number') {
+        // Convert string rarity to number
+        const numValue = parseInt(attr.value);
+        return {
+          ...attr,
+          value: !isNaN(numValue) && numValue >= 1 && numValue <= 5 ? numValue : 1
+        };
+      }
+      // Ensure other numeric fields are numbers
+      if (['Power', 'Capacity', 'Total Power', 'Total Capacity', 'Token ID', 'Heroes Count'].includes(attr.trait_type)) {
+        const numValue = parseInt(attr.value);
+        return {
+          ...attr,
+          value: !isNaN(numValue) ? numValue : 0
+        };
+      }
+      return attr;
+    });
+  }
+  
+  // Ensure image URL is absolute HTTPS
+  if (fixed.image && !fixed.image.startsWith('https://')) {
+    if (fixed.image.startsWith('http://')) {
+      fixed.image = fixed.image.replace('http://', 'https://');
+    } else if (fixed.image.startsWith('/')) {
+      fixed.image = `${FRONTEND_DOMAIN}${fixed.image}`;
+    }
+  }
+  
+  // Add external_url if missing
+  if (!fixed.external_url) {
+    fixed.external_url = `${FRONTEND_DOMAIN}/nft/${type}/${tokenId}`;
+  }
+  
+  return fixed;
 }
 
 // 快取鍵生成
@@ -858,6 +903,9 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         };
       }
     }
+    
+    // Apply OKX compatibility fixes before sending response
+    nftData = ensureOKXCompatibility(nftData, type, tokenId);
     
     res.json(nftData);
   } catch (error) {
