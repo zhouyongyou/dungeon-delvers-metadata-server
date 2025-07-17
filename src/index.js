@@ -276,6 +276,39 @@ function readJSONFile(filePath) {
   }
 }
 
+// 生成增強的 NFT 名稱（包含稀有度）
+function generateEnhancedNFTName(type, tokenId, rarity) {
+  const validRarity = Math.max(1, Math.min(5, rarity || 1));
+  const stars = '★'.repeat(validRarity);
+  
+  const rarityNames = {
+    1: '普通',
+    2: '稀有', 
+    3: '史詩',
+    4: '傳奇',
+    5: '神話'
+  };
+  
+  const typeNames = {
+    'hero': '英雄',
+    'relic': '聖物', 
+    'party': '隊伍',
+    'vip': 'VIP Pass',
+    'vipstaking': 'VIP Pass',
+    'playerprofile': 'Player Profile'
+  };
+  
+  const rarityText = rarityNames[validRarity] || '普通';
+  const typeText = typeNames[type] || type;
+  
+  // 對於 VIP 和 Profile，不使用稀有度前綴
+  if (type === 'vip' || type === 'vipstaking' || type === 'playerprofile') {
+    return `${typeText} #${tokenId}`;
+  }
+  
+  return `${stars} ${rarityText}${typeText} #${tokenId}`;
+}
+
 // 生成 fallback metadata
 async function generateFallbackMetadata(type, tokenId, rarity = null) {
   // 如果沒有提供稀有度，嘗試從合約讀取
@@ -316,7 +349,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
     case 'hero':
       return {
         ...baseData,
-        name: `英雄 #${tokenId}`,
+        name: generateEnhancedNFTName('hero', tokenId, rarity),
         image: getImageByRarity('hero', rarity),
         attributes: [
           { trait_type: 'Power', value: 0 },
@@ -326,7 +359,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
     case 'relic':
       return {
         ...baseData,
-        name: `聖物 #${tokenId}`,
+        name: generateEnhancedNFTName('relic', tokenId, rarity),
         image: getImageByRarity('relic', rarity),
         attributes: [
           { trait_type: 'Capacity', value: 0 },
@@ -336,7 +369,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
     case 'party':
       return {
         ...baseData,
-        name: `隊伍 #${tokenId}`,
+        name: generateEnhancedNFTName('party', tokenId, rarity),
         image: `${FRONTEND_DOMAIN}/images/party/party.png`,
         attributes: [
           { trait_type: 'Total Power', value: 0 },
@@ -822,7 +855,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             const rarityIndex = Math.max(1, Math.min(5, rarity));
             
             nftData = {
-              name: `${type === 'hero' ? '英雄' : type === 'relic' ? '聖物' : '隊伍'} #${tokenId}`,
+              name: generateEnhancedNFTName(type, tokenId, rarity),
               description: 'Dungeon Delvers NFT - 從區塊鏈獲取的即時資料',
               image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
               attributes: [
@@ -913,8 +946,8 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             console.warn(`${type} JSON not found for rarity ${rarityIndex}, using fallback`);
             metadata = await generateFallbackMetadata(type, tokenId, rarity);
           } else {
-            // 更新 token ID 相關信息
-            metadata.name = `${metadata.name} #${tokenId}`;
+            // 更新 token ID 相關信息 - 使用增強的名稱格式
+            metadata.name = generateEnhancedNFTName(type, tokenId, rarity);
             metadata.image = `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
             metadata.source = 'static';
             
