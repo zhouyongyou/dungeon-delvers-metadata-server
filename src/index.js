@@ -93,7 +93,7 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.1';
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.4';
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 指向主專案的 public/api

@@ -45,6 +45,8 @@ export const GET_PARTY_QUERY = gql`
       totalCapacity
       partyRarity
       contractAddress
+      heroIds
+      relicIds
       heros {
         tokenId
         power
@@ -123,6 +125,8 @@ export const GET_PLAYER_ASSETS_QUERY = gql`
         totalCapacity
         partyRarity
         contractAddress
+        heroIds
+        relicIds
         heros { tokenId }
         relics { tokenId }
         fatigueLevel
