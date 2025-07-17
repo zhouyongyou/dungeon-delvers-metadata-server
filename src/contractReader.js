@@ -6,8 +6,8 @@ const BSC_RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 
 // 合約地址
 const CONTRACTS = {
-  hero: '0x929a4187a462314fCC480ff547019fA122A283f0',
-  relic: '0x1067295025D21f59C8AcB5E777E42F3866a6D2fF',
+  hero: '0xaa3166b87648F10E7C8A59f000E48d21A1A048C1',
+  relic: '0x7023E506A9AD9339D5150c1c9F767A422066D3Df',
   party: '0xE0272e1D76de1F789ce0996F3226bCf54a8c7735'
 };
 
