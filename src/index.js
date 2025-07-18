@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
 const { getRarityFromContract } = require('./contractReader');
+const { MarketplaceAdapter } = require('./adapters/MarketplaceAdapter');
 require('dotenv').config();
 
 const app = express();
@@ -406,7 +407,8 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   }
 }
 
-// OKX Compatibility Layer
+// OKX Compatibility Layer (Deprecated - now using MarketplaceAdapter)
+// Kept for backward compatibility but replaced by adapter pattern
 function ensureOKXCompatibility(metadata, type, tokenId) {
   // Create a deep copy to avoid modifying the original
   const fixed = JSON.parse(JSON.stringify(metadata));
@@ -1011,10 +1013,32 @@ app.get('/api/:type/:tokenId', async (req, res) => {
       }
     }
     
-    // Apply OKX compatibility fixes before sending response
-    nftData = ensureOKXCompatibility(nftData, type, tokenId);
+    // Detect marketplace and apply appropriate adapter
+    const detectedMarketplace = MarketplaceAdapter.detectMarketplace(req.headers);
+    console.log(`🎯 Detected marketplace: ${detectedMarketplace} for ${type} #${tokenId}`);
     
-    res.json(nftData);
+    // Create and apply marketplace-specific adapter
+    const adapter = MarketplaceAdapter.create(detectedMarketplace, nftData, {
+      type,
+      tokenId,
+      contractAddress: CONTRACTS[type],
+      frontendDomain: FRONTEND_DOMAIN
+    });
+    
+    const adaptedMetadata = adapter.adapt();
+    
+    // Validate adapted metadata in development
+    if (process.env.NODE_ENV === 'development' && adapter.validate) {
+      const validation = adapter.validate();
+      if (!validation.valid) {
+        console.error(`❌ Metadata validation errors:`, validation.errors);
+      }
+      if (validation.warnings?.length > 0) {
+        console.warn(`⚠️ Metadata validation warnings:`, validation.warnings);
+      }
+    }
+    
+    res.json(adaptedMetadata);
   } catch (error) {
     res.status(500).json({
       error: 'Failed to fetch NFT',
