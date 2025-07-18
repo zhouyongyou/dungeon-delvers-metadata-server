@@ -6,9 +6,9 @@ const BSC_RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 
 // 合約地址 - 優先使用環境變數
 const CONTRACTS = {
-  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0xaF1Ca485BB112236BE70A40F0CD79D9D562B50E8',
-  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0x07161a55DBc5f6351013B3513fab2b524F93023b',
-  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0xBFcfB4e00EF020b30A602e982026e54617dAfd44'
+  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0x33d94b7F5E32aAdEf1BD40C529c8552f0bB6d1CB',
+  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0xf1A26Cbf115f62aD2a78378288b3b84f840B99ce',
+  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0xcB580B4F444D72853800e6e4A3e01BD919271179'
 };
 
 // 簡化的 ABI - 只包含我們需要的函數
