@@ -83,20 +83,38 @@ class MarketplaceAdapter {
    * @returns {string|null} Detected marketplace
    */
   static detectMarketplace(headers) {
-    const userAgent = headers['user-agent'] || '';
-    const referer = headers['referer'] || headers['referrer'] || '';
+    const userAgent = (headers['user-agent'] || '').toLowerCase();
+    const referer = (headers['referer'] || headers['referrer'] || '').toLowerCase();
+    const origin = (headers['origin'] || '').toLowerCase();
+    
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔍 Marketplace detection:', {
+        userAgent: userAgent.substring(0, 100),
+        referer: referer,
+        origin: origin
+      });
+    }
     
     // Check User-Agent patterns
-    if (userAgent.toLowerCase().includes('okx')) return 'okx';
-    if (userAgent.toLowerCase().includes('element')) return 'element';
-    if (userAgent.toLowerCase().includes('opensea')) return 'opensea';
+    if (userAgent.includes('okx') || userAgent.includes('okex')) return 'okx';
+    if (userAgent.includes('element')) return 'element';
+    if (userAgent.includes('opensea')) return 'opensea';
     
-    // Check Referer patterns
-    if (referer.includes('okx.com')) return 'okx';
-    if (referer.includes('element.market')) return 'element';
+    // Check Referer patterns (more comprehensive)
+    if (referer.includes('okx.com') || referer.includes('okex.com')) return 'okx';
+    if (referer.includes('element.market') || referer.includes('element.market')) return 'element';
     if (referer.includes('opensea.io')) return 'opensea';
     
-    // Default to OKX for BSC chain
+    // Check Origin header
+    if (origin.includes('okx.com') || origin.includes('okex.com')) return 'okx';
+    if (origin.includes('element.market')) return 'element';
+    if (origin.includes('opensea.io')) return 'opensea';
+    
+    // Check for specific OKX crawler patterns
+    if (userAgent.includes('okhttp') || userAgent.includes('okx-nft')) return 'okx';
+    
+    // Default to OKX for BSC chain (since it's the primary BSC NFT marketplace)
     return 'okx';
   }
 

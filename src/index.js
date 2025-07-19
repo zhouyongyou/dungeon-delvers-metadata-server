@@ -1208,6 +1208,68 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
+// 診斷端點 - 測試市場適配器
+app.get('/api/:type/:tokenId/debug', async (req, res) => {
+  try {
+    const { type, tokenId } = req.params;
+    const { marketplace } = req.query;
+    
+    if (!['hero', 'relic', 'party', 'vip', 'vipstaking', 'playerprofile'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid NFT type' });
+    }
+    
+    // 獲取原始 metadata
+    const cacheKey = generateCacheKey(`${type}-${tokenId}`, {});
+    let nftData = cache.get(cacheKey);
+    
+    if (!nftData) {
+      // 生成 fallback metadata
+      nftData = await generateFallbackMetadata(type, tokenId);
+    }
+    
+    // 檢測或使用指定的市場
+    const detectedMarketplace = marketplace || MarketplaceAdapter.detectMarketplace(req.headers);
+    
+    // 創建適配器
+    const adapter = MarketplaceAdapter.create(detectedMarketplace, nftData, {
+      type,
+      tokenId,
+      contractAddress: CONTRACTS[type],
+      frontendDomain: FRONTEND_DOMAIN
+    });
+    
+    // 獲取原始和適配後的 metadata
+    const originalMetadata = JSON.parse(JSON.stringify(nftData));
+    const adaptedMetadata = adapter.adapt();
+    
+    // 驗證
+    const validation = adapter.validate ? adapter.validate() : { valid: true };
+    
+    res.json({
+      debug: true,
+      marketplace: detectedMarketplace,
+      headers: {
+        'user-agent': req.headers['user-agent'],
+        'referer': req.headers['referer'],
+        'origin': req.headers['origin']
+      },
+      original: originalMetadata,
+      adapted: adaptedMetadata,
+      validation,
+      changes: {
+        nameChanged: originalMetadata.name !== adaptedMetadata.name,
+        attributesChanged: JSON.stringify(originalMetadata.attributes) !== JSON.stringify(adaptedMetadata.attributes),
+        imageChanged: originalMetadata.image !== adaptedMetadata.image
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Debug failed',
+      message: error.message
+    });
+  }
+});
+
 // 強制刷新特定NFT快取
 app.post('/api/:type/:tokenId/refresh', async (req, res) => {
   try {

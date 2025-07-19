@@ -79,6 +79,9 @@ class OKXAdapter extends MarketplaceAdapter {
     // OKX specific metadata fields
     this.metadata.okx_optimized = true;
     this.metadata.marketplace_compatibility = 'okx';
+    
+    // Ensure proper encoding for OKX
+    this.metadata.charset = 'UTF-8';
 
     // Add collection info if missing
     if (!this.metadata.collection) {
@@ -88,13 +91,40 @@ class OKXAdapter extends MarketplaceAdapter {
       };
     }
 
-    // Ensure name doesn't have problematic characters
+    // Convert name to English for OKX compatibility
     if (this.metadata.name) {
-      // OKX sometimes has issues with special Unicode characters
-      this.metadata.name = this.metadata.name.replace(/[^\x00-\x7F]+/g, (match) => {
-        // Keep stars but remove other non-ASCII
-        return match === '★' ? match : '';
-      });
+      // Extract rarity from attributes
+      const rarityAttr = this.metadata.attributes?.find(attr => attr.trait_type === 'Rarity');
+      const rarity = rarityAttr ? this.normalizeRarity(rarityAttr.value) : 1;
+      
+      // Generate English name without stars
+      const rarityNames = {
+        1: 'Common',
+        2: 'Rare',
+        3: 'Epic',
+        4: 'Legendary',
+        5: 'Mythic'
+      };
+      
+      const typeNames = {
+        'hero': 'Hero',
+        'relic': 'Relic',
+        'party': 'Party',
+        'vip': 'VIP Pass',
+        'vipstaking': 'VIP Pass',
+        'playerprofile': 'Player Profile'
+      };
+      
+      const rarityText = rarityNames[rarity] || 'Common';
+      const typeText = typeNames[this.type] || this.type.charAt(0).toUpperCase() + this.type.slice(1);
+      
+      // For VIP and Profile, don't use rarity prefix
+      if (this.type === 'vip' || this.type === 'vipstaking' || this.type === 'playerprofile') {
+        this.metadata.name = `${typeText} #${this.tokenId}`;
+      } else {
+        // Use English format: "Legendary Hero #123"
+        this.metadata.name = `${rarityText} ${typeText} #${this.tokenId}`;
+      }
     }
 
     return this.metadata;
