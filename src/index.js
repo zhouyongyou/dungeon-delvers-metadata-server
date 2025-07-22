@@ -61,17 +61,89 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('combined'));
 
-// 速率限制
-const rateLimiter = new RateLimiterMemory({
+// 速率限制 - 分層限流策略
+// 白名單 IP（無限制）
+const whitelistedIPs = [
+  '35.197.118.178', // Google Cloud IP
+  // 可以在這裡添加更多白名單 IP
+];
+
+// 創建不同級別的限流器
+const defaultRateLimiter = new RateLimiterMemory({
   keyGenerator: (req) => req.ip,
-  points: 100, // 請求次數
-  duration: 60, // 時間窗口（秒）
+  points: 300, // 普通用戶：300 請求/分鐘（支援大量 NFT 持有者）
+  duration: 60,
+  blockDuration: 60, // 超限後封鎖 60 秒
 });
 
-const rateLimiterMiddleware = (req, res, next) => {
-  rateLimiter.consume(req.ip)
-    .then(() => next())
-    .catch(() => res.status(429).json({ error: 'Too many requests' }));
+const serviceRateLimiter = new RateLimiterMemory({
+  keyGenerator: (req) => req.ip,
+  points: 1000, // 已知服務：1000 請求/分鐘
+  duration: 60,
+  blockDuration: 30, // 超限後封鎖 30 秒
+});
+
+// 針對 metadata 端點的特殊限流器（更寬鬆）
+const metadataRateLimiter = new RateLimiterMemory({
+  keyGenerator: (req) => req.ip,
+  points: 600, // metadata 請求：600 請求/分鐘
+  duration: 60,
+  blockDuration: 30,
+});
+
+const rateLimiterMiddleware = async (req, res, next) => {
+  // 白名單 IP 直接通過
+  if (whitelistedIPs.includes(req.ip)) {
+    return next();
+  }
+  
+  // 檢查請求路徑
+  const path = req.path.toLowerCase();
+  const userAgent = req.headers['user-agent'] || '';
+  
+  // metadata 端點使用專門的限流器
+  if (path.includes('/metadata/') || path.includes('/api/hero/') || 
+      path.includes('/api/relic/') || path.includes('/api/party/')) {
+    try {
+      await metadataRateLimiter.consume(req.ip);
+      return next();
+    } catch (rejRes) {
+      return res.status(429).json({ 
+        error: 'Too many requests',
+        message: 'Metadata rate limit exceeded (600 req/min)',
+        retryAfter: Math.round(rejRes.msBeforeNext / 1000) || 60
+      });
+    }
+  }
+  
+  // 為已知服務提供更高配額
+  if (userAgent.includes('Go-http-client') || 
+      userAgent.includes('PostmanRuntime') ||
+      userAgent.includes('insomnia') ||
+      userAgent.includes('axios')) {  // 添加 axios（常用於前端）
+    try {
+      await serviceRateLimiter.consume(req.ip);
+      next();
+    } catch (rejRes) {
+      res.status(429).json({ 
+        error: 'Too many requests',
+        message: 'Service rate limit exceeded (1000 req/min)',
+        retryAfter: Math.round(rejRes.msBeforeNext / 1000) || 30
+      });
+    }
+  } else {
+    // 普通用戶使用默認限制
+    try {
+      await defaultRateLimiter.consume(req.ip);
+      next();
+    } catch (rejRes) {
+      res.status(429).json({ 
+        error: 'Too many requests',
+        message: 'Rate limit exceeded (300 req/min)',
+        retryAfter: Math.round(rejRes.msBeforeNext / 1000) || 60
+      });
+    }
+  }
 };
 
 app.use(rateLimiterMiddleware);
