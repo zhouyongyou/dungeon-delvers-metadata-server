@@ -51,14 +51,16 @@ class ConfigLoader {
       // 轉換合約地址格式
       const contracts = {};
       if (data.contracts && data.contracts.mainnet) {
-        // 新格式：從 contracts.mainnet 載入
+        // 新格式：從 contracts.mainnet 載入（如主配置文件）
         Object.entries(data.contracts.mainnet).forEach(([key, value]) => {
           contracts[key] = value;
         });
-      } else {
-        // 向後相容：舊格式
-        Object.entries(data.contracts || {}).forEach(([key, value]) => {
-          contracts[`${key}_ADDRESS`] = value;
+      } else if (data.contracts) {
+        // 前端配置格式：直接從 contracts 載入並轉換為 _ADDRESS 格式
+        Object.entries(data.contracts).forEach(([key, value]) => {
+          // 如果 key 沒有 _ADDRESS 後綴，則添加
+          const addressKey = key.endsWith('_ADDRESS') ? key : `${key}_ADDRESS`;
+          contracts[addressKey] = value;
         });
       }
       
