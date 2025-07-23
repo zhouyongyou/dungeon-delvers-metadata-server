@@ -61,6 +61,9 @@ class ConfigLoader {
           // 如果 key 沒有 _ADDRESS 後綴，則添加
           const addressKey = key.endsWith('_ADDRESS') ? key : `${key}_ADDRESS`;
           contracts[addressKey] = value;
+          
+          // 同時保存原始格式，以便支援不同的查找方式
+          contracts[key] = value;
         });
       }
       

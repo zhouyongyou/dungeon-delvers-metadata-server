@@ -1,14 +1,15 @@
 // 直接從智能合約讀取 NFT 資料的模組
 const { ethers } = require('ethers');
+const configLoader = require('./configLoader');
 
 // BSC RPC
 const BSC_RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 
-// 合約地址 - 從環境變數讀取 (V15)
-const CONTRACTS = {
-  hero: process.env.HERO_ADDRESS,
-  relic: process.env.RELIC_ADDRESS,
-  party: process.env.PARTY_ADDRESS
+// 合約地址 - 動態從配置載入器獲取
+let CONTRACTS = {
+  hero: null,
+  relic: null,
+  party: null
 };
 
 // 簡化的 ABI - 只包含我們需要的函數
@@ -30,12 +31,40 @@ const PARTY_ABI = [
 // 創建 provider
 const provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
 
-// 創建合約實例
-const contracts = {
-  hero: new ethers.Contract(CONTRACTS.hero, HERO_ABI, provider),
-  relic: new ethers.Contract(CONTRACTS.relic, RELIC_ABI, provider),
-  party: new ethers.Contract(CONTRACTS.party, PARTY_ABI, provider)
-};
+// 合約實例將在初始化時創建
+let contracts = {};
+
+// 初始化合約實例
+async function initializeContracts() {
+  try {
+    const config = await configLoader.loadConfig();
+    
+    CONTRACTS.hero = config.contracts.HERO_ADDRESS || config.contracts.HERO;
+    CONTRACTS.relic = config.contracts.RELIC_ADDRESS || config.contracts.RELIC;
+    CONTRACTS.party = config.contracts.PARTY_ADDRESS || config.contracts.PARTY;
+    
+    console.log('Loading contract addresses:', CONTRACTS);
+    
+    if (!CONTRACTS.hero || !CONTRACTS.relic || !CONTRACTS.party) {
+      console.error('Missing contract addresses:', CONTRACTS);
+      throw new Error('Missing required contract addresses');
+    }
+    
+    contracts = {
+      hero: new ethers.Contract(CONTRACTS.hero, HERO_ABI, provider),
+      relic: new ethers.Contract(CONTRACTS.relic, RELIC_ABI, provider),
+      party: new ethers.Contract(CONTRACTS.party, PARTY_ABI, provider)
+    };
+    
+    console.log('Contract instances initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize contracts:', error);
+    throw error;
+  }
+}
+
+// 自動初始化
+initializeContracts().catch(console.error);
 
 /**
  * 從合約讀取 NFT 稀有度
@@ -45,6 +74,11 @@ const contracts = {
  */
 async function getRarityFromContract(type, tokenId) {
   try {
+    // 確保合約已初始化
+    if (!contracts[type]) {
+      await initializeContracts();
+    }
+    
     const contract = contracts[type];
     if (!contract) {
       console.error(`未知的 NFT 類型: ${type}`);
@@ -124,6 +158,11 @@ async function getRarityFromContract(type, tokenId) {
  * @returns {Promise<Object>} tokenId -> rarity 的映射
  */
 async function getBatchRarityFromContract(type, tokenIds) {
+  // 確保合約已初始化
+  if (!contracts[type]) {
+    await initializeContracts();
+  }
+  
   const results = {};
   
   // 使用 Promise.allSettled 避免單個失敗影響整體
