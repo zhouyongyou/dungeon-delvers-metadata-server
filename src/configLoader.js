@@ -50,9 +50,17 @@ class ConfigLoader {
       
       // 轉換合約地址格式
       const contracts = {};
-      Object.entries(data.contracts).forEach(([key, value]) => {
-        contracts[`${key}_ADDRESS`] = value;
-      });
+      if (data.contracts && data.contracts.mainnet) {
+        // 新格式：從 contracts.mainnet 載入
+        Object.entries(data.contracts.mainnet).forEach(([key, value]) => {
+          contracts[key] = value;
+        });
+      } else {
+        // 向後相容：舊格式
+        Object.entries(data.contracts || {}).forEach(([key, value]) => {
+          contracts[`${key}_ADDRESS`] = value;
+        });
+      }
       
       this.config = {
         version: data.version,
