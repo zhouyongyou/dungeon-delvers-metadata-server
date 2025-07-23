@@ -13,6 +13,7 @@ const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
 const { getRarityFromContract } = require('./contractReader');
 const { MarketplaceAdapter } = require('./adapters/MarketplaceAdapter');
+const configLoader = require('./configLoader');
 require('dotenv').config();
 
 const app = express();
@@ -166,7 +167,9 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.5';
+// The Graph URL - 可以被動態配置覆蓋
+let THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.5';
+global.THE_GRAPH_API_URL = THE_GRAPH_API_URL;
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 指向主專案的 public/api
@@ -178,14 +181,52 @@ const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.x
 // 測試模式：根據 tokenId 模擬稀有度（僅用於測試）
 const TEST_MODE = process.env.TEST_MODE === 'true';
 
-// 合約地址配置 - V12 更新後的地址（2025-07-23 部署）
-const CONTRACTS = {
-  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0xAA3734B376eDf4E92402Df4328AA6C1B8254144e',
-  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0xD73D7D5D279ac033c9D8639A15CcEa6B6BE2C786',
-  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0x54025749950137d64469fb11263B475F6A346b83',
-  vip: process.env.VITE_MAINNET_VIPSTAKING_ADDRESS || '0x56350F90a26A844B3248F55dbd5043C3B3F27927',
-  playerprofile: process.env.VITE_MAINNET_PLAYERPROFILE_ADDRESS || '0x0dEf83dbD501fC7D96Bb24FcA2eAAc06c6DD5db9'
+// 合約地址配置 - 初始化時從環境變數載入作為備份
+let CONTRACTS = {
+  hero: process.env.HERO_ADDRESS,
+  relic: process.env.RELIC_ADDRESS,
+  party: process.env.PARTY_ADDRESS,
+  vip: process.env.VIPSTAKING_ADDRESS,
+  playerprofile: process.env.PLAYERPROFILE_ADDRESS
 };
+
+// 異步初始化函數
+async function initializeConfig() {
+  try {
+    console.log('🔄 載入配置...');
+    const config = await configLoader.loadConfig();
+    
+    // 更新合約地址
+    CONTRACTS = {
+      hero: config.contracts.HERO_ADDRESS || CONTRACTS.hero,
+      relic: config.contracts.RELIC_ADDRESS || CONTRACTS.relic,
+      party: config.contracts.PARTY_ADDRESS || CONTRACTS.party,
+      vip: config.contracts.VIPSTAKING_ADDRESS || CONTRACTS.vip,
+      playerprofile: config.contracts.PLAYERPROFILE_ADDRESS || CONTRACTS.playerprofile
+    };
+    
+    console.log(`✅ 配置載入成功: Version ${config.version}`);
+    console.log('📋 合約地址:', CONTRACTS);
+    
+    // 更新 The Graph URL 如果有的話
+    if (config.subgraph?.url) {
+      global.THE_GRAPH_API_URL = config.subgraph.url;
+    }
+  } catch (error) {
+    console.error('❌ 配置載入失敗，使用環境變數:', error.message);
+  }
+  
+  // 驗證必要的合約地址
+  const requiredContracts = ['hero', 'relic', 'party', 'vip', 'playerprofile'];
+  for (const contract of requiredContracts) {
+    if (!CONTRACTS[contract]) {
+      console.error(`ERROR: ${contract.toUpperCase()}_ADDRESS not set`);
+      if (process.env.NODE_ENV === 'production') {
+        process.exit(1);
+      }
+    }
+  }
+}
 
 // 添加NFT市場API配置（BSC鏈優先）
 const NFT_MARKET_APIS = {
@@ -282,7 +323,8 @@ const GRAPHQL_QUERIES = {
 // GraphQL 請求函數
 async function queryGraphQL(query, variables = {}) {
   try {
-    const response = await axios.post(THE_GRAPH_API_URL, {
+    // 使用全局的 THE_GRAPH_API_URL（可能被動態配置更新）
+    const response = await axios.post(global.THE_GRAPH_API_URL || THE_GRAPH_API_URL, {
       query,
       variables
     }, {
@@ -666,10 +708,14 @@ if (process.env.NODE_ENV === 'development') {
 // =================================================================
 
 // 健康檢查
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  // 嘗試重新載入配置
+  const currentConfig = await configLoader.loadConfig();
+  
   res.json({
     status: 'healthy',
     version: '1.3.0',
+    configVersion: currentConfig.version,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
@@ -683,9 +729,11 @@ app.get('/health', (req, res) => {
       bscMarketIntegration: true,
       graphqlSync: true,
       autoRefresh: true,
-      marketPriority: ['okx', 'element', 'opensea']
+      marketPriority: ['okx', 'element', 'opensea'],
+      dynamicConfig: true
     },
-    contracts: CONTRACTS
+    contracts: CONTRACTS,
+    configSource: currentConfig.version ? 'remote' : 'env'
   });
 });
 
@@ -1280,6 +1328,45 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
+// 配置刷新端點
+app.post('/api/config/refresh', async (req, res) => {
+  try {
+    console.log('🔄 手動刷新配置...');
+    
+    // 強制重新載入配置
+    configLoader.config = null;
+    configLoader.lastFetch = 0;
+    
+    const config = await configLoader.loadConfig();
+    
+    // 更新合約地址
+    CONTRACTS = {
+      hero: config.contracts.HERO_ADDRESS || CONTRACTS.hero,
+      relic: config.contracts.RELIC_ADDRESS || CONTRACTS.relic,
+      party: config.contracts.PARTY_ADDRESS || CONTRACTS.party,
+      vip: config.contracts.VIPSTAKING_ADDRESS || CONTRACTS.vip,
+      playerprofile: config.contracts.PLAYERPROFILE_ADDRESS || CONTRACTS.playerprofile
+    };
+    
+    // 更新 The Graph URL
+    if (config.subgraph?.url) {
+      global.THE_GRAPH_API_URL = config.subgraph.url;
+    }
+    
+    res.json({
+      message: 'Configuration refreshed successfully',
+      version: config.version,
+      contracts: Object.keys(CONTRACTS).length,
+      subgraph: config.subgraph?.url ? 'updated' : 'unchanged'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to refresh configuration',
+      message: error.message
+    });
+  }
+});
+
 // 診斷端點 - 測試市場適配器
 app.get('/api/:type/:tokenId/debug', async (req, res) => {
   try {
@@ -1385,11 +1472,14 @@ app.post('/api/:type/:tokenId/refresh', async (req, res) => {
 });
 
 // 根路徑
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  const currentConfig = await configLoader.loadConfig();
+  
   res.json({
     service: 'Dungeon Delvers Metadata Server',
     version: '1.3.0',
-    description: 'Advanced metadata server with GraphQL integration and caching',
+    configVersion: currentConfig.version,
+    description: 'Advanced metadata server with GraphQL integration and dynamic configuration',
     endpoints: [
       'GET /health',
       'GET /api/sync-status',
@@ -1397,8 +1487,14 @@ app.get('/', (req, res) => {
       'GET /api/player/:owner/assets',
       'GET /api/stats',
       'GET /api/hot/:type',
-      'POST /api/cache/clear (dev only)'
-    ]
+      'POST /api/cache/clear (dev only)',
+      'POST /api/config/refresh'
+    ],
+    features: {
+      dynamicConfig: true,
+      configSource: currentConfig.version ? 'remote' : 'env',
+      autoRefresh: true
+    }
   });
 });
 
@@ -1430,24 +1526,37 @@ app.use((error, req, res, next) => {
 // Section: 服務啟動
 // =================================================================
 
-app.listen(PORT, () => {
-  console.log(`🚀 Metadata Server v1.3.0 running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
-  console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
-  console.log(`🔄 Refresh API: http://localhost:${PORT}/api/:type/:tokenId/refresh`);
-  console.log(`👤 Player assets: http://localhost:${PORT}/api/player/:owner/assets`);
-  console.log(`📈 Stats: http://localhost:${PORT}/api/stats`);
-  console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
-  console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
-  console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
-  console.log(`🔄 BSC Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
-  console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
-  console.log(`🎯 Priority: OKX > Element > OpenSea > Metadata Server`);
+// 啟動服務器
+async function startServer() {
+  // 初始化配置
+  await initializeConfig();
   
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`🔧 Development mode: Local static files available at /images and /assets`);
-  }
+  app.listen(PORT, () => {
+    console.log(`🚀 Metadata Server v1.3.0 running on port ${PORT}`);
+    console.log(`📍 Health check: http://localhost:${PORT}/health`);
+    console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
+    console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
+    console.log(`🔄 Refresh API: http://localhost:${PORT}/api/:type/:tokenId/refresh`);
+    console.log(`👤 Player assets: http://localhost:${PORT}/api/player/:owner/assets`);
+    console.log(`📈 Stats: http://localhost:${PORT}/api/stats`);
+    console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
+    console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
+    console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
+    console.log(`🔄 BSC Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
+    console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
+    console.log(`🎯 Priority: OKX > Element > OpenSea > Metadata Server`);
+    console.log(`⚙️ Dynamic Config: ${process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v15.json'}`);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔧 Development mode: Local static files available at /images and /assets`);
+    }
+  });
+}
+
+// 啟動
+startServer().catch(error => {
+  console.error('❌ 服務器啟動失敗:', error);
+  process.exit(1);
 });
 
 module.exports = app;

@@ -24,29 +24,49 @@ DungeonDelvers 的 Node.js 後端服務，提供 NFT metadata、遊戲邏輯和 
 - **區塊鏈**: ethers.js v6
 - **部署**: Render
 
-## 環境變數
+## 環境變數（2025-07-23 簡化版）
 ```bash
-# 環境設置
-NODE_ENV=production  # Render 上使用
-TEST_MODE=false      # 生產環境關閉
-PORT=3001           # 本地開發，Render 自動分配
-
-# V12 合約地址
-DUNGEONCORE_ADDRESS=0x2CB2Bd1b18CDd0cbF37cD6F7FF672D03E7a038a5
-DUNGEONMASTER_ADDRESS=0xb71f6ED7B13452a99d740024aC17470c1b4F0021
-# ... 其他合約地址
-
-# API Keys
-ALCHEMY_API_KEY_1=你的KEY1
-ALCHEMY_API_KEY_2=你的KEY2
-# ...
-
-# The Graph
-THE_GRAPH_API_URL=https://api.studio.thegraph.com/query/115633/dungeon-delvers/v3.0.5
-
-# CORS
+# Render 上只需要這些環境變數！
+NODE_ENV=production
 CORS_ORIGIN=https://dungeondelvers.xyz,https://www.dungeondelvers.xyz
+FRONTEND_DOMAIN=https://dungeondelvers.xyz
+
+# 可選（有默認值）
+CONFIG_URL=https://dungeondelvers.xyz/config/v15.json
+
+# 不再需要設置合約地址！
+# 所有地址從 CDN 配置自動載入
 ```
+
+## 🔄 配置管理系統
+
+### 動態配置載入
+後端現在使用 `configLoader.js` 自動載入配置：
+- 從 CDN 載入所有合約地址
+- 5 分鐘緩存機制
+- 環境變數作為備份
+
+### 配置載入優先級
+1. CDN 配置（優先）
+2. 環境變數（備份）
+3. 內建默認值
+
+### API 端點
+- `POST /api/config/refresh` - 手動刷新配置
+- `GET /health` - 查看當前配置版本
+
+### 開發環境
+```bash
+# 本地開發時可用
+CONFIG_URL=file:///path/to/local/config.json
+NODE_ENV=development
+```
+
+### 配置更新流程
+1. 前端部署新的 CDN 配置
+2. 後端自動在 5 分鐘內載入
+3. 或調用 `/api/config/refresh` 立即更新
+4. 無需重新部署後端！
 
 ## 主要端點
 - `/metadata/:type/:id` - NFT metadata
