@@ -4,11 +4,11 @@ const { ethers } = require('ethers');
 // BSC RPC
 const BSC_RPC = process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/';
 
-// 合約地址 - 優先使用環境變數 (V3 - 2025-01-18)
+// 合約地址 - 優先使用環境變數 (V12 - 2025-07-23)
 const CONTRACTS = {
-  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0x99658b9Aa55BFD3a8bd465c77DcCa6b1E7741dA3',
-  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0xF3e8546216cFdB2F0A1E886291385785177ba773',
-  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0xddCFa681Cee80D3a0F23834cC07D371792207C85'
+  hero: process.env.VITE_MAINNET_HERO_ADDRESS || '0xAA3734B376eDf4E92402Df4328AA6C1B8254144e',
+  relic: process.env.VITE_MAINNET_RELIC_ADDRESS || '0xD73D7D5D279ac033c9D8639A15CcEa6B6BE2C786',
+  party: process.env.VITE_MAINNET_PARTY_ADDRESS || '0x54025749950137d64469fb11263B475F6A346b83'
 };
 
 // 簡化的 ABI - 只包含我們需要的函數
