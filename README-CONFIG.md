@@ -22,7 +22,7 @@
 
 ## 配置文件位置
 
-- **CDN URL**: `https://dungeondelvers.xyz/config/v15.json`
+- **CDN URL**: `https://dungeondelvers.xyz/config/v18.json`
 - **本地開發**: 自動使用前端專案的配置文件
 
 ## API 端點
@@ -49,7 +49,7 @@ NODE_ENV=production
 PORT=3001
 
 # 配置 URL（可選，有默認值）
-CONFIG_URL=https://dungeondelvers.xyz/config/v15.json
+CONFIG_URL=https://dungeondelvers.xyz/config/v18.json
 
 # The Graph（如果 CDN 配置中沒有）
 THE_GRAPH_API_URL=https://api.studio.thegraph.com/query/115633/dungeon-delvers/v3.0.9
@@ -66,11 +66,11 @@ FRONTEND_DOMAIN=https://dungeondelvers.xyz
 如果 CDN 配置無法載入，系統會使用這些環境變數：
 
 ```bash
-HERO_ADDRESS=0x2b6CB00D10EFB1aF0125a26dfcbd9EBa87e07CD2
-RELIC_ADDRESS=0xaEa78C3FC4bc50966aC41D76331fD0bf219D00ac
-PARTY_ADDRESS=0x514AFBb114fa6c77CC025720A31aaeE038fBbcd7
-VIPSTAKING_ADDRESS=0x9c2fdD1c692116aB5209983e467286844B3b9921
-PLAYERPROFILE_ADDRESS=0x5d4582266654CBEA6cC6Bdf696B68B8473521b63
+HERO_ADDRESS=0x6E4dF8F5413B42EC7b82D2Bc20254Db5A11DB374
+RELIC_ADDRESS=0x40e001D24aD6a28FC40870901DbF843D921fe56C
+PARTY_ADDRESS=0xb26466A44f51CfFF8C13837dA8B2aD6BA82c62dF
+VIPSTAKING_ADDRESS=0xe4B6C86748b49D91ac635A56a9DF25af963F8fdd
+PLAYERPROFILE_ADDRESS=0xE5E85233082827941A9E9cb215bDB83407d7534b
 ```
 
 ## 測試配置載入
@@ -83,7 +83,7 @@ npm run test:config
 ## 更新流程
 
 1. **更新配置文件**
-   - 編輯 `/Documents/GitHub/DungeonDelvers/public/config/v15.json`
+   - 編輯 `/Documents/GitHub/DungeonDelvers/public/config/v18.json`
    - 部署前端到 Vercel
 
 2. **後端自動更新**
