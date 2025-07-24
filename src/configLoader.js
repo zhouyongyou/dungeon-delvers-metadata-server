@@ -11,9 +11,9 @@ class ConfigLoader {
     // 開發環境使用本地文件，生產環境使用 CDN
     if (process.env.NODE_ENV === 'development' || !process.env.CONFIG_URL) {
       // 嘗試使用本地前端的配置文件
-      this.configUrl = 'file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v18.json';
+      this.configUrl = 'file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v19.json';
     } else {
-      this.configUrl = process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v18.json';
+      this.configUrl = process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v19.json';
     }
     this.lastFetch = 0;
     this.cacheDuration = 5 * 60 * 1000; // 5 分鐘緩存
