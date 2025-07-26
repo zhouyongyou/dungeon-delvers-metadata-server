@@ -3,65 +3,48 @@
 
 const rarityMappings = {
   hero: {
-    // 英雄稀有度映射 - 基於已知的 mint 模式
+    // 英雄稀有度映射 - 合理的隨機分布
     ranges: [
-      // 早期 mint (1-1000): 稀有度分布較為均勻
-      { min: 1, max: 200, rarities: { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 } },
-      { min: 201, max: 500, rarities: { 1: 35, 2: 35, 3: 20, 4: 8, 5: 2 } },
-      { min: 501, max: 1000, rarities: { 1: 30, 2: 35, 3: 25, 4: 8, 5: 2 } },
-      
-      // 中期 mint (1001-5000): 更多中等稀有度
-      { min: 1001, max: 2000, rarities: { 1: 25, 2: 40, 3: 25, 4: 8, 5: 2 } },
-      { min: 2001, max: 3500, rarities: { 1: 25, 2: 35, 3: 30, 4: 8, 5: 2 } },
-      { min: 3501, max: 5000, rarities: { 1: 20, 2: 35, 3: 35, 4: 8, 5: 2 } },
-      
-      // 後期 mint (5001+): 更多高稀有度
-      { min: 5001, max: 7500, rarities: { 1: 20, 2: 30, 3: 35, 4: 12, 5: 3 } },
-      { min: 7501, max: 10000, rarities: { 1: 15, 2: 30, 3: 40, 4: 12, 5: 3 } },
-      { min: 10001, max: Infinity, rarities: { 1: 15, 2: 25, 3: 40, 4: 15, 5: 5 } }
+      // 所有範圍使用相同的合理分布
+      { min: 1, max: Infinity, rarities: { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 } }
     ],
     
-    // 特殊 tokenId 的固定稀有度
+    // 不設置特殊 tokenId
     special: {
-      1: 5,      // Genesis Hero
-      100: 5,    // Centurion
-      1000: 5,   // Millennium Hero
-      10000: 5,  // Ten Thousand
-      // 可以根據需要添加更多特殊 ID
+      // 移除特殊處理，讓所有 NFT 公平隨機
     }
   },
   
   artifact: {
-    // 聖物稀有度映射 - 低星較多
+    // 聖物稀有度映射 - 合理分布（改為 relic）
     ranges: [
-      { min: 1, max: 500, rarities: { 1: 50, 2: 30, 3: 15, 4: 4, 5: 1 } },
-      { min: 501, max: 1500, rarities: { 1: 45, 2: 35, 3: 15, 4: 4, 5: 1 } },
-      { min: 1501, max: 3000, rarities: { 1: 40, 2: 35, 3: 20, 4: 4, 5: 1 } },
-      { min: 3001, max: 5000, rarities: { 1: 35, 2: 35, 3: 25, 4: 4, 5: 1 } },
-      { min: 5001, max: Infinity, rarities: { 1: 30, 2: 35, 3: 28, 4: 6, 5: 1 } }
+      { min: 1, max: Infinity, rarities: { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 } }
     ],
     
     special: {
-      1: 5,      // First Artifact
-      777: 5,    // Lucky Artifact
-      1337: 5,   // Elite Artifact
+      // 不設置特殊 ID
+    }
+  },
+  
+  relic: {
+    // 聖物稀有度映射 - 與 artifact 相同
+    ranges: [
+      { min: 1, max: Infinity, rarities: { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 } }
+    ],
+    
+    special: {
+      // 不設置特殊 ID
     }
   },
   
   party: {
-    // 隊伍稀有度映射 - 中間星級較多
+    // 隊伍稀有度映射 - 標準分布
     ranges: [
-      { min: 1, max: 300, rarities: { 1: 20, 2: 40, 3: 30, 4: 8, 5: 2 } },
-      { min: 301, max: 800, rarities: { 1: 15, 2: 40, 3: 35, 4: 8, 5: 2 } },
-      { min: 801, max: 1500, rarities: { 1: 15, 2: 35, 3: 40, 4: 8, 5: 2 } },
-      { min: 1501, max: 2500, rarities: { 1: 10, 2: 35, 3: 40, 4: 12, 5: 3 } },
-      { min: 2501, max: Infinity, rarities: { 1: 10, 2: 30, 3: 45, 4: 12, 5: 3 } }
+      { min: 1, max: Infinity, rarities: { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 } }
     ],
     
     special: {
-      1: 5,      // First Party
-      42: 5,     // Answer to Everything
-      100: 5,    // Century Party
+      // 不設置特殊 ID
     }
   }
 };
@@ -125,8 +108,8 @@ function calculateRarityFromDistribution(tokenId, distribution) {
  * @returns {number} 稀有度 (1-5)
  */
 function getDefaultRarity(tokenId) {
-  // 默認分布：1星(30%), 2星(35%), 3星(25%), 4星(8%), 5星(2%)
-  const distribution = { 1: 30, 2: 35, 3: 25, 4: 8, 5: 2 };
+  // 默認分布：1星(40%), 2星(30%), 3星(20%), 4星(8%), 5星(2%)
+  const distribution = { 1: 40, 2: 30, 3: 20, 4: 8, 5: 2 };
   return calculateRarityFromDistribution(tokenId, distribution);
 }
 

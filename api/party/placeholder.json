@@ -1,0 +1,11 @@
+{
+  "name": "Unknown Party",
+  "description": "This party's data is currently unavailable. Please try again later.",
+  "image": "https://www.dungeondelvers.xyz/images/party/party-placeholder.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Loading"
+    }
+  ]
+}

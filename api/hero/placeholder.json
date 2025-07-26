@@ -1,0 +1,11 @@
+{
+  "name": "Unknown Hero",
+  "description": "This hero's data is currently unavailable. Please try again later.",
+  "image": "https://www.dungeondelvers.xyz/images/hero/hero-placeholder.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Loading"
+    }
+  ]
+}

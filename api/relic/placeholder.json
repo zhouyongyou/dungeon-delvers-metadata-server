@@ -1,0 +1,11 @@
+{
+  "name": "Unknown Relic",
+  "description": "This relic's data is currently unavailable. Please try again later.",
+  "image": "https://www.dungeondelvers.xyz/images/relic/relic-placeholder.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Loading"
+    }
+  ]
+}

@@ -424,101 +424,24 @@ function generateEnhancedNFTName(type, tokenId, rarity) {
   return `${stars} ${rarityText}${typeText} #${tokenId}`;
 }
 
-// 生成 fallback metadata
+// 生成 fallback metadata (占位符)
 async function generateFallbackMetadata(type, tokenId, rarity = null) {
-  // 如果沒有提供稀有度，嘗試從合約讀取
-  if (!rarity || rarity === 0) {
-    try {
-      rarity = await getRarityFromContract(type, tokenId);
-      if (rarity) {
-        console.log(`Fallback: 從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
-      } else {
-        // NFT 不存在
-        console.warn(`Fallback: ${type} #${tokenId} 在合約中不存在，使用映射表`);
-        rarity = getRarityFromMapping(type, tokenId);
-      }
-    } catch (error) {
-      console.error(`Fallback: 合約讀取失敗 ${error.message}`);
-      // 使用映射表
-      rarity = getRarityFromMapping(type, tokenId);
-    }
-  }
+  // 不再進行任何稀有度計算，直接返回占位符
+  console.log(`Generating placeholder for ${type} #${tokenId}`);
+  
   const baseData = {
     name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
-    description: '正在載入詳細資訊...',
-    image: '',
-    attributes: [],
-    source: 'fallback'
+    description: "This NFT's data is currently unavailable. Please try again later.",
+    image: `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`,
+    attributes: [
+      { trait_type: "Status", value: "Loading" },
+      { trait_type: "Token ID", value: parseInt(tokenId) }
+    ],
+    source: 'placeholder'
   };
   
-  const getImageByRarity = (type, rarity) => {
-    // 處理未知稀有度的情況
-    if (!rarity || rarity === 0) {
-      return `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`;
-    }
-    const rarityIndex = Math.max(1, Math.min(5, rarity));
-    return `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
-  };
-  
-  switch (type) {
-    case 'hero':
-      return {
-        ...baseData,
-        name: generateEnhancedNFTName('hero', tokenId, rarity),
-        image: getImageByRarity('hero', rarity),
-        attributes: [
-          { trait_type: 'Power', value: 0 },
-          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
-        ]
-      };
-    case 'relic':
-      return {
-        ...baseData,
-        name: generateEnhancedNFTName('relic', tokenId, rarity),
-        image: getImageByRarity('relic', rarity),
-        attributes: [
-          { trait_type: 'Capacity', value: 0 },
-          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
-        ]
-      };
-    case 'party':
-      return {
-        ...baseData,
-        name: generateEnhancedNFTName('party', tokenId, rarity),
-        image: `${FRONTEND_DOMAIN}/images/party/party.png`,
-        attributes: [
-          { trait_type: 'Total Power', value: 0 },
-          { trait_type: 'Heroes Count', value: 0 },
-          { trait_type: 'Rarity', value: typeof rarity === 'number' ? rarity : 1 }
-        ]
-      };
-    case 'vip':
-    case 'vipstaking':
-      return {
-        ...baseData,
-        name: `VIP Pass #${tokenId}`,
-        description: 'Exclusive VIP membership card for DungeonDelvers. Grants special privileges and reduced fees.',
-        image: `${FRONTEND_DOMAIN}/images/vip/vip.png`,
-        attributes: [
-          { trait_type: 'Type', value: 'VIP Pass' },
-          { trait_type: 'Status', value: 'Active' },
-          { trait_type: 'Benefits', value: 'Fee Reduction' }
-        ]
-      };
-    case 'playerprofile':
-      return {
-        ...baseData,
-        name: `Player Profile #${tokenId}`,
-        description: 'DungeonDelvers Player Profile NFT',
-        image: `${FRONTEND_DOMAIN}/images/profile/profile.png`,
-        attributes: [
-          { trait_type: 'Type', value: 'Player Profile' },
-          { trait_type: 'Status', value: 'Active' }
-        ]
-      };
-    default:
-      return baseData;
-  }
+  // 直接返回基礎占位符數據
+  return baseData;
 }
 
 // OKX Compatibility Layer (Deprecated - now using MarketplaceAdapter)
@@ -1001,9 +924,96 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           }
         }
         
-        // 如果 subgraph 沒有資料，嘗試從靜態 JSON 讀取
+        // 如果 subgraph 沒有資料，嘗試從合約確認 NFT 是否存在
         if (!nftData) {
-          let rarity = getRarityFromMapping(type, tokenId); // 預設使用映射表而非 1
+          console.log(`No subgraph data for ${type} #${tokenId}, checking contract...`);
+          
+          // 先嘗試從合約確認 NFT 是否存在
+          let nftExists = false;
+          let contractRarity = null;
+          
+          try {
+            contractRarity = await getRarityFromContract(type, tokenId);
+            if (contractRarity) {
+              nftExists = true;
+              console.log(`${type} #${tokenId} exists in contract with rarity ${contractRarity}`);
+            }
+          } catch (error) {
+            console.log(`Contract check failed: ${error.message}`);
+          }
+          
+          if (nftExists && contractRarity) {
+            // NFT 存在但子圖還沒索引，使用合約數據生成臨時元數據
+            const rarityIndex = Math.max(1, Math.min(5, contractRarity));
+            const jsonPath = path.join(JSON_BASE_PATH, type, `${rarityIndex}.json`);
+            const templateData = readJSONFile(jsonPath);
+            
+            if (templateData) {
+              nftData = {
+                ...templateData,
+                name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+                tokenId: tokenId.toString(),
+                attributes: [
+                  ...templateData.attributes,
+                  { trait_type: "Data Source", value: "Contract (Indexing)" }
+                ],
+                // 添加標記表示這是臨時數據
+                indexing: true
+              };
+              console.log(`Using contract data for ${type} #${tokenId} while indexing`);
+            }
+          }
+          
+          // 如果還是沒有數據，返回占位符
+          if (!nftData) {
+            console.log(`No data found for ${type} #${tokenId}, returning placeholder`);
+            
+            // 嘗試讀取占位符文件
+            const placeholderPath = path.join(JSON_BASE_PATH, type, 'placeholder.json');
+            const placeholderData = readJSONFile(placeholderPath);
+            
+            if (placeholderData) {
+              // 使用占位符數據
+              nftData = {
+                ...placeholderData,
+                name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+                tokenId: tokenId.toString()
+              };
+            } else {
+              // 連占位符都沒有，使用最基本的 fallback
+              nftData = {
+                name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+                description: "This NFT's data is currently unavailable. Please try again later.",
+                image: `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`,
+                attributes: [
+                  { trait_type: "Status", value: "Loading" },
+                  { trait_type: "Token ID", value: parseInt(tokenId) }
+                ],
+                tokenId: tokenId.toString()
+              };
+            }
+          }
+        }
+        
+        // 動態快取策略
+        if (nftData) {
+          if (nftData.indexing) {
+            // 正在索引的 NFT 只快取 10 秒，以便快速更新
+            cache.set(cacheKey, nftData, 10);
+            console.log(`Caching indexing NFT ${type} #${tokenId} for 10 seconds`);
+          } else if (nftData.source === 'placeholder') {
+            // 占位符快取 5 秒
+            cache.set(cacheKey, nftData, 5);
+            console.log(`Caching placeholder ${type} #${tokenId} for 5 seconds`);
+          } else {
+            // 正常數據快取 1 分鐘
+            cache.set(cacheKey, nftData, 60);
+          }
+        }
+        
+        // 直接跳到 marketplace adapter
+        if (false) { // 保留這段以避免大幅修改
+          let rarity = 1;
           
           // 測試模式：根據 tokenId 模擬稀有度
           const testRarity = getTestRarity(tokenId);
