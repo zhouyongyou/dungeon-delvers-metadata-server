@@ -434,13 +434,13 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
         console.log(`Fallback: 從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
       } else {
         // NFT 不存在
-        console.warn(`Fallback: ${type} #${tokenId} 在合約中不存在`);
-        rarity = 1;
+        console.warn(`Fallback: ${type} #${tokenId} 在合約中不存在，使用映射表`);
+        rarity = getRarityFromMapping(type, tokenId);
       }
     } catch (error) {
       console.error(`Fallback: 合約讀取失敗 ${error.message}`);
-      // 使用保守的預設值
-      rarity = 1;
+      // 使用映射表
+      rarity = getRarityFromMapping(type, tokenId);
     }
   }
   const baseData = {
@@ -1003,7 +1003,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         
         // 如果 subgraph 沒有資料，嘗試從靜態 JSON 讀取
         if (!nftData) {
-          let rarity = 1;
+          let rarity = getRarityFromMapping(type, tokenId); // 預設使用映射表而非 1
           
           // 測試模式：根據 tokenId 模擬稀有度
           const testRarity = getTestRarity(tokenId);
@@ -1030,13 +1030,13 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                     console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
                   } else {
                     // 合約也沒有資料，可能 NFT 不存在
-                    console.warn(`${type} #${tokenId} 在合約中不存在`);
-                    rarity = 1; // 不存在的 NFT 返回最低稀有度
+                    console.warn(`${type} #${tokenId} 在合約中不存在，使用映射表`);
+                    rarity = getRarityFromMapping(type, tokenId); // 使用映射表而非固定返回 1
                   }
                 } catch (contractError) {
                   console.error(`合約讀取失敗: ${contractError.message}`);
-                  // 最後備選：使用保守的預設值
-                  rarity = 1;
+                  // 最後備選：使用映射表
+                  rarity = getRarityFromMapping(type, tokenId);
                 }
               }
             } catch (error) {
@@ -1047,13 +1047,13 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                 if (rarity) {
                   console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
                 } else {
-                  console.warn(`${type} #${tokenId} 在合約中不存在`);
-                  rarity = 1;
+                  console.warn(`${type} #${tokenId} 在合約中不存在，使用映射表`);
+                  rarity = getRarityFromMapping(type, tokenId);
                 }
               } catch (contractError) {
                 console.error(`合約讀取也失敗: ${contractError.message}`);
-                // 最後備選：使用保守的預設值
-                rarity = 1;
+                // 最後備選：使用映射表
+                rarity = getRarityFromMapping(type, tokenId);
               }
             }
           }
