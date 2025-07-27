@@ -1040,13 +1040,13 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                     console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
                   } else {
                     // 合約也沒有資料，可能 NFT 不存在
-                    console.warn(`${type} #${tokenId} 在合約中不存在，使用映射表`);
-                    rarity = getRarityFromMapping(type, tokenId); // 使用映射表而非固定返回 1
+                    console.warn(`${type} #${tokenId} 在合約中不存在，不設置稀有度`);
+                    rarity = null; // 不使用假的隨機值
                   }
                 } catch (contractError) {
                   console.error(`合約讀取失敗: ${contractError.message}`);
-                  // 最後備選：使用映射表
-                  rarity = getRarityFromMapping(type, tokenId);
+                  // 最後備選：不設置稀有度
+                  rarity = null;
                 }
               }
             } catch (error) {
@@ -1057,22 +1057,32 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                 if (rarity) {
                   console.log(`從合約獲取 ${type} #${tokenId} 稀有度: ${rarity}`);
                 } else {
-                  console.warn(`${type} #${tokenId} 在合約中不存在，使用映射表`);
-                  rarity = getRarityFromMapping(type, tokenId);
+                  console.warn(`${type} #${tokenId} 在合約中不存在，不設置稀有度`);
+                  rarity = null;
                 }
               } catch (contractError) {
                 console.error(`合約讀取也失敗: ${contractError.message}`);
-                // 最後備選：使用映射表
-                rarity = getRarityFromMapping(type, tokenId);
+                // 最後備選：不設置稀有度
+                rarity = null;
               }
             }
           }
           
           // 根據稀有度選擇圖片 (1-5)
-          const rarityIndex = Math.max(1, Math.min(5, rarity));
-          const jsonPath = path.join(JSON_BASE_PATH, type, `${rarityIndex}.json`);
-          
-          let metadata = readJSONFile(jsonPath);
+          if (rarity === null || rarity === undefined) {
+            console.log(`${type} #${tokenId} 沒有稀有度資料，使用占位符`);
+            nftData = await generateFallbackMetadata(type, tokenId, null);
+            nftData = {
+              ...nftData,
+              id: tokenId,
+              contractAddress: CONTRACTS[type],
+              type
+            };
+          } else {
+            const rarityIndex = Math.max(1, Math.min(5, rarity));
+            const jsonPath = path.join(JSON_BASE_PATH, type, `${rarityIndex}.json`);
+            
+            let metadata = readJSONFile(jsonPath);
           
           if (!metadata) {
             console.warn(`${type} JSON not found for rarity ${rarityIndex}, using fallback`);
@@ -1096,12 +1106,13 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             }
           }
           
-          nftData = {
-            ...metadata,
-            id: tokenId,
-            contractAddress: CONTRACTS[type],
-            type
-          };
+            nftData = {
+              ...metadata,
+              id: tokenId,
+              contractAddress: CONTRACTS[type],
+              type
+            };
+          }
         }
         
         // 檢查是否需要從市場更新資料（暫時禁用，因為市場 API 有問題）
