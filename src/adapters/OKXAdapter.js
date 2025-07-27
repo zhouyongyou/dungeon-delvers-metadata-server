@@ -87,10 +87,8 @@ class OKXAdapter extends MarketplaceAdapter {
     // Ensure HTTPS image URL
     this.metadata.image = this.ensureHttpsUrl(this.metadata.image, this.frontendDomain);
     
-    // 如果是占位圖，使用 OKX 友好的版本
-    if (this.metadata.image && this.metadata.image.includes('placeholder')) {
-      this.metadata.image = `${this.frontendDomain}/images/okx-placeholder.png`;
-    }
+    // 占位圖片已經是正確的路徑，不需要特別修改
+    // 例如：/images/hero/hero-placeholder.png
 
     // Add external_url for OKX detail page navigation
     if (!this.metadata.external_url) {
