@@ -584,13 +584,19 @@ async function fetchFromOpenSea(type, tokenId, contractAddress) {
   return null;
 }
 
-// 從NFT市場獲取最新資料（BSC鏈優先）
+// 從NFT市場獲取最新資料（只有 OKX 支援 BSC）
 async function fetchFromNFTMarket(type, tokenId, contractAddress) {
-  // 按優先級嘗試不同的BSC市場
+  // 檢查是否啟用市場獲取
+  if (process.env.ENABLE_MARKET_FETCH !== 'true') {
+    return null;
+  }
+  
+  // 只使用 OKX，因為是 BSC 上唯一的 NFT 市場
   const marketSources = [
     { name: 'okx', fetchFn: () => fetchFromOKX(type, tokenId, contractAddress) },
-    { name: 'element', fetchFn: () => fetchFromElement(type, tokenId, contractAddress) },
-    { name: 'opensea', fetchFn: () => fetchFromOpenSea(type, tokenId, contractAddress) },
+    // Element 和 OpenSea 已不再支援 BSC
+    // { name: 'element', fetchFn: () => fetchFromElement(type, tokenId, contractAddress) },
+    // { name: 'opensea', fetchFn: () => fetchFromOpenSea(type, tokenId, contractAddress) },
   ];
 
   for (const source of marketSources) {
@@ -1563,9 +1569,9 @@ async function startServer() {
     console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
-    console.log(`🔄 BSC Market integration: ${Object.keys(NFT_MARKET_APIS).join(', ')}`);
+    console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
     console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
-    console.log(`🎯 Priority: OKX > Element > OpenSea > Metadata Server`);
+    console.log(`🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)`);
     console.log(`⚙️ Dynamic Config: ${process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v15.json'}`);
     
     if (process.env.NODE_ENV === 'development') {

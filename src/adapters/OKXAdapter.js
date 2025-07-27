@@ -31,6 +31,10 @@ class OKXAdapter extends MarketplaceAdapter {
 
       // Handle Rarity - MUST be numeric for OKX
       if (attr.trait_type === 'Rarity') {
+        // 如果稀有度為 null 或 undefined，不包含此屬性
+        if (attr.value === null || attr.value === undefined || attr.value === 'Unknown') {
+          return null; // 將在後面過濾掉
+        }
         adapted.value = this.normalizeRarity(attr.value);
         adapted.display_type = 'number';
         
@@ -51,7 +55,7 @@ class OKXAdapter extends MarketplaceAdapter {
       
       // Keep string attributes as-is
       return adapted;
-    });
+    }).filter(attr => attr !== null); // 過濾掉 null 值
 
     // Ensure Token ID is present and numeric
     const hasTokenId = this.metadata.attributes.some(attr => attr.trait_type === 'Token ID');
@@ -63,8 +67,30 @@ class OKXAdapter extends MarketplaceAdapter {
       });
     }
 
+    // 如果沒有稀有度，添加狀態說明
+    const hasRarity = this.metadata.attributes.some(attr => attr.trait_type === 'Rarity');
+    if (!hasRarity) {
+      this.metadata.attributes.push({
+        trait_type: 'Status',
+        value: 'Data Syncing',
+        display_type: 'string'
+      });
+      
+      // 添加 BSC 鏈標識
+      this.metadata.attributes.push({
+        trait_type: 'Chain',
+        value: 'BSC',
+        display_type: 'string'
+      });
+    }
+    
     // Ensure HTTPS image URL
     this.metadata.image = this.ensureHttpsUrl(this.metadata.image, this.frontendDomain);
+    
+    // 如果是占位圖，使用 OKX 友好的版本
+    if (this.metadata.image && this.metadata.image.includes('placeholder')) {
+      this.metadata.image = `${this.frontendDomain}/images/okx-placeholder.png`;
+    }
 
     // Add external_url for OKX detail page navigation
     if (!this.metadata.external_url) {
