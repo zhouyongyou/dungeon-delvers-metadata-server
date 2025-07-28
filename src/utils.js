@@ -26,9 +26,16 @@ export const publicClient = createPublicClient({
   transport: http(process.env.BSC_RPC_URL || 'https://bsc-dataseed1.binance.org/'),
 });
 
-// ★ 新增：The Graph 客戶端 (帶重試機制)
-const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || process.env.VITE_THE_GRAPH_STUDIO_API_URL;
+// ★ 新增：The Graph 客戶端 (帶重試機制和備用URL)
+const THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 
+                         process.env.THE_GRAPH_DECENTRALIZED_URL || 
+                         'https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs';
+
+const THE_GRAPH_STUDIO_URL = process.env.THE_GRAPH_STUDIO_URL || 
+                            'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v3.2.0';
+
 const baseGraphClient = new GraphQLClient(THE_GRAPH_API_URL);
+const studioGraphClient = new GraphQLClient(THE_GRAPH_STUDIO_URL);
 
 // ★ 新增：Redis 客戶端配置
 const redis = new Redis({

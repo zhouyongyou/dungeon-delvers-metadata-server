@@ -77,6 +77,34 @@ const defaultRateLimiter = new RateLimiterMemory({
   blockDuration: 60, // 超限後封鎖 60 秒
 });
 
+// NFT 預緩存機制配置
+const PREHEAT_CONFIG = {
+  enabled: process.env.PREHEAT_ENABLED !== 'false', // 默認啟用
+  interval: parseInt(process.env.PREHEAT_INTERVAL) || 3 * 60 * 1000, // 3 分鐘檢查一次
+  quickInterval: 30 * 1000, // 快速檢查間隔：30 秒（檢測突發鑄造）
+  lookbackMinutes: 60, // 檢查最近 60 分鐘的 NFT
+  quickLookbackMinutes: 5, // 快速檢查最近 5 分鐘
+  
+  // 動態並發控制
+  baseConcurrency: 20, // 基礎並發數
+  maxConcurrency: 100, // 最大並發數
+  batchSize: 50, // 每批處理數量
+  batchDelay: 2000, // 批次間延遲 (毫秒)
+  
+  // 智能重試機制
+  maxRetries: 3,
+  retryDelay: 5000, // 重試延遲
+  
+  // 緩存策略 - ID 永不重用，可以放心長期緩存
+  newNftCacheTTL: 90 * 24 * 60 * 60, // 新 NFT 緩存 90 天（更保守，防止意外）
+  permanentCacheTTL: 365 * 24 * 60 * 60, // 確認存在的 NFT 緩存 1 年（ID 永不重用）
+  cacheTTL: 30 * 24 * 60 * 60, // 預熱數據的默認緩存 30 天
+  
+  // 負載控制
+  maxRpcCallsPerMinute: 200, // 每分鐘最多 RPC 調用數
+  enableAdaptiveConcurrency: true, // 自適應並發控制
+};
+
 const serviceRateLimiter = new RateLimiterMemory({
   keyGenerator: (req) => req.ip,
   points: 1000, // 已知服務：1000 請求/分鐘
@@ -167,9 +195,17 @@ const hotNftCache = new NodeCache({
 // Section: 配置常量
 // =================================================================
 
-// The Graph URL - 可以被動態配置覆蓋
-let THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v2.0.5';
+// The Graph URL - 支援去中心化優先策略
+let THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 
+                       process.env.THE_GRAPH_DECENTRALIZED_URL || 
+                       'https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs';
+
+// Studio 版本作為備用
+const THE_GRAPH_STUDIO_URL = process.env.THE_GRAPH_STUDIO_URL || 
+                            'https://api.studio.thegraph.com/query/115633/dungeon-delvers/v3.2.0';
+
 global.THE_GRAPH_API_URL = THE_GRAPH_API_URL;
+global.THE_GRAPH_STUDIO_URL = THE_GRAPH_STUDIO_URL;
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
 // JSON 文件路徑配置 - 指向主專案的 public/api
@@ -322,27 +358,51 @@ const GRAPHQL_QUERIES = {
 
 // GraphQL 請求函數
 async function queryGraphQL(query, variables = {}) {
+  const requestConfig = {
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0'
+    }
+  };
+
+  // 首先嘗試去中心化版本
   try {
-    // 使用全局的 THE_GRAPH_API_URL（可能被動態配置更新）
+    console.log(`[The Graph] 使用去中心化版本查詢...`);
     const response = await axios.post(global.THE_GRAPH_API_URL || THE_GRAPH_API_URL, {
       query,
       variables
-    }, {
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'DungeonDelvers-MetadataServer/1.3.0'
-      }
-    });
-    
+    }, requestConfig);
+
     if (response.data.errors) {
       throw new Error(`GraphQL errors: ${JSON.stringify(response.data.errors)}`);
     }
-    
+
+    console.log(`[The Graph] ✅ 去中心化版本查詢成功`);
     return response.data.data;
-  } catch (error) {
-    console.error('GraphQL query failed:', error.message);
-    throw error;
+    
+  } catch (primaryError) {
+    console.error(`[The Graph] ❌ 去中心化版本失敗:`, primaryError.message);
+    
+    // 備用：嘗試 Studio 版本
+    try {
+      console.log(`[The Graph] 嘗試 Studio 備用版本...`);
+      const fallbackResponse = await axios.post(global.THE_GRAPH_STUDIO_URL || THE_GRAPH_STUDIO_URL, {
+        query,
+        variables
+      }, requestConfig);
+
+      if (fallbackResponse.data.errors) {
+        throw new Error(`Studio GraphQL errors: ${JSON.stringify(fallbackResponse.data.errors)}`);
+      }
+
+      console.log(`[The Graph] ✅ Studio 備用版本查詢成功`);
+      return fallbackResponse.data.data;
+      
+    } catch (fallbackError) {
+      console.error(`[The Graph] ❌ Studio 備用版本也失敗:`, fallbackError.message);
+      throw new Error(`所有 GraphQL 端點都失敗 - 主要: ${primaryError.message}, 備用: ${fallbackError.message}`);
+    }
   }
 }
 
@@ -1553,6 +1613,340 @@ app.use((error, req, res, next) => {
 // Section: 服務啟動
 // =================================================================
 
+// 預緩存統計數據
+let preheatStats = {
+  processed: 0,
+  failed: 0,
+  skipped: 0,
+  rpcCalls: 0,
+  lastRun: null,
+  avgProcessingTime: 0
+};
+
+// RPC 調用速率控制
+let rpcCallHistory = [];
+
+// 檢查 RPC 調用速率
+function checkRpcRateLimit() {
+  const now = Date.now();
+  const oneMinuteAgo = now - 60000;
+  
+  // 清理過期記錄
+  rpcCallHistory = rpcCallHistory.filter(time => time > oneMinuteAgo);
+  
+  return rpcCallHistory.length < PREHEAT_CONFIG.maxRpcCallsPerMinute;
+}
+
+// 記錄 RPC 調用
+function recordRpcCall() {
+  rpcCallHistory.push(Date.now());
+  preheatStats.rpcCalls++;
+}
+
+// 自適應並發控制
+function getAdaptiveConcurrency(failureRate, avgResponseTime) {
+  if (!PREHEAT_CONFIG.enableAdaptiveConcurrency) {
+    return PREHEAT_CONFIG.baseConcurrency;
+  }
+  
+  let concurrency = PREHEAT_CONFIG.baseConcurrency;
+  
+  // 根據失敗率調整
+  if (failureRate > 0.1) { // 失敗率超過 10%
+    concurrency = Math.max(5, concurrency * 0.5);
+  } else if (failureRate < 0.02) { // 失敗率低於 2%
+    concurrency = Math.min(PREHEAT_CONFIG.maxConcurrency, concurrency * 1.5);
+  }
+  
+  // 根據響應時間調整
+  if (avgResponseTime > 3000) { // 響應時間超過 3 秒
+    concurrency = Math.max(10, concurrency * 0.7);
+  }
+  
+  return Math.floor(concurrency);
+}
+
+// 快速預熱檢查（只檢查最近 5 分鐘）
+async function quickPreheatCheck() {
+  if (!PREHEAT_CONFIG.enabled) {
+    return;
+  }
+
+  try {
+    // 快速查詢最近 5 分鐘的 NFT
+    const data = await queryGraphQL(`
+      query GetVeryRecentNFTs {
+        heros(first: 50, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+        relics(first: 50, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+        parties(first: 50, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+      }
+    `);
+
+    const cutoffTime = Date.now() - (PREHEAT_CONFIG.quickLookbackMinutes * 60 * 1000);
+    let urgentNFTs = [];
+    
+    ['heros', 'relics', 'parties'].forEach(nftType => {
+      const type = nftType === 'heros' ? 'hero' : nftType === 'relics' ? 'relic' : 'party';
+      
+      if (data?.[nftType]) {
+        data[nftType].forEach(nft => {
+          const createdTime = parseInt(nft.createdAt) * 1000;
+          
+          if (createdTime > cutoffTime) {
+            const cacheKey = generateCacheKey(`${type}-${nft.tokenId}`, {});
+            
+            if (!cache.get(cacheKey)) {
+              urgentNFTs.push({ 
+                type, 
+                tokenId: nft.tokenId, 
+                createdAt: createdTime,
+                retries: 0
+              });
+            }
+          }
+        });
+      }
+    });
+
+    if (urgentNFTs.length > 0) {
+      console.log(`🚨 快速預熱: 發現 ${urgentNFTs.length} 個緊急 NFT`);
+      
+      // 高優先級處理，使用最大並發
+      const chunks = [];
+      for (let i = 0; i < urgentNFTs.length; i += PREHEAT_CONFIG.maxConcurrency) {
+        chunks.push(urgentNFTs.slice(i, i + PREHEAT_CONFIG.maxConcurrency));
+      }
+
+      for (const chunk of chunks) {
+        const promises = chunk.map(nft => preheatSingleNFT(nft));
+        await Promise.allSettled(promises);
+      }
+      
+      console.log(`⚡ 快速預熱完成: ${urgentNFTs.length} 個 NFT`);
+    }
+  } catch (error) {
+    console.warn('⚠️ 快速預熱失敗:', error.message);
+  }
+}
+
+// NFT 預緩存機制（增強版）
+async function preheatNewNFTs(isFullCheck = true) {
+  if (!PREHEAT_CONFIG.enabled) {
+    return;
+  }
+
+  const startTime = Date.now();
+  console.log('🔥 開始預熱新 NFT...');
+
+  try {
+    // 檢查子圖中的最新 NFT（增加查詢數量）
+    const data = await queryGraphQL(`
+      query GetRecentNFTs {
+        heros(first: 100, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+        relics(first: 100, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+        parties(first: 100, orderBy: createdAt, orderDirection: desc) {
+          id tokenId createdAt
+        }
+      }
+    `);
+
+    const recentNFTs = [];
+    const lookbackTime = isFullCheck ? PREHEAT_CONFIG.lookbackMinutes : PREHEAT_CONFIG.quickLookbackMinutes;
+    const cutoffTime = Date.now() - (lookbackTime * 60 * 1000);
+    
+    // 收集最近的 NFT
+    ['heros', 'relics', 'parties'].forEach(nftType => {
+      const type = nftType === 'heros' ? 'hero' : nftType === 'relics' ? 'relic' : 'party';
+      
+      if (data?.[nftType]) {
+        data[nftType].forEach(nft => {
+          const createdTime = parseInt(nft.createdAt) * 1000;
+          
+          if (createdTime > cutoffTime) {
+            const cacheKey = generateCacheKey(`${type}-${nft.tokenId}`, {});
+            
+            // 檢查是否已緩存
+            if (!cache.get(cacheKey)) {
+              recentNFTs.push({ 
+                type, 
+                tokenId: nft.tokenId, 
+                createdAt: createdTime,
+                retries: 0
+              });
+            } else {
+              preheatStats.skipped++;
+            }
+          }
+        });
+      }
+    });
+
+    console.log(`📊 發現 ${recentNFTs.length} 個未緩存的 NFT`);
+    
+    if (recentNFTs.length === 0) {
+      console.log('✅ 沒有需要預熱的 NFT');
+      return;
+    }
+
+    // 計算自適應並發數
+    const failureRate = preheatStats.processed > 0 ? preheatStats.failed / preheatStats.processed : 0;
+    const currentConcurrency = getAdaptiveConcurrency(failureRate, preheatStats.avgProcessingTime);
+    
+    console.log(`⚙️ 使用並發數: ${currentConcurrency} (失敗率: ${(failureRate * 100).toFixed(1)}%)`);
+
+    // 分批處理
+    const batches = [];
+    for (let i = 0; i < recentNFTs.length; i += PREHEAT_CONFIG.batchSize) {
+      batches.push(recentNFTs.slice(i, i + PREHEAT_CONFIG.batchSize));
+    }
+
+    let totalProcessed = 0;
+    let totalFailed = 0;
+
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex];
+      console.log(`📦 處理批次 ${batchIndex + 1}/${batches.length} (${batch.length} 個 NFT)`);
+
+      // 分組並發處理
+      const chunks = [];
+      for (let i = 0; i < batch.length; i += currentConcurrency) {
+        chunks.push(batch.slice(i, i + currentConcurrency));
+      }
+
+      for (const chunk of chunks) {
+        // 檢查 RPC 速率限制
+        if (!checkRpcRateLimit()) {
+          console.warn('⚠️ RPC 速率限制，等待 10 秒...');
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          continue;
+        }
+
+        const chunkPromises = chunk.map(async (nft) => {
+          return preheatSingleNFT(nft);
+        });
+
+        const results = await Promise.allSettled(chunkPromises);
+        
+        results.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            if (result.value) {
+              totalProcessed++;
+              console.log(`✅ 預熱成功: ${chunk[index].type} #${chunk[index].tokenId}`);
+            } else {
+              totalFailed++;
+            }
+          } else {
+            totalFailed++;
+            console.warn(`❌ 預熱失敗: ${chunk[index].type} #${chunk[index].tokenId}: ${result.reason}`);
+          }
+        });
+
+        // 批次間延遲
+        if (batchIndex < batches.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, PREHEAT_CONFIG.batchDelay));
+        }
+      }
+    }
+
+    // 更新統計
+    preheatStats.processed += totalProcessed;
+    preheatStats.failed += totalFailed;
+    preheatStats.lastRun = new Date().toISOString();
+    preheatStats.avgProcessingTime = Date.now() - startTime;
+
+    console.log(`🔥 預熱完成: 成功 ${totalProcessed}, 失敗 ${totalFailed}, 總耗時 ${(Date.now() - startTime)/1000}s`);
+
+  } catch (error) {
+    console.error('❌ 預熱過程失敗:', error.message);
+    preheatStats.failed++;
+  }
+}
+
+// 單個 NFT 預熱處理
+async function preheatSingleNFT(nft) {
+  const startTime = Date.now();
+  
+  try {
+    recordRpcCall();
+    
+    // 預先獲取稀有度
+    const rarity = await getRarityFromContract(nft.type, nft.tokenId);
+    
+    if (rarity) {
+      const metadata = await generateMetadata(nft.type, nft.tokenId, rarity);
+      const cacheKey = generateCacheKey(`${nft.type}-${nft.tokenId}`, {});
+      
+      // 根據 NFT 年齡決定緩存時間
+      const nftAge = Date.now() - nft.createdAt;
+      const isVeryNewNFT = nftAge < (24 * 60 * 60 * 1000); // 24 小時內算很新 NFT
+      const isNewNFT = nftAge < (30 * 24 * 60 * 60 * 1000); // 30 天內算新 NFT
+      
+      let cacheTime;
+      if (isVeryNewNFT) {
+        cacheTime = PREHEAT_CONFIG.newNftCacheTTL; // 90 天緩存
+      } else if (isNewNFT) {
+        cacheTime = PREHEAT_CONFIG.newNftCacheTTL; // 90 天緩存
+      } else {
+        cacheTime = PREHEAT_CONFIG.permanentCacheTTL; // 1 年緩存
+      }
+      cache.set(cacheKey, {
+        ...metadata,
+        cached: Date.now(),
+        source: 'preheated',
+        permanent: !isNewNFT
+      }, cacheTime);
+      
+      // 如果是熱門 NFT，也加入熱門緩存
+      if (parseInt(nft.tokenId) <= 1000) {
+        hotNftCache.set(cacheKey, metadata, cacheTime);
+      }
+      
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    // 重試邏輯
+    if (nft.retries < PREHEAT_CONFIG.maxRetries) {
+      nft.retries++;
+      console.warn(`🔄 重試 ${nft.type} #${nft.tokenId} (第 ${nft.retries} 次)`);
+      
+      await new Promise(resolve => setTimeout(resolve, PREHEAT_CONFIG.retryDelay));
+      return preheatSingleNFT(nft);
+    }
+    
+    throw error;
+  }
+}
+
+// 生成元數據的輔助函數
+async function generateMetadata(type, tokenId, rarity) {
+  const rarityIndex = Math.max(1, Math.min(5, rarity));
+  
+  return {
+    name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+    description: `Dungeon Delvers ${type} with rarity ${rarity}`,
+    image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
+    attributes: [
+      { trait_type: 'Token ID', value: parseInt(tokenId) },
+      { trait_type: 'Rarity', value: rarity },
+      { trait_type: 'Data Source', value: 'Preheated' }
+    ],
+    tokenId: tokenId.toString(),
+    source: 'preheated'
+  };
+}
+
 // 啟動服務器
 async function startServer() {
   // 初始化配置
@@ -1570,9 +1964,26 @@ async function startServer() {
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
     console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
-    console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs)`);
+    console.log(`⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)`);
     console.log(`🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)`);
     console.log(`⚙️ Dynamic Config: ${process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v15.json'}`);
+    
+    // 啟動預熱機制
+    if (PREHEAT_CONFIG.enabled) {
+      console.log(`🔥 NFT Preheat: Every ${PREHEAT_CONFIG.interval/60000} minutes`);
+      console.log(`📊 Concurrency: ${PREHEAT_CONFIG.baseConcurrency}-${PREHEAT_CONFIG.maxConcurrency} (adaptive)`);
+      console.log(`📦 Batch size: ${PREHEAT_CONFIG.batchSize}, delay: ${PREHEAT_CONFIG.batchDelay}ms`);
+      console.log(`🔄 Max RPC calls: ${PREHEAT_CONFIG.maxRpcCallsPerMinute}/min`);
+      
+      // 立即執行一次完整預熱（服務器啟動後）
+      setTimeout(() => preheatNewNFTs(true), 30000); // 30 秒後開始完整檢查
+      
+      // 定期執行完整檢查
+      setInterval(() => preheatNewNFTs(true), PREHEAT_CONFIG.interval);
+      
+      // 每 30 秒快速檢查最近 5 分鐘的鑄造
+      setInterval(quickPreheatCheck, PREHEAT_CONFIG.quickInterval);
+    }
     
     if (process.env.NODE_ENV === 'development') {
       console.log(`🔧 Development mode: Local static files available at /images and /assets`);
