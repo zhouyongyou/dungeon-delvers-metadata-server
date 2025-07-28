@@ -32,7 +32,7 @@ CORS_ORIGIN=https://dungeondelvers.xyz,https://www.dungeondelvers.xyz
 FRONTEND_DOMAIN=https://dungeondelvers.xyz
 
 # 可選（有默認值）
-CONFIG_URL=https://dungeondelvers.xyz/config/v15.json
+CONFIG_URL=https://dungeondelvers.xyz/config/v25.json
 
 # 不再需要設置合約地址！
 # 所有地址從 CDN 配置自動載入

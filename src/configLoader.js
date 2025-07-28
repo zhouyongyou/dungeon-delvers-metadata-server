@@ -11,9 +11,9 @@ class ConfigLoader {
     // 開發環境使用本地文件，生產環境使用 CDN
     if (process.env.NODE_ENV === 'development' || !process.env.CONFIG_URL) {
       // 嘗試使用本地前端的配置文件
-      this.configUrl = 'file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v19.json';
+      this.configUrl = 'file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json';
     } else {
-      this.configUrl = process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v19.json';
+      this.configUrl = process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v25.json';
     }
     this.lastFetch = 0;
     this.cacheDuration = 5 * 60 * 1000; // 5 分鐘緩存
@@ -106,7 +106,7 @@ class ConfigLoader {
       version: process.env.VERSION || 'Unknown',
       contracts,
       subgraph: {
-        url: process.env.THE_GRAPH_API_URL
+        url: process.env.THE_GRAPH_API_URL || 'https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs'
       }
     };
   }

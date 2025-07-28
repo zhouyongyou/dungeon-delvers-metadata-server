@@ -2,7 +2,7 @@
 // 在 index.js 的第 171 行附近
 
 // The Graph URL - 使用去中心化版本
-let THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://gateway.thegraph.com/api/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs';
+let THE_GRAPH_API_URL = process.env.THE_GRAPH_API_URL || 'https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs';
 global.THE_GRAPH_API_URL = THE_GRAPH_API_URL;
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
