@@ -1,0 +1,43 @@
+// V25 Contract Configuration for Backend
+// Generated on 2025-07-29T11:29:24.848Z
+// DO NOT EDIT MANUALLY - Use v25-sync-all.js to update
+
+module.exports = {
+  // BSC Mainnet Contracts
+  contracts: {
+    // Core Contracts
+    DUNGEONCORE: '0x2B5A79C9B4586219Beac988f0c2ff6b3f30E573c',
+    ORACLE: '0xFd6bEF32C48B2F97fBe3ec113AFC344b2dEE7f81',
+    
+    // Token Contracts
+    SOULSHARD: '0x97B2C2a9A11C7b6A020b4bAEaAd349865eaD0bcF',
+    
+    // NFT Contracts
+    HERO: '0x76C9c7E9a82132739A6E6B04FD87f16801F4EF22',
+    RELIC: '0xe66036839c7E5F8372ADC36da8f0357429a96A34',
+    PARTY: '0x22Ac9b248716FA64eD97025c77112c4c3e0169ab',
+    
+    // Game Contracts
+    DUNGEONMASTER: '0xf7143B7644219e896D2013Fc01bc9e9e006C6Dca',
+    DUNGEONSTORAGE: '0xf8B2c73fe5d8A7c6B11C4d8e67673258F4D8af36',
+    PLAYERVAULT: '0xfCC9B70840754F38e7d1a8609BB12C04776BBb5a',
+    PLAYERPROFILE: '0x90e86Dc3c536B63AF5Df93F29df61Ce3961fcbb4',
+    
+    // Feature Contracts
+    VIPSTAKING: '0xf8D77F5588d1F93a18CFe36e3aad4037Cc81038C',
+    ALTAROFASCENSION: '0x462fdBAdEc00895ddF168197Be16fff9ed786DC8',
+    
+    // External
+    DUNGEONMASTERWALLET: '0x10925A7138649C7E1794CE646182eeb5BF8ba647',
+  },
+  
+  // Contract version for tracking
+  version: 'V25',
+  
+  // Network configuration
+  network: {
+    chainId: 56,
+    name: 'BSC Mainnet',
+    rpcUrl: process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/'
+  }
+};
