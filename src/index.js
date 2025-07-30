@@ -284,13 +284,13 @@ const GRAPHQL_QUERIES = {
   getNftById: `
     query GetNftById($nftId: String!) {
       hero(id: $nftId) {
-        id tokenId owner { id } power rarity createdAt
+        id tokenId owner { id } power rarity createdAt contractAddress
       }
       relic(id: $nftId) {
-        id tokenId owner { id } capacity rarity createdAt
+        id tokenId owner { id } capacity rarity createdAt contractAddress
       }
       party(id: $nftId) {
-        id tokenId owner { id } totalPower totalCapacity partyRarity createdAt
+        id tokenId owner { id } totalPower totalCapacity partyRarity createdAt contractAddress
       }
     }
   `,
@@ -623,18 +623,87 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   // 不再進行任何稀有度計算，直接返回占位符
   console.log(`Generating placeholder for ${type} #${tokenId}`);
   
+  // 嘗試從子圖獲取數據以提供更完整的占位符
+  let additionalAttributes = [];
+  let hasSubgraphData = false;
+  
+  try {
+    const contractAddress = CONTRACTS[type];
+    const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
+    const data = await queryGraphQL(GRAPHQL_QUERIES.getNftById, { nftId });
+    
+    if (data && data[type]) {
+      const nft = data[type];
+      hasSubgraphData = true;
+      
+      // 更新稀有度
+      if (nft.rarity || nft.partyRarity) {
+        rarity = parseInt(nft.rarity || nft.partyRarity);
+      }
+      
+      // 添加類型特定的屬性
+      if (type === 'hero' && nft.power) {
+        additionalAttributes.push({
+          trait_type: 'Power',
+          value: parseInt(nft.power),
+          display_type: 'number',
+          max_value: 255
+        });
+      } else if (type === 'relic' && nft.capacity) {
+        additionalAttributes.push({
+          trait_type: 'Capacity',
+          value: parseInt(nft.capacity),
+          display_type: 'number',
+          max_value: 5
+        });
+      } else if (type === 'party') {
+        if (nft.totalPower) {
+          additionalAttributes.push({
+            trait_type: 'Total Power',
+            value: parseInt(nft.totalPower),
+            display_type: 'number',
+            max_value: 2820
+          });
+        }
+        if (nft.totalCapacity) {
+          additionalAttributes.push({
+            trait_type: 'Total Capacity',
+            value: parseInt(nft.totalCapacity),
+            display_type: 'number',
+            max_value: 25
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`無法從子圖獲取 ${type} #${tokenId} 的數據:`, error.message);
+  }
+  
+  // 根據是否有稀有度數據決定圖片
+  const imageUrl = rarity && rarity >= 1 && rarity <= 5
+    ? `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarity}.png`
+    : `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`;
+  
   const baseData = {
-    name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
-    description: "This NFT's data is currently unavailable. Please try again later.",
-    image: `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`,
+    name: rarity ? generateEnhancedNFTName(type, tokenId, rarity) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+    description: hasSubgraphData ? "Dungeon Delvers NFT" : "This NFT's data is currently unavailable. Please try again later.",
+    image: imageUrl,
     attributes: [
-      { trait_type: "Status", value: "Loading" },
-      { trait_type: "Token ID", value: parseInt(tokenId) }
+      { trait_type: "Token ID", value: parseInt(tokenId), display_type: "number" },
+      ...(rarity ? [{
+        trait_type: "Rarity",
+        value: rarity,
+        display_type: "number",
+        max_value: 5
+      }] : []),
+      ...additionalAttributes,
+      { trait_type: "Status", value: hasSubgraphData ? "Available" : "Loading" },
+      { trait_type: "Data Source", value: hasSubgraphData ? "Subgraph" : "Fallback" }
     ],
-    source: 'placeholder'
+    source: hasSubgraphData ? 'subgraph-fallback' : 'placeholder',
+    metadata_status: hasSubgraphData ? 'final' : 'pending'
   };
   
-  // 直接返回基礎占位符數據
   return baseData;
 }
 
@@ -2118,17 +2187,71 @@ async function preheatSingleNFT(nft) {
 async function generateMetadata(type, tokenId, rarity) {
   const rarityIndex = Math.max(1, Math.min(5, rarity));
   
+  // 嘗試從子圖獲取完整數據
+  let additionalAttributes = [];
+  try {
+    const contractAddress = CONTRACTS[type];
+    const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
+    const data = await queryGraphQL(GRAPHQL_QUERIES.getNftById, { nftId });
+    
+    if (data && data[type]) {
+      const nft = data[type];
+      
+      if (type === 'hero' && nft.power) {
+        additionalAttributes.push({
+          trait_type: 'Power',
+          value: parseInt(nft.power),
+          display_type: 'number',
+          max_value: 255
+        });
+      } else if (type === 'relic' && nft.capacity) {
+        additionalAttributes.push({
+          trait_type: 'Capacity',
+          value: parseInt(nft.capacity),
+          display_type: 'number',
+          max_value: 5
+        });
+      } else if (type === 'party') {
+        if (nft.totalPower) {
+          additionalAttributes.push({
+            trait_type: 'Total Power',
+            value: parseInt(nft.totalPower),
+            display_type: 'number',
+            max_value: 2820
+          });
+        }
+        if (nft.totalCapacity) {
+          additionalAttributes.push({
+            trait_type: 'Total Capacity',
+            value: parseInt(nft.totalCapacity),
+            display_type: 'number',
+            max_value: 25
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`無法從子圖獲取 ${type} #${tokenId} 的額外屬性:`, error.message);
+  }
+  
   return {
-    name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
+    name: generateEnhancedNFTName(type, tokenId, rarity),
     description: `Dungeon Delvers ${type} with rarity ${rarity}`,
     image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
     attributes: [
-      { trait_type: 'Token ID', value: parseInt(tokenId) },
-      { trait_type: 'Rarity', value: rarity },
+      { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
+      { 
+        trait_type: 'Rarity', 
+        value: rarity,
+        display_type: 'number',
+        max_value: 5
+      },
+      ...additionalAttributes,
       { trait_type: 'Data Source', value: 'Preheated' }
     ],
     tokenId: tokenId.toString(),
-    source: 'preheated'
+    source: 'preheated',
+    metadata_status: additionalAttributes.length > 0 ? 'complete' : 'partial'
   };
 }
 
