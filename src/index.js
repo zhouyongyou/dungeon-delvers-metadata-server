@@ -1149,6 +1149,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               source: 'subgraph',
               contractAddress,
               type,
+              metadata_status: 'final',
               // 保留原始子圖資料供內部使用
               _subgraphData: nft
             };
@@ -1176,23 +1177,33 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           if (nftExists && contractRarity) {
             // NFT 存在但子圖還沒索引，使用合約數據生成臨時元數據
             const rarityIndex = Math.max(1, Math.min(5, contractRarity));
-            const jsonPath = path.join(JSON_BASE_PATH, type, `${rarityIndex}.json`);
-            const templateData = readJSONFile(jsonPath);
             
-            if (templateData) {
-              nftData = {
-                ...templateData,
-                name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
-                tokenId: tokenId.toString(),
-                attributes: [
-                  ...templateData.attributes,
-                  { trait_type: "Data Source", value: "Contract (Indexing)" }
-                ],
-                // 添加標記表示這是臨時數據
-                indexing: true
-              };
-              console.log(`Using contract data for ${type} #${tokenId} while indexing`);
-            }
+            // 根據類型生成正確的圖片路徑
+            const imageUrl = type === 'party' 
+              ? `${FRONTEND_DOMAIN}/images/party/party.png` // Party 暫時使用固定圖片
+              : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
+            
+            nftData = {
+              name: generateEnhancedNFTName(type, tokenId, contractRarity),
+              description: 'Dungeon Delvers NFT - 資料同步中',
+              image: imageUrl,
+              tokenId: tokenId.toString(),
+              attributes: [
+                { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
+                { 
+                  trait_type: 'Rarity', 
+                  value: contractRarity,
+                  display_type: 'number',
+                  max_value: 5
+                },
+                { trait_type: "Data Source", value: "Contract (Indexing)" }
+              ],
+              // 添加標記表示這是臨時數據
+              indexing: true,
+              metadata_status: "indexing",
+              retry_after: 10
+            };
+            console.log(`Using contract data for ${type} #${tokenId} while indexing`);
           }
           
           // 如果還是沒有數據，返回占位符
@@ -1216,15 +1227,30 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               };
             } else {
               // 連占位符都沒有，使用最基本的 fallback
+              // 對於無法確定稀有度的情況，使用稀有度 1 的圖片作為預設
+              const defaultRarity = 1;
+              const defaultImageUrl = type === 'party' 
+                ? `${FRONTEND_DOMAIN}/images/party/party.png`
+                : `${FRONTEND_DOMAIN}/images/${type}/${type}-${defaultRarity}.png`;
+              
               nftData = {
                 name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
                 description: "This NFT's data is currently unavailable. Please try again later.",
-                image: `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`,
+                image: defaultImageUrl,
                 attributes: [
                   { trait_type: "Status", value: "Loading" },
-                  { trait_type: "Token ID", value: parseInt(tokenId) }
+                  { trait_type: "Token ID", value: parseInt(tokenId), display_type: "number" },
+                  { 
+                    trait_type: "Rarity", 
+                    value: defaultRarity,
+                    display_type: "number",
+                    max_value: 5,
+                    note: "Default value - actual rarity pending"
+                  }
                 ],
-                tokenId: tokenId.toString()
+                tokenId: tokenId.toString(),
+                metadata_status: "pending",
+                retry_after: 10
               };
             }
           }
@@ -1243,6 +1269,18 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           } else {
             // 正常數據快取 1 分鐘
             cache.set(cacheKey, nftData, 60);
+          }
+        }
+        
+        // 設置響應頭，告訴 NFT 市場何時應該重新請求
+        if (nftData) {
+          if (nftData.indexing || nftData.source === 'placeholder') {
+            // 正在索引或占位符：建議 10 秒後重試
+            res.set('Cache-Control', 'public, max-age=10');
+            res.set('X-Refresh-After', '10');
+          } else {
+            // 正常數據：可以緩存更久
+            res.set('Cache-Control', 'public, max-age=3600');
           }
         }
         
