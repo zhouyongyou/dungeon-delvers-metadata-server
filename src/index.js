@@ -1338,19 +1338,27 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
             // 根據 NFT 穩定性決定內部緩存時間
             const tokenIdNum = parseInt(tokenId);
+            const estimatedAge = Math.max(0, tokenIdNum / 200);
             const isVeryOldNft = tokenIdNum <= 1000;
             const isOldNft = tokenIdNum <= 5000;
+            const isAncientNft = estimatedAge > 90;
             
             let cacheTime, description;
-            if (isVeryOldNft) {
-              cacheTime = 7200; // 2 小時（極穩定）
-              description = '2 hours (very stable)';
+            if (isVeryOldNft && isAncientNft) {
+              cacheTime = 86400; // 24 小時（永久級穩定）
+              description = '24 hours (ancient, permanent-level)';
+            } else if (isVeryOldNft) {
+              cacheTime = 43200; // 12 小時（極穩定）
+              description = '12 hours (very stable)';
             } else if (isOldNft) {
-              cacheTime = 3600; // 1 小時（穩定）
-              description = '1 hour (stable)';
+              cacheTime = 7200;  // 2 小時（穩定）
+              description = '2 hours (stable)';
+            } else if (estimatedAge > 7) {
+              cacheTime = 3600;  // 1 小時（成熟）
+              description = '1 hour (mature)';
             } else {
-              cacheTime = 600;  // 10 分鐘（新 NFT）
-              description = '10 minutes (new)';
+              cacheTime = 600;   // 10 分鐘（新 NFT）
+              description = '10 minutes (fresh)';
             }
             
             cache.set(cacheKey, nftData, cacheTime);
@@ -1369,20 +1377,36 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             res.set('Cache-Control', 'public, max-age=120');
             res.set('X-Refresh-After', '120');
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 根據 NFT 年齡決定緩存時間
+            // 根據 NFT 年齡和創建時間決定緩存時間
             const tokenIdNum = parseInt(tokenId);
-            const isVeryOldNft = tokenIdNum <= 1000; // 前 1000 個是早期 NFT
-            const isOldNft = tokenIdNum <= 5000;     // 前 5000 個是穩定 NFT
+            const now = Date.now();
             
-            if (isVeryOldNft) {
-              // 早期 NFT：24 小時緩存（數據非常穩定）
-              res.set('Cache-Control', 'public, max-age=86400');
+            // 通過 Token ID 估算創建時間（假設每天鑄造約 100-500 個）
+            const estimatedAge = Math.max(0, tokenIdNum / 200); // 粗略估算天數
+            const isVeryOldNft = tokenIdNum <= 1000;  // 前 1000 個
+            const isOldNft = tokenIdNum <= 5000;      // 前 5000 個
+            const isAncientNft = estimatedAge > 90;   // 超過 3 個月的 NFT
+            
+            if (isVeryOldNft && isAncientNft) {
+              // 古老 NFT：1 年緩存（數據極度穩定，幾乎不會變）
+              res.set('Cache-Control', 'public, max-age=31536000');
+              res.set('X-Cache-Level', 'permanent');
+            } else if (isVeryOldNft) {
+              // 早期 NFT：30 天緩存（數據非常穩定）
+              res.set('Cache-Control', 'public, max-age=2592000');
+              res.set('X-Cache-Level', 'long-term');
             } else if (isOldNft) {
-              // 穩定 NFT：4 小時緩存
-              res.set('Cache-Control', 'public, max-age=14400');
+              // 穩定 NFT：7 天緩存
+              res.set('Cache-Control', 'public, max-age=604800');
+              res.set('X-Cache-Level', 'stable');
+            } else if (estimatedAge > 7) {
+              // 一週以上的 NFT：24 小時緩存
+              res.set('Cache-Control', 'public, max-age=86400');
+              res.set('X-Cache-Level', 'mature');
             } else {
               // 新 NFT：30 分鐘緩存（可能還有變動）
               res.set('Cache-Control', 'public, max-age=1800');
+              res.set('X-Cache-Level', 'fresh');
             }
           } else {
             // 其他數據：標準緩存
