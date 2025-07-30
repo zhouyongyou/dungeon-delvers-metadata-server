@@ -708,16 +708,27 @@ function ensureHttpsUrl(url, baseUrl = FRONTEND_DOMAIN) {
   return url;
 }
 
-// 生成標準 NFT 名稱（英文格式）
-function generateEnhancedNFTName(type, tokenId, rarity) {
-  const validRarity = Math.max(1, Math.min(5, rarity || 1));
+// 獲取隊伍戰力範圍前綴
+function getPartyPowerRangePrefix(totalPower) {
+  // 使用300為單位劃分等級
+  const power = parseInt(totalPower) || 0;
+  const lowerBound = Math.floor(power / 300) * 300;
+  const upperBound = lowerBound + 299;
+  return `${lowerBound}-${upperBound}`;
+}
+
+// 生成標準 NFT 名稱（使用 UR/SSR 系統）
+function generateEnhancedNFTName(type, tokenId, rarity, totalPower = null) {
+  const validRarity = Math.max(1, Math.min(6, rarity || 1));
   
-  const rarityNames = {
-    1: 'Common',
-    2: 'Rare', 
-    3: 'Epic',
-    4: 'Legendary',
-    5: 'Mythic'
+  // 使用與前端相同的稀有度縮寫系統
+  const rarityPrefixes = {
+    1: 'N',    // Normal (Common)
+    2: 'R',    // Rare (Uncommon)
+    3: 'SR',   // Super Rare (Rare)
+    4: 'SSR',  // Super Super Rare (Epic)
+    5: 'UR',   // Ultra Rare (Legendary)
+    6: 'UR+'   // Ultra Rare Plus (Mythic)
   };
   
   const typeNames = {
@@ -729,7 +740,7 @@ function generateEnhancedNFTName(type, tokenId, rarity) {
     'playerprofile': 'Player Profile'
   };
   
-  const rarityText = rarityNames[validRarity] || 'Common';
+  const rarityPrefix = rarityPrefixes[validRarity] || '';
   const typeText = typeNames[type] || type.charAt(0).toUpperCase() + type.slice(1);
   
   // 對於 VIP 和 Profile，不使用稀有度前綴
@@ -737,7 +748,14 @@ function generateEnhancedNFTName(type, tokenId, rarity) {
     return `${typeText} #${tokenId}`;
   }
   
-  return `${rarityText} ${typeText} #${tokenId}`;
+  // 對於 Party，使用戰力範圍前綴
+  if (type === 'party' && totalPower !== null) {
+    const powerPrefix = getPartyPowerRangePrefix(totalPower);
+    return `${powerPrefix} ${typeText} #${tokenId}`;
+  }
+  
+  // 對於英雄和聖物，使用稀有度前綴
+  return rarityPrefix ? `${rarityPrefix} ${typeText} #${tokenId}` : `${typeText} #${tokenId}`;
 }
 
 // 生成 fallback metadata (占位符)
@@ -1348,7 +1366,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
             
             nftData = {
-              name: generateEnhancedNFTName(type, tokenId, rarity),
+              name: generateEnhancedNFTName(type, tokenId, rarity, type === 'party' ? nft.totalPower : null),
               description: 'Dungeon Delvers NFT - 從區塊鏈獲取的即時資料',
               image: imageUrl,
               attributes: [
