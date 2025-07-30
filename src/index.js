@@ -1339,16 +1339,18 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             // 根據 Token ID 和非線性鑄造模式決定內部緩存時間
             const tokenIdNum = parseInt(tokenId);
             
-            // 使用相同的年齡估算邏輯
+            // 使用相同的十倍鑄造量年齡估算邏輯
             let estimatedAge;
             if (tokenIdNum <= 1000) {
-              estimatedAge = Math.max(90, tokenIdNum / 10);
+              estimatedAge = Math.max(90, 90 + tokenIdNum / 100);
             } else if (tokenIdNum <= 5000) {
-              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 30);
-            } else if (tokenIdNum <= 10000) {
-              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 100);
+              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 100);
+            } else if (tokenIdNum <= 20000) {
+              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 500);
+            } else if (tokenIdNum <= 50000) {
+              estimatedAge = Math.max(7, 30 - (tokenIdNum - 20000) / 1000);
             } else {
-              estimatedAge = Math.max(0, 30 - (tokenIdNum - 10000) / 30);
+              estimatedAge = Math.max(0, 7 - (tokenIdNum - 50000) / 100);
             }
             
             const isVeryOldNft = tokenIdNum <= 1000;
@@ -1393,20 +1395,23 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             // 基於 Token ID 和非線性鑄造模式的智能估算
             const tokenIdNum = parseInt(tokenId);
             
-            // 🎯 改進的 Token ID 年齡估算（考慮非線性鑄造）
+            // 🎯 調整為十倍鑄造量的年齡估算
             let estimatedAge;
             if (tokenIdNum <= 1000) {
-              // 前 1000 個：假設前 3 天爆發式鑄造（每天 300-400 個）
-              estimatedAge = Math.max(90, tokenIdNum / 10); // 至少 90 天前
+              // 前 1000 個：假設首日爆發（幾千個/天）
+              estimatedAge = Math.max(90, 90 + tokenIdNum / 100); // 至少 90 天前，越早的 ID 越老
             } else if (tokenIdNum <= 5000) {
-              // 1001-5000：假設接下來 2 週內鑄造（每天 200-300 個）
-              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 30);
-            } else if (tokenIdNum <= 10000) {
-              // 5001-10000：假設接下來 1 個月內（每天 100-200 個）
-              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 100);
+              // 1001-5000：假設首週內高峰鑄造（每天 1000-2000 個）
+              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 100); // 60-90 天前
+            } else if (tokenIdNum <= 20000) {
+              // 5001-20000：假設首月內穩定鑄造（每天 500-1000 個）
+              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 500); // 30-60 天前
+            } else if (tokenIdNum <= 50000) {
+              // 20001-50000：假設低量期（每天 100-500 個）
+              estimatedAge = Math.max(7, 30 - (tokenIdNum - 20000) / 1000); // 7-30 天前
             } else {
-              // 10000+：假設每天 10-50 個（低量期）
-              estimatedAge = Math.max(0, 30 - (tokenIdNum - 10000) / 30);
+              // 50000+：假設極低量期（每天 10-100 個）
+              estimatedAge = Math.max(0, 7 - (tokenIdNum - 50000) / 100); // 0-7 天前
             }
             
             // 安全邊界檢查
