@@ -775,6 +775,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   // 嘗試從子圖獲取數據以提供更完整的占位符
   let additionalAttributes = [];
   let hasSubgraphData = false;
+  let totalPower = null; // 用於隊伍名稱生成
   
   try {
     const contractAddress = CONTRACTS[type];
@@ -807,9 +808,10 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
         });
       } else if (type === 'party') {
         if (nft.totalPower) {
+          totalPower = parseInt(nft.totalPower); // 保存總戰力
           additionalAttributes.push({
             trait_type: 'Total Power',
-            value: parseInt(nft.totalPower),
+            value: totalPower,
             display_type: 'number',
             max_value: 2820
           });
@@ -842,7 +844,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   const baseData = {
     name: (type === 'vip' || type === 'vipstaking') 
       ? `VIP #${tokenId}` 
-      : (rarity ? generateEnhancedNFTName(type, tokenId, rarity) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`),
+      : (rarity ? generateEnhancedNFTName(type, tokenId, rarity, totalPower) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`),
     description: (type === 'vip' || type === 'vipstaking')
       ? "Dungeon Delvers VIP - Exclusive membership with staking benefits. VIP level is determined by staked amount."
       : (hasSubgraphData ? "Dungeon Delvers NFT" : "This NFT's data is currently unavailable. Please try again later."),
@@ -1742,8 +1744,17 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             console.warn(`${type} JSON not found for rarity ${rarityIndex}, using fallback`);
             metadata = await generateFallbackMetadata(type, tokenId, rarity);
           } else {
+            // 對於隊伍，嘗試從 metadata 屬性中獲取 totalPower
+            let totalPower = null;
+            if (type === 'party' && metadata.attributes) {
+              const powerAttr = metadata.attributes.find(attr => attr.trait_type === 'Total Power');
+              if (powerAttr) {
+                totalPower = parseInt(powerAttr.value);
+              }
+            }
+            
             // 更新 token ID 相關信息 - 使用增強的名稱格式
-            metadata.name = generateEnhancedNFTName(type, tokenId, rarity);
+            metadata.name = generateEnhancedNFTName(type, tokenId, rarity, totalPower);
             metadata.image = `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
             metadata.source = 'static';
             
@@ -2080,7 +2091,7 @@ app.post('/api/batch', async (req, res) => {
                 : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
               
               nftData = {
-                name: generateEnhancedNFTName(type, tokenId, rarity),
+                name: generateEnhancedNFTName(type, tokenId, rarity, type === 'party' ? nft.totalPower : null),
                 description: 'Dungeon Delvers NFT - 批量查詢',
                 image: imageUrl,
                 attributes: [
@@ -2680,6 +2691,7 @@ async function generateMetadata(type, tokenId, rarity) {
   
   // 嘗試從子圖獲取完整數據
   let additionalAttributes = [];
+  let totalPower = null; // 用於隊伍名稱生成
   try {
     const contractAddress = CONTRACTS[type];
     const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
@@ -2704,9 +2716,10 @@ async function generateMetadata(type, tokenId, rarity) {
         });
       } else if (type === 'party') {
         if (nft.totalPower) {
+          totalPower = parseInt(nft.totalPower); // 保存總戰力
           additionalAttributes.push({
             trait_type: 'Total Power',
-            value: parseInt(nft.totalPower),
+            value: totalPower,
             display_type: 'number',
             max_value: 2820
           });
@@ -2726,7 +2739,7 @@ async function generateMetadata(type, tokenId, rarity) {
   }
   
   return {
-    name: generateEnhancedNFTName(type, tokenId, rarity),
+    name: generateEnhancedNFTName(type, tokenId, rarity, totalPower),
     description: `Dungeon Delvers ${type} with rarity ${rarity}`,
     image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
     attributes: [
