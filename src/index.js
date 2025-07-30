@@ -365,7 +365,6 @@ const GRAPHQL_QUERIES = {
       globalStats(id: "global") {
         totalHeroes totalRelics totalParties totalPlayers
         totalUpgradeAttempts successfulUpgrades
-        lastUpdated
       }
     }
   `,
@@ -491,7 +490,17 @@ async function queryGraphQL(query, variables = {}) {
   // 首先嘗試去中心化版本
   try {
     console.log(`[The Graph] 使用去中心化版本查詢...`);
-    const response = await axios.post(global.THE_GRAPH_API_URL || THE_GRAPH_API_URL, {
+    // 從 URL 中提取 API Key
+    const apiUrl = global.THE_GRAPH_API_URL || THE_GRAPH_API_URL;
+    const urlMatch = apiUrl.match(/\/api\/([a-f0-9]{32})\//);
+    const apiKey = urlMatch ? urlMatch[1] : null;
+    
+    // 如果有 API Key，添加到 header
+    if (apiKey) {
+      requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
+    }
+    
+    const response = await axios.post(apiUrl, {
       query,
       variables
     }, requestConfig);
@@ -1908,9 +1917,9 @@ app.get('/api/stats', async (req, res) => {
     if (!stats) {
       const data = await queryGraphQL(GRAPHQL_QUERIES.getStats);
       stats = {
-        ...data.stats,
+        ...data.globalStats,
         source: 'subgraph',
-        lastUpdated: new Date().toISOString()
+        timestamp: new Date().toISOString()
       };
       
       // 快取 5 分鐘
