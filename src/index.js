@@ -1529,6 +1529,57 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           
           console.log(`✅ VIP metadata 生成完成: ${nftOwner} Level ${vipLevel}`);
         }
+        // PlayerProfile 特殊處理：自動從合約讀取玩家數據
+        else if (type === 'playerprofile') {
+          console.log(`👤 處理 PlayerProfile metadata: ${tokenId}`);
+          
+          // 自動從合約獲取玩家檔案數據
+          const profileData = await getPlayerProfileData(tokenId);
+          
+          if (!profileData) {
+            // Token 不存在
+            nftData = {
+              error: 'Token not found',
+              message: `Player Profile NFT #${tokenId} does not exist`
+            };
+            return res.status(404).json(nftData);
+          }
+          
+          const { owner: profileOwner, experience, level, adventures } = profileData;
+          
+          // 生成 PlayerProfile metadata
+          nftData = {
+            name: `Player Profile #${tokenId}`,
+            description: `Dungeon Delvers Player Profile - Soul-bound achievement NFT tracking your journey through the dungeons.`,
+            image: `${FRONTEND_DOMAIN}/images/profile/profile-1.png`,
+            attributes: [
+              { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
+              { trait_type: 'Type', value: 'Player Profile' },
+              { trait_type: 'Experience', value: experience, display_type: 'number' },
+              { trait_type: 'Level', value: level, display_type: 'number' },
+              { trait_type: 'Total Adventures', value: adventures, display_type: 'number' },
+              { trait_type: 'Chain', value: 'BSC' },
+              { trait_type: 'Data Source', value: 'Contract Auto-Query' },
+              { trait_type: 'Owner', value: profileOwner }
+            ],
+            source: 'contract',
+            metadata_status: 'final',
+            // 額外的元數據
+            id: tokenId,
+            contractAddress: CONTRACTS.playerprofile,
+            type: 'playerprofile',
+            external_url: `${FRONTEND_DOMAIN}/nft/playerprofile/${tokenId}`,
+            okx_optimized: true,
+            marketplace_compatibility: 'unified',
+            charset: 'UTF-8',
+            collection: {
+              name: 'Dungeon Delvers',
+              family: 'Dungeon Delvers NFT'
+            }
+          };
+          
+          console.log(`✅ PlayerProfile metadata 生成完成: ${profileOwner} Level ${level} (${experience} EXP)`);
+        }
         // 先嘗試從 subgraph 獲取資料
         else if (['hero', 'relic', 'party'].includes(type)) {
           const contractAddress = CONTRACTS[type];
