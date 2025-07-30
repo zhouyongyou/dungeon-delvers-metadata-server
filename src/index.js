@@ -1820,6 +1820,185 @@ app.post('/api/config/refresh', async (req, res) => {
 });
 
 // 診斷端點 - 測試市場適配器
+// 批量查詢 API - 為 NFT 市場優化
+app.post('/api/batch', async (req, res) => {
+  try {
+    const { requests } = req.body;
+    
+    // 驗證請求格式
+    if (!Array.isArray(requests) || requests.length === 0) {
+      return res.status(400).json({ 
+        error: 'Invalid request format',
+        message: 'requests should be a non-empty array'
+      });
+    }
+    
+    // 限制批量大小（防止濫用）
+    const maxBatchSize = 100;
+    if (requests.length > maxBatchSize) {
+      return res.status(400).json({ 
+        error: 'Batch size too large',
+        message: `Maximum batch size is ${maxBatchSize}, got ${requests.length}`
+      });
+    }
+    
+    console.log(`🔄 批量查詢請求: ${requests.length} 個 NFT`);
+    
+    // 批量處理請求
+    const batchResults = await Promise.allSettled(
+      requests.map(async (request, index) => {
+        const { type, tokenId } = request;
+        
+        // 驗證單個請求
+        if (!type || !tokenId) {
+          throw new Error(`Invalid request at index ${index}: missing type or tokenId`);
+        }
+        
+        if (!['hero', 'relic', 'party', 'vip'].includes(type)) {
+          throw new Error(`Invalid NFT type at index ${index}: ${type}`);
+        }
+        
+        // 重用現有的 API 邏輯
+        const cacheKey = generateCacheKey(`${type}-${tokenId}`, {});
+        let nftData = cache.get(cacheKey);
+        
+        if (!nftData) {
+          // 嘗試從子圖獲取資料
+          if (['hero', 'relic', 'party'].includes(type)) {
+            const contractAddress = CONTRACTS[type];
+            const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
+            const data = await queryGraphQL(GRAPHQL_QUERIES.getNftById, { nftId });
+            
+            const nft = data[type];
+            if (nft) {
+              const rarity = nft.rarity || nft.partyRarity || 1;
+              const rarityIndex = Math.max(1, Math.min(5, rarity));
+              
+              const imageUrl = type === 'party' 
+                ? getPartyImageByPower(nft.totalPower)
+                : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
+              
+              nftData = {
+                name: generateEnhancedNFTName(type, tokenId, rarity),
+                description: 'Dungeon Delvers NFT - 批量查詢',
+                image: imageUrl,
+                attributes: [
+                  { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
+                  { 
+                    trait_type: 'Rarity', 
+                    value: rarity,
+                    display_type: 'number',
+                    max_value: 5
+                  },
+                  ...(type === 'hero' ? [
+                    { 
+                      trait_type: 'Power', 
+                      value: parseInt(nft.power),
+                      display_type: 'number',
+                      max_value: 255
+                    }
+                  ] : type === 'relic' ? [
+                    { 
+                      trait_type: 'Capacity', 
+                      value: parseInt(nft.capacity),
+                      display_type: 'number',
+                      max_value: 5
+                    }
+                  ] : type === 'party' ? [
+                    { 
+                      trait_type: 'Total Power', 
+                      value: parseInt(nft.totalPower),
+                      display_type: 'number',
+                      max_value: 2820
+                    },
+                    { 
+                      trait_type: 'Total Capacity', 
+                      value: parseInt(nft.totalCapacity),
+                      display_type: 'number',
+                      max_value: 25
+                    }
+                  ] : [])
+                ],
+                source: 'batch-subgraph',
+                type,
+                tokenId: tokenId.toString()
+              };
+              
+              // 智能緩存
+              const tokenIdNum = parseInt(tokenId);
+              let cacheTime = 600; // 預設 10 分鐘
+              
+              if (tokenIdNum <= 1000) {
+                cacheTime = 86400; // 24 小時
+              } else if (tokenIdNum <= 5000) {
+                cacheTime = 7200;  // 2 小時
+              } else if (tokenIdNum <= 20000) {
+                cacheTime = 3600;  // 1 小時
+              }
+              
+              cache.set(cacheKey, nftData, cacheTime);
+            }
+          }
+          
+          // 如果沒有從子圖獲取到數據，生成 fallback
+          if (!nftData) {
+            nftData = await generateFallbackMetadata(type, tokenId);
+          }
+        }
+        
+        return {
+          type,
+          tokenId,
+          success: true,
+          data: nftData
+        };
+      })
+    );
+    
+    // 處理結果
+    const results = batchResults.map((result, index) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      } else {
+        return {
+          type: requests[index]?.type || 'unknown',
+          tokenId: requests[index]?.tokenId || 'unknown',
+          success: false,
+          error: result.reason?.message || 'Unknown error'
+        };
+      }
+    });
+    
+    // 統計結果
+    const successCount = results.filter(r => r.success).length;
+    const failureCount = results.length - successCount;
+    
+    console.log(`✅ 批量查詢完成: ${successCount} 成功, ${failureCount} 失敗`);
+    
+    // 設置適當的緩存頭
+    res.set('Cache-Control', 'public, max-age=300'); // 5 分鐘緩存
+    res.set('X-Batch-Size', results.length.toString());
+    res.set('X-Success-Count', successCount.toString());
+    res.set('X-Failure-Count', failureCount.toString());
+    
+    res.json({
+      success: true,
+      total: results.length,
+      successful: successCount,
+      failed: failureCount,
+      results
+    });
+    
+  } catch (error) {
+    console.error('❌ 批量查詢錯誤:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Batch query failed',
+      message: error.message
+    });
+  }
+});
+
 app.get('/api/:type/:tokenId/debug', async (req, res) => {
   try {
     const { type, tokenId } = req.params;
@@ -2380,6 +2559,7 @@ async function startServer() {
     console.log(`👤 Player assets: http://localhost:${PORT}/api/player/:owner/assets`);
     console.log(`📈 Stats: http://localhost:${PORT}/api/stats`);
     console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
+    console.log(`📦 Batch API: http://localhost:${PORT}/api/batch (POST)`);
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
     console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
