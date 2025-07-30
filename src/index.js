@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
 const { getRarityFromContract } = require('./contractReader');
+const { getPartyImageByPower, getPartyTierByPower } = require('./partyImageHelper');
 const configLoader = require('./configLoader');
 require('dotenv').config();
 
@@ -1098,10 +1099,15 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             const rarity = nft.rarity || nft.partyRarity || 1;
             const rarityIndex = Math.max(1, Math.min(5, rarity));
             
+            // Party 需要特殊處理圖片
+            const imageUrl = type === 'party' 
+              ? getPartyImageByPower(nft.totalPower)
+              : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
+            
             nftData = {
               name: generateEnhancedNFTName(type, tokenId, rarity),
               description: 'Dungeon Delvers NFT - 從區塊鏈獲取的即時資料',
-              image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
+              image: imageUrl,
               attributes: [
                 { trait_type: 'Token ID', value: parseInt(tokenId) },
                 { trait_type: 'Rarity', value: rarity },
@@ -1111,7 +1117,8 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                   { trait_type: 'Capacity', value: parseInt(nft.capacity) }
                 ] : type === 'party' ? [
                   { trait_type: 'Total Power', value: parseInt(nft.totalPower) },
-                  { trait_type: 'Total Capacity', value: parseInt(nft.totalCapacity) }
+                  { trait_type: 'Total Capacity', value: parseInt(nft.totalCapacity) },
+                  { trait_type: 'Power Tier', value: getPartyTierByPower(nft.totalPower) }
                 ] : [])
               ],
               source: 'subgraph',
