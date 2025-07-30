@@ -680,13 +680,23 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   }
   
   // 根據是否有稀有度數據決定圖片
-  const imageUrl = rarity && rarity >= 1 && rarity <= 5
-    ? `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarity}.png`
-    : `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`;
+  let imageUrl;
+  if (type === 'vip' || type === 'vipstaking') {
+    // VIP 使用固定圖片，因為等級需要從合約讀取
+    imageUrl = `${FRONTEND_DOMAIN}/images/vip/vip-1.png`;
+  } else if (rarity && rarity >= 1 && rarity <= 5) {
+    imageUrl = `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarity}.png`;
+  } else {
+    imageUrl = `${FRONTEND_DOMAIN}/images/${type}/${type}-placeholder.png`;
+  }
   
   const baseData = {
-    name: rarity ? generateEnhancedNFTName(type, tokenId, rarity) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
-    description: hasSubgraphData ? "Dungeon Delvers NFT" : "This NFT's data is currently unavailable. Please try again later.",
+    name: (type === 'vip' || type === 'vipstaking') 
+      ? `VIP #${tokenId}` 
+      : (rarity ? generateEnhancedNFTName(type, tokenId, rarity) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`),
+    description: (type === 'vip' || type === 'vipstaking')
+      ? "Dungeon Delvers VIP - Exclusive membership with staking benefits. VIP level is determined by staked amount."
+      : (hasSubgraphData ? "Dungeon Delvers NFT" : "This NFT's data is currently unavailable. Please try again later."),
     image: imageUrl,
     attributes: [
       { trait_type: "Token ID", value: parseInt(tokenId), display_type: "number" },
