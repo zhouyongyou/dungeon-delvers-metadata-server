@@ -451,37 +451,36 @@ function readJSONFile(filePath) {
   }
 }
 
-// 生成增強的 NFT 名稱（包含稀有度）
+// 生成標準 NFT 名稱（英文格式）
 function generateEnhancedNFTName(type, tokenId, rarity) {
   const validRarity = Math.max(1, Math.min(5, rarity || 1));
-  const stars = '★'.repeat(validRarity);
   
   const rarityNames = {
-    1: '普通',
-    2: '稀有', 
-    3: '史詩',
-    4: '傳奇',
-    5: '神話'
+    1: 'Common',
+    2: 'Rare', 
+    3: 'Epic',
+    4: 'Legendary',
+    5: 'Mythic'
   };
   
   const typeNames = {
-    'hero': '英雄',
-    'relic': '聖物', 
-    'party': '隊伍',
+    'hero': 'Hero',
+    'relic': 'Relic', 
+    'party': 'Party',
     'vip': 'VIP Pass',
     'vipstaking': 'VIP Pass',
     'playerprofile': 'Player Profile'
   };
   
-  const rarityText = rarityNames[validRarity] || '普通';
-  const typeText = typeNames[type] || type;
+  const rarityText = rarityNames[validRarity] || 'Common';
+  const typeText = typeNames[type] || type.charAt(0).toUpperCase() + type.slice(1);
   
   // 對於 VIP 和 Profile，不使用稀有度前綴
   if (type === 'vip' || type === 'vipstaking' || type === 'playerprofile') {
     return `${typeText} #${tokenId}`;
   }
   
-  return `${stars} ${rarityText}${typeText} #${tokenId}`;
+  return `${rarityText} ${typeText} #${tokenId}`;
 }
 
 // 生成 fallback metadata (占位符)
@@ -1039,11 +1038,15 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             const placeholderData = readJSONFile(placeholderPath);
             
             if (placeholderData) {
-              // 使用占位符數據
+              // 使用占位符數據 - 保持原始內容不變
               nftData = {
                 ...placeholderData,
-                name: `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`,
-                tokenId: tokenId.toString()
+                tokenId: tokenId.toString(),
+                // 只添加必要的額外屬性
+                attributes: [
+                  ...placeholderData.attributes,
+                  { trait_type: "Token ID", value: parseInt(tokenId), display_type: "number" }
+                ]
               };
             } else {
               // 連占位符都沒有，使用最基本的 fallback

@@ -115,41 +115,9 @@ class OKXAdapter extends MarketplaceAdapter {
       };
     }
 
-    // Convert name to English for OKX compatibility
-    if (this.metadata.name) {
-      // Extract rarity from attributes
-      const rarityAttr = this.metadata.attributes?.find(attr => attr.trait_type === 'Rarity');
-      const rarity = rarityAttr ? this.normalizeRarity(rarityAttr.value) : 1;
-      
-      // Generate English name without stars
-      const rarityNames = {
-        1: 'Common',
-        2: 'Rare',
-        3: 'Epic',
-        4: 'Legendary',
-        5: 'Mythic'
-      };
-      
-      const typeNames = {
-        'hero': 'Hero',
-        'relic': 'Relic',
-        'party': 'Party',
-        'vip': 'VIP Pass',
-        'vipstaking': 'VIP Pass',
-        'playerprofile': 'Player Profile'
-      };
-      
-      const rarityText = rarityNames[rarity] || 'Common';
-      const typeText = typeNames[this.type] || this.type.charAt(0).toUpperCase() + this.type.slice(1);
-      
-      // For VIP and Profile, don't use rarity prefix
-      if (this.type === 'vip' || this.type === 'vipstaking' || this.type === 'playerprofile') {
-        this.metadata.name = `${typeText} #${this.tokenId}`;
-      } else {
-        // Use English format: "Legendary Hero #123"
-        this.metadata.name = `${rarityText} ${typeText} #${this.tokenId}`;
-      }
-    }
+    // Keep original name - don't override
+    // OKX can handle any reasonable name format
+    // This preserves placeholder names like "Unknown Hero"
 
     return this.metadata;
   }
