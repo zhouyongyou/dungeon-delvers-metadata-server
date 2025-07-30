@@ -835,6 +835,9 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   if (type === 'vip' || type === 'vipstaking') {
     // VIP 使用固定圖片，因為等級需要從合約讀取
     imageUrl = `${FRONTEND_DOMAIN}/images/vip/vip-1.png`;
+  } else if (type === 'party' && totalPower) {
+    // Party 使用基於戰力的圖片
+    imageUrl = getPartyImageByPower(totalPower);
   } else if (rarity && rarity >= 1 && rarity <= 5) {
     imageUrl = `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarity}.png`;
   } else {
@@ -1755,7 +1758,10 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             
             // 更新 token ID 相關信息 - 使用增強的名稱格式
             metadata.name = generateEnhancedNFTName(type, tokenId, rarity, totalPower);
-            metadata.image = `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
+            // Party 使用基於戰力的圖片
+            metadata.image = type === 'party' && totalPower 
+              ? getPartyImageByPower(totalPower)
+              : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`;
             metadata.source = 'static';
             
             metadata.attributes = metadata.attributes.map(attr => {
@@ -2741,7 +2747,9 @@ async function generateMetadata(type, tokenId, rarity) {
   return {
     name: generateEnhancedNFTName(type, tokenId, rarity, totalPower),
     description: `Dungeon Delvers ${type} with rarity ${rarity}`,
-    image: `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
+    image: type === 'party' && totalPower 
+      ? getPartyImageByPower(totalPower)
+      : `${FRONTEND_DOMAIN}/images/${type}/${type}-${rarityIndex}.png`,
     attributes: [
       { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
       { 
