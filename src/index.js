@@ -1328,28 +1328,36 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         // 動態快取策略
         if (nftData) {
           if (nftData.indexing) {
-            // 正在索引的 NFT 只快取 10 秒，以便快速更新
-            cache.set(cacheKey, nftData, 10);
-            console.log(`Caching indexing NFT ${type} #${tokenId} for 10 seconds`);
+            // 正在索引的 NFT 快取 2 分鐘（配合刷新策略）
+            cache.set(cacheKey, nftData, 120);
+            console.log(`Caching indexing NFT ${type} #${tokenId} for 2 minutes`);
           } else if (nftData.source === 'placeholder') {
-            // 占位符快取 5 秒
-            cache.set(cacheKey, nftData, 5);
-            console.log(`Caching placeholder ${type} #${tokenId} for 5 seconds`);
-          } else {
-            // 正常數據快取 1 分鐘
+            // 占位符快取 1 分鐘
             cache.set(cacheKey, nftData, 60);
+            console.log(`Caching placeholder ${type} #${tokenId} for 1 minute`);
+          } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
+            // 完整數據快取 10 分鐘（內部緩存可以更長）
+            cache.set(cacheKey, nftData, 600);
+            console.log(`Caching complete NFT ${type} #${tokenId} for 10 minutes`);
+          } else {
+            // 其他數據快取 5 分鐘
+            cache.set(cacheKey, nftData, 300);
+            console.log(`Caching NFT ${type} #${tokenId} for 5 minutes`);
           }
         }
         
         // 設置響應頭，告訴 NFT 市場何時應該重新請求
         if (nftData) {
           if (nftData.indexing || nftData.source === 'placeholder') {
-            // 正在索引或占位符：建議 10 秒後重試
-            res.set('Cache-Control', 'public, max-age=10');
-            res.set('X-Refresh-After', '10');
+            // 正在索引或占位符：建議 2 分鐘後重試（符合子圖索引時間）
+            res.set('Cache-Control', 'public, max-age=120');
+            res.set('X-Refresh-After', '120');
+          } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
+            // 完整數據：可以緩存 30 分鐘（平衡及時性和效能）
+            res.set('Cache-Control', 'public, max-age=1800');
           } else {
-            // 正常數據：可以緩存更久
-            res.set('Cache-Control', 'public, max-age=3600');
+            // 其他數據：標準緩存
+            res.set('Cache-Control', 'public, max-age=600');
           }
         }
         
