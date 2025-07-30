@@ -1110,14 +1110,39 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               image: imageUrl,
               attributes: [
                 { trait_type: 'Token ID', value: parseInt(tokenId) },
-                { trait_type: 'Rarity', value: rarity },
+                { 
+                  trait_type: 'Rarity', 
+                  value: rarity,
+                  display_type: 'number',
+                  max_value: 5
+                },
                 ...(type === 'hero' ? [
-                  { trait_type: 'Power', value: parseInt(nft.power) }
+                  { 
+                    trait_type: 'Power', 
+                    value: parseInt(nft.power),
+                    display_type: 'number',
+                    max_value: 255
+                  }
                 ] : type === 'relic' ? [
-                  { trait_type: 'Capacity', value: parseInt(nft.capacity) }
+                  { 
+                    trait_type: 'Capacity', 
+                    value: parseInt(nft.capacity),
+                    display_type: 'number',
+                    max_value: 5
+                  }
                 ] : type === 'party' ? [
-                  { trait_type: 'Total Power', value: parseInt(nft.totalPower) },
-                  { trait_type: 'Total Capacity', value: parseInt(nft.totalCapacity) },
+                  { 
+                    trait_type: 'Total Power', 
+                    value: parseInt(nft.totalPower),
+                    display_type: 'number',
+                    max_value: 2820
+                  },
+                  { 
+                    trait_type: 'Total Capacity', 
+                    value: parseInt(nft.totalCapacity),
+                    display_type: 'number',
+                    max_value: 25
+                  },
                   { trait_type: 'Power Tier', value: getPartyTierByPower(nft.totalPower) }
                 ] : [])
               ],
