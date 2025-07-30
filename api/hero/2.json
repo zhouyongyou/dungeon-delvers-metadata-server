@@ -1,11 +1,17 @@
 {
-  "name": "Runic Guardian",
-  "description": "A full body portrait of a Runic Guardian. They wear standardized plate armor with faint glowing blue runes etched onto the surface, wielding a heavy one-handed axe and a kite shield with a glowing central rune.",
+  "name": "Eryn the Agile",
+  "name_ch": "精銳斥候 艾琳",
+  "description": "A young and agile female scout, wearing a short cloak and light leather armor. She holds a grappling hook and small throwing knives, nimbly perched on high stone steps within the dungeon. Familiar with all dungeon exits and entrances, always one step ahead.",
+  "description_ch": "一位年輕敏捷的女性斥候，穿著短斗篷和輕便的皮甲。她手持抓鉤與小型飛刀，靈活地棲息在地城內的高處石階上。熟悉所有地城出口入口，永遠搶先一步。",
   "image": "https://www.dungeondelvers.xyz/images/hero/hero-2.png",
   "attributes": [
     {
       "trait_type": "Rarity",
       "value": "Uncommon"
+    },
+    {
+      "trait_type": "Star",
+      "value": "R"
     },
     {
       "display_type": "number",

@@ -1,11 +1,17 @@
 {
-  "name": "Shattered Runestone",
-  "description": "A broken stone found on an ancient battlefield. It's inscribed with forgotten words and emanates a faint, dim light.",
+  "name": "Wand of Oops",
+  "name_ch": "失敗魔杖",
+  "description": "A broken wooden wand haphazardly taped together, with its tip still smoking. It lies abandoned on a dusty desk, surrounded by crumpled notes and spilled ink. The spell wasn't even finished before it exploded.",
+  "description_ch": "一根用膠帶胡亂黏合、尖端還在冒煙的斷裂木魔杖。它被遺棄在佈滿灰塵的書桌上，周圍散落著揉皺的筆記和灑出的墨水。咒語還沒念完，它就先爆了。",
   "image": "https://www.dungeondelvers.xyz/images/relic/relic-1.png",
   "attributes": [
     {
       "trait_type": "Rarity",
       "value": "Common"
+    },
+    {
+      "trait_type": "Star",
+      "value": "N"
     },
     {
       "display_type": "number",

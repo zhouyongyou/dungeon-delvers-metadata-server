@@ -1,11 +1,17 @@
 {
-  "name": "Orb of Power",
-  "description": "A flawless crystal orb that contains restless magical lightning, ready to empower the party with greater energy.",
+  "name": "Echofang",
+  "name_ch": "影鳴匕首",
+  "description": "A streamlined curved dagger with glowing blue edges, displayed on a cracked altar, surrounded by shadow effects and soft ethereal glow. Forged for dual-wielding assassins, each strike hides another voice.",
+  "description_ch": "一把帶有發光藍色邊緣的流線型弧形匕首，它被陳列在一座破裂的祭壇上，周圍有著陰影效果和柔和的空靈光芒。專為雙刀刺客所鑄，每一擊都藏著另一個聲音。",
   "image": "https://www.dungeondelvers.xyz/images/relic/relic-3.png",
   "attributes": [
     {
       "trait_type": "Rarity",
       "value": "Rare"
+    },
+    {
+      "trait_type": "Star",
+      "value": "SR"
     },
     {
       "display_type": "number",

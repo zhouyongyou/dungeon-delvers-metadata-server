@@ -1,11 +1,17 @@
 {
-  "name": "Arcane Warrior",
-  "description": "A full body portrait of an Arcane Warrior. They wear enchanted leather armor with glowing magical symbols, wielding a staff topped with a glowing crystal and a spell tome bound to their belt.",
+  "name": "Kain & Kaes, Twin Shadows",
+  "name_ch": "追影雙刃 凱因＆凱斯",
+  "description": "Twin thief brothers, one holding a crossbow, the other wielding a dagger. They wear black hooded attire, standing back-to-back in a dimly lit dungeon corridor illuminated by blue-green light. Silent assassins in darkness, one arrow one blade, hundred steps without sound.",
+  "description_ch": "一對雙胞胎盜賊兄弟，一人持弩，一人握著匕首。他們身穿黑色連帽裝束，在藍綠色燈光映照的陰暗地城走廊中背對背站著。黑暗中的默契刺殺者，一箭一刃，百步無聲。",
   "image": "https://www.dungeondelvers.xyz/images/hero/hero-3.png",
   "attributes": [
     {
       "trait_type": "Rarity",
       "value": "Rare"
+    },
+    {
+      "trait_type": "Star",
+      "value": "SR"
     },
     {
       "display_type": "number",
