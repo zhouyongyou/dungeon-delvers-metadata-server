@@ -5,7 +5,9 @@
   "attributes": [
     {
       "trait_type": "Rarity",
-      "value": "Epic"
+      "value": 4,
+      "display_type": "number",
+      "max_value": 5
     },
     {
       "trait_type": "Star",
