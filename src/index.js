@@ -1336,39 +1336,42 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             cache.set(cacheKey, nftData, 60);
             console.log(`Caching placeholder ${type} #${tokenId} for 1 minute`);
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 根據 NFT 實際年齡決定內部緩存時間
+            // 根據 Token ID 和非線性鑄造模式決定內部緩存時間
             const tokenIdNum = parseInt(tokenId);
-            const now = Date.now();
             
-            // 嘗試獲取實際創建時間
-            let actualAge = null;
-            if (nftData._subgraphData && nftData._subgraphData.createdAt) {
-              const createdAt = parseInt(nftData._subgraphData.createdAt) * 1000;
-              actualAge = (now - createdAt) / (1000 * 60 * 60 * 24);
+            // 使用相同的年齡估算邏輯
+            let estimatedAge;
+            if (tokenIdNum <= 1000) {
+              estimatedAge = Math.max(90, tokenIdNum / 10);
+            } else if (tokenIdNum <= 5000) {
+              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 30);
+            } else if (tokenIdNum <= 10000) {
+              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 100);
+            } else {
+              estimatedAge = Math.max(0, 30 - (tokenIdNum - 10000) / 30);
             }
             
-            const ageInDays = actualAge !== null ? actualAge : Math.max(0, tokenIdNum / 200);
             const isVeryOldNft = tokenIdNum <= 1000;
             
             let cacheTime, description;
-            if (isVeryOldNft && ageInDays > 90) {
+            if (isVeryOldNft && estimatedAge > 90) {
               cacheTime = 86400; // 24 小時（傳奇級穩定）
-              description = `24 hours (legendary, ${Math.floor(ageInDays)}d old)`;
-            } else if (ageInDays > 90) {
+              description = `24 hours (legendary, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
+            } else if (estimatedAge > 90) {
               cacheTime = 43200; // 12 小時（古老級穩定）
-              description = `12 hours (ancient, ${Math.floor(ageInDays)}d old)`;
-            } else if (ageInDays > 30) {
+              description = `12 hours (ancient, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
+            } else if (estimatedAge > 30) {
               cacheTime = 7200;  // 2 小時（成熟級穩定）
-              description = `2 hours (mature, ${Math.floor(ageInDays)}d old)`;
-            } else if (ageInDays > 7) {
+              description = `2 hours (mature, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
+            } else if (estimatedAge > 7) {
               cacheTime = 3600;  // 1 小時（週級穩定）
-              description = `1 hour (week-old, ${Math.floor(ageInDays)}d old)`;
-            } else if (ageInDays > 1) {
+              description = `1 hour (week-old, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
+            } else if (estimatedAge > 1) {
               cacheTime = 1800;  // 30 分鐘（天級穩定）
-              description = `30 minutes (day-old, ${Math.floor(ageInDays)}d old)`;
+              description = `30 minutes (day-old, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
             } else {
               cacheTime = 600;   // 10 分鐘（新鮮）
-              description = `10 minutes (fresh, ${Math.floor(ageInDays * 24)}h old)`;
+              description = `10 minutes (fresh, ~${Math.floor(estimatedAge * 24)}h old, id:${tokenIdNum})`;
             }
             
             cache.set(cacheKey, nftData, cacheTime);
@@ -1387,62 +1390,69 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             res.set('Cache-Control', 'public, max-age=120');
             res.set('X-Refresh-After', '120');
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 根據 NFT 實際創建時間和 Token ID 決定緩存時間
+            // 基於 Token ID 和非線性鑄造模式的智能估算
             const tokenIdNum = parseInt(tokenId);
-            const now = Date.now();
             
-            // 嘗試從子圖獲取實際創建時間
-            let actualAge = null;
-            let createdAt = null;
-            
-            if (nftData._subgraphData && nftData._subgraphData.createdAt) {
-              createdAt = parseInt(nftData._subgraphData.createdAt) * 1000; // 轉為毫秒
-              actualAge = (now - createdAt) / (1000 * 60 * 60 * 24); // 天數
+            // 🎯 改進的 Token ID 年齡估算（考慮非線性鑄造）
+            let estimatedAge;
+            if (tokenIdNum <= 1000) {
+              // 前 1000 個：假設前 3 天爆發式鑄造（每天 300-400 個）
+              estimatedAge = Math.max(90, tokenIdNum / 10); // 至少 90 天前
+            } else if (tokenIdNum <= 5000) {
+              // 1001-5000：假設接下來 2 週內鑄造（每天 200-300 個）
+              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 30);
+            } else if (tokenIdNum <= 10000) {
+              // 5001-10000：假設接下來 1 個月內（每天 100-200 個）
+              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 100);
+            } else {
+              // 10000+：假設每天 10-50 個（低量期）
+              estimatedAge = Math.max(0, 30 - (tokenIdNum - 10000) / 30);
             }
             
-            // 使用實際年齡（優先）或 Token ID 估算（備用）
-            const ageInDays = actualAge !== null ? actualAge : Math.max(0, tokenIdNum / 200);
-            const isVeryOldNft = tokenIdNum <= 1000;  // 前 1000 個
-            const isOldNft = tokenIdNum <= 5000;      // 前 5000 個
-            const isAncientNft = ageInDays > 90;      // 超過 3 個月的 NFT
-            const isMatureNft = ageInDays > 30;       // 超過 1 個月的 NFT
+            // 安全邊界檢查
+            estimatedAge = Math.max(0, estimatedAge);
+            
+            const isVeryOldNft = tokenIdNum <= 1000;    // 前 1000 個（傳奇級）
+            const isOldNft = tokenIdNum <= 5000;        // 前 5000 個（早期）
+            const isAncientNft = estimatedAge > 90;     // 超過 3 個月
+            const isMatureNft = estimatedAge > 30;      // 超過 1 個月
             
             let cacheSeconds, cacheLevel;
             
             if (isVeryOldNft && isAncientNft) {
               // 古老傳奇 NFT：1 年緩存
               cacheSeconds = 31536000; // 1 年
-              cacheLevel = `permanent-${Math.floor(ageInDays)}d`;
+              cacheLevel = `legendary-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
             } else if (isAncientNft) {
               // 古老 NFT：6 個月緩存
               cacheSeconds = 15552000; // 6 個月
-              cacheLevel = `ancient-${Math.floor(ageInDays)}d`;
+              cacheLevel = `ancient-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
             } else if (isVeryOldNft && isMatureNft) {
               // 早期成熟 NFT：30 天緩存
               cacheSeconds = 2592000; // 30 天
-              cacheLevel = `early-mature-${Math.floor(ageInDays)}d`;
+              cacheLevel = `early-mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
             } else if (isMatureNft) {
               // 成熟 NFT：7 天緩存
               cacheSeconds = 604800; // 7 天
-              cacheLevel = `mature-${Math.floor(ageInDays)}d`;
-            } else if (ageInDays > 7) {
+              cacheLevel = `mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+            } else if (estimatedAge > 7) {
               // 一週以上：24 小時緩存
               cacheSeconds = 86400; // 24 小時
-              cacheLevel = `week-old-${Math.floor(ageInDays)}d`;
-            } else if (ageInDays > 1) {
+              cacheLevel = `week-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+            } else if (estimatedAge > 1) {
               // 一天以上：4 小時緩存
               cacheSeconds = 14400; // 4 小時
-              cacheLevel = `day-old-${Math.floor(ageInDays)}d`;
+              cacheLevel = `day-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
             } else {
               // 新鑄造：30 分鐘緩存
               cacheSeconds = 1800; // 30 分鐘
-              cacheLevel = `fresh-${Math.floor(ageInDays * 24)}h`;
+              cacheLevel = `fresh-${Math.floor(estimatedAge * 24)}h-id${tokenIdNum}`;
             }
             
             res.set('Cache-Control', `public, max-age=${cacheSeconds}`);
             res.set('X-Cache-Level', cacheLevel);
-            res.set('X-NFT-Age-Days', Math.floor(ageInDays).toString());
-            res.set('X-Age-Source', actualAge !== null ? 'subgraph' : 'estimated');
+            res.set('X-NFT-Age-Days-Estimated', Math.floor(estimatedAge).toString());
+            res.set('X-Age-Source', 'token-id-based-estimation');
           } else {
             // 其他數據：標準緩存
             res.set('Cache-Control', 'public, max-age=600');
