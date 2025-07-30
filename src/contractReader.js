@@ -28,8 +28,8 @@ const PARTY_ABI = [
   'function partyCompositions(uint256 partyId) view returns (uint256 heroId, uint256 relicId, uint8 partyRarity, uint256 totalPower, uint16 totalCapacity)'
 ];
 
-// 創建 provider (ethers v5)
-const provider = new ethers.providers.JsonRpcProvider(BSC_RPC);
+// 創建 provider (ethers v6)  
+const provider = new ethers.JsonRpcProvider(BSC_RPC);
 
 // 合約實例將在初始化時創建
 let contracts = {};

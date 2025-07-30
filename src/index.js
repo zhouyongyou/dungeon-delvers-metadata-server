@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const NodeCache = require('node-cache');
 const axios = require('axios');
 const { RateLimiterMemory } = require('rate-limiter-flexible');
+const { ethers } = require('ethers');
 const fs = require('fs');
 const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
@@ -264,6 +265,51 @@ async function initializeConfig() {
   }
 }
 
+// BSC RPC 端點配置（多節點容錯）
+const BSC_RPC_ENDPOINTS = [
+  'https://bsc-dataseed1.binance.org/',
+  'https://bsc-dataseed2.binance.org/',
+  'https://bsc-dataseed3.binance.org/',
+  'https://bsc-dataseed4.binance.org/',
+  'https://bsc-dataseed1.defibit.io/',
+  'https://bsc-dataseed2.defibit.io/'
+];
+
+// 創建 ethers provider（帶容錯機制）
+let provider;
+let currentRpcIndex = 0;
+
+function createProvider() {
+  try {
+    const rpcUrl = BSC_RPC_ENDPOINTS[currentRpcIndex];
+    console.log(`🔗 嘗試連接 BSC RPC: ${rpcUrl}`);
+    provider = new ethers.JsonRpcProvider(rpcUrl);
+    return provider;
+  } catch (error) {
+    console.error(`❌ RPC 連接失敗: ${error.message}`);
+    // 嘗試下一個 RPC
+    currentRpcIndex = (currentRpcIndex + 1) % BSC_RPC_ENDPOINTS.length;
+    if (currentRpcIndex === 0) {
+      throw new Error('所有 BSC RPC 端點都無法連接');
+    }
+    return createProvider();
+  }
+}
+
+// VIP Staking 合約 ABI（只需要 getVipLevel 函數）
+const VIP_STAKING_ABI = [
+  {
+    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
+    "name": "getVipLevel",
+    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
+// VIP 等級緩存（30 分鐘）
+const vipLevelCache = new NodeCache({ stdTTL: 1800 });
+
 // 添加NFT市場API配置（BSC鏈優先）
 const NFT_MARKET_APIS = {
   // BSC鏈主要市場
@@ -355,6 +401,82 @@ const GRAPHQL_QUERIES = {
 // =================================================================
 // Section: 工具函數
 // =================================================================
+
+// VIP 等級讀取函數（帶緩存和容錯）
+async function getVipLevel(userAddress) {
+  if (!userAddress || !ethers.isAddress(userAddress)) {
+    console.warn(`❌ 無效的地址格式: ${userAddress}`);
+    return 0;
+  }
+
+  // 檢查快取
+  const cacheKey = `vip-level-${userAddress.toLowerCase()}`;
+  const cachedLevel = vipLevelCache.get(cacheKey);
+  if (cachedLevel !== undefined) {
+    console.log(`🎯 VIP 等級快取命中: ${userAddress} -> Level ${cachedLevel}`);
+    return cachedLevel;
+  }
+
+  try {
+    // 確保 provider 存在
+    if (!provider) {
+      provider = createProvider();
+    }
+
+    // 創建合約實例
+    const vipContract = new ethers.Contract(
+      CONTRACTS.vip,
+      VIP_STAKING_ABI,
+      provider
+    );
+
+    console.log(`🔍 讀取 VIP 等級: ${userAddress}`);
+    
+    // 調用合約函數
+    const level = await vipContract.getVipLevel(userAddress);
+    const vipLevel = Number(level);
+
+    console.log(`✅ VIP 等級讀取成功: ${userAddress} -> Level ${vipLevel}`);
+
+    // 緩存結果（30 分鐘）
+    vipLevelCache.set(cacheKey, vipLevel);
+
+    return vipLevel;
+
+  } catch (error) {
+    console.error(`❌ VIP 等級讀取失敗: ${userAddress}`, error.message);
+
+    // 如果是 RPC 問題，嘗試切換節點
+    if (error.message.includes('network') || error.message.includes('timeout')) {
+      console.log('🔄 RPC 問題，嘗試切換節點...');
+      try {
+        currentRpcIndex = (currentRpcIndex + 1) % BSC_RPC_ENDPOINTS.length;
+        provider = createProvider();
+        
+        // 重試一次
+        const vipContract = new ethers.Contract(
+          CONTRACTS.vip,
+          VIP_STAKING_ABI,
+          provider
+        );
+        
+        const level = await vipContract.getVipLevel(userAddress);
+        const vipLevel = Number(level);
+        
+        console.log(`✅ VIP 等級重試成功: ${userAddress} -> Level ${vipLevel}`);
+        vipLevelCache.set(cacheKey, vipLevel);
+        return vipLevel;
+        
+      } catch (retryError) {
+        console.error(`❌ VIP 等級重試也失敗: ${retryError.message}`);
+      }
+    }
+
+    // 返回默認值 0，並緩存短時間（5 分鐘）避免重複嘗試
+    vipLevelCache.set(cacheKey, 0, 300);
+    return 0;
+  }
+}
 
 // GraphQL 請求函數
 async function queryGraphQL(query, variables = {}) {
@@ -1164,8 +1286,50 @@ app.get('/api/:type/:tokenId', async (req, res) => {
     
     if (!nftData) {
       try {
+        // VIP 特殊處理：從合約讀取等級
+        if (type === 'vip' || type === 'vipstaking') {
+          console.log(`🎯 處理 VIP metadata: ${tokenId}`);
+          
+          // VIP NFT 的 tokenId 就是用戶地址，但我們需要從 owner 參數獲取
+          // 如果沒有 owner 參數，VIP 無法顯示等級
+          let vipLevel = 0;
+          let userAddress = owner;
+          
+          if (userAddress && ethers.isAddress(userAddress)) {
+            vipLevel = await getVipLevel(userAddress);
+            console.log(`✅ VIP 等級獲取成功: ${userAddress} -> Level ${vipLevel}`);
+          } else {
+            console.warn(`⚠️ VIP metadata 缺少有效的 owner 參數，無法讀取等級`);
+          }
+          
+          // 生成 VIP metadata
+          nftData = {
+            name: vipLevel > 0 ? `Level ${vipLevel} VIP #${tokenId}` : `VIP #${tokenId}`,
+            description: vipLevel > 0 
+              ? `Dungeon Delvers VIP Level ${vipLevel} - Exclusive membership with enhanced staking benefits and privileges.`
+              : `Dungeon Delvers VIP - Exclusive membership with staking benefits. VIP level is determined by staked amount.`,
+            image: `${FRONTEND_DOMAIN}/images/vip/vip-1.png`,
+            attributes: [
+              { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
+              { trait_type: 'Type', value: 'VIP Membership' },
+              ...(vipLevel > 0 ? [{
+                trait_type: 'VIP Level',
+                value: vipLevel,
+                display_type: 'number',
+                max_value: 10
+              }] : []),
+              { trait_type: 'Chain', value: 'BSC' },
+              { trait_type: 'Data Source', value: vipLevel > 0 ? 'Contract' : 'Static' },
+              ...(userAddress ? [{ trait_type: 'Owner', value: userAddress }] : [])
+            ],
+            source: vipLevel > 0 ? 'contract' : 'static',
+            metadata_status: 'final'
+          };
+          
+          console.log(`✅ VIP metadata 生成完成: Level ${vipLevel}`);
+        }
         // 先嘗試從 subgraph 獲取資料
-        if (['hero', 'relic', 'party'].includes(type)) {
+        else if (['hero', 'relic', 'party'].includes(type)) {
           const contractAddress = CONTRACTS[type];
           const nftId = `${contractAddress.toLowerCase()}-${tokenId}`;
           const data = await queryGraphQL(GRAPHQL_QUERIES.getNftById, {
@@ -2560,8 +2724,17 @@ async function startServer() {
   // 初始化配置
   await initializeConfig();
   
+  // 初始化 BSC provider
+  try {
+    provider = createProvider();
+    console.log(`✅ BSC Provider 初始化成功`);
+  } catch (error) {
+    console.warn(`⚠️ BSC Provider 初始化失敗: ${error.message}`);
+    console.warn(`VIP 等級讀取功能將在首次使用時初始化`);
+  }
+
   app.listen(PORT, () => {
-    console.log(`🚀 Metadata Server v1.3.0 running on port ${PORT}`);
+    console.log(`🚀 Metadata Server v1.3.0 running on port ${PORT} 🎯 VIP Level Support`);
     console.log(`📍 Health check: http://localhost:${PORT}/health`);
     console.log(`📊 Sync status: http://localhost:${PORT}/api/sync-status`);
     console.log(`🎮 NFT API: http://localhost:${PORT}/api/:type/:tokenId`);
@@ -2570,6 +2743,7 @@ async function startServer() {
     console.log(`📈 Stats: http://localhost:${PORT}/api/stats`);
     console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
     console.log(`📦 Batch API: http://localhost:${PORT}/api/batch (POST)`);
+    console.log(`🎯 VIP Level API: http://localhost:${PORT}/api/vip/:tokenId?owner=ADDRESS`);
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
     console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
