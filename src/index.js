@@ -207,8 +207,8 @@ global.THE_GRAPH_API_URL = THE_GRAPH_API_URL;
 global.THE_GRAPH_STUDIO_URL = THE_GRAPH_STUDIO_URL;
 const SUBGRAPH_ID = process.env.SUBGRAPH_ID || 'dungeon-delvers';
 
-// JSON 文件路徑配置 - 指向主專案的 public/api
-const JSON_BASE_PATH = path.join(__dirname, '../../../GitHub/DungeonDelvers/public/api');
+// JSON 文件路徑配置 - 使用後端自己的 api 目錄
+const JSON_BASE_PATH = path.join(__dirname, '../../api');
 
 // 前端域名配置 - 用於圖片 URL
 const FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN || 'https://dungeondelvers.xyz';

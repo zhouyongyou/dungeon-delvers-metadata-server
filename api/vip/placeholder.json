@@ -1,0 +1,11 @@
+{
+  "name": "Unknown VIP Pass",
+  "description": "This VIP Pass's data is currently unavailable. Please try again later.",
+  "image": "https://www.dungeondelvers.xyz/images/vip/vip-placeholder.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Loading"
+    }
+  ]
+}
