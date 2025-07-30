@@ -1,8 +1,6 @@
 {
   "name": "Snowfeather Scepter",
-  "name_ch": "雪羽權杖",
   "description": "A frost staff with glowing ice feathers and a snow crystal core, floating on a frozen pedestal in a glacial vault, emanating cold mist. It's said that a mere touch can turn enemies into ice sculptures.",
-  "description_ch": "一根帶有發光冰羽和雪晶核心的霜凍法杖，它漂浮在一座冰川寶庫內的冰凍石座上，散發著寒氣。據說只需碰觸，便可將敵人凍成雕像。",
   "image": "https://www.dungeondelvers.xyz/images/relic/relic-4.png",
   "attributes": [
     {

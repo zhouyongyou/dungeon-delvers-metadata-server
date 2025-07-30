@@ -1,8 +1,6 @@
 {
   "name": "Milo the Beginner",
-  "name_ch": "新手學徒 米洛",
   "description": "A clumsy young male mage wearing an oversized wizard robe that doesn't fit, sporting huge round glasses. He holds a crooked staff and an upside-down magic book, with glowing magical doodles floating around him. Still can't figure out which end is the wand and which is the handle, but trying hard!",
-  "description_ch": "一位笨拙的年輕男法師，穿著不合身的過大巫師袍，戴著巨大的圓眼鏡。他手裡拿著歪曲的法杖和一本拿顛倒的魔法書，身邊漂浮著發光的魔法塗鴉。還搞不清楚哪邊是魔杖哪邊是把手，但很努力！",
   "image": "https://www.dungeondelvers.xyz/images/hero/hero-1.png",
   "attributes": [
     {

@@ -1,8 +1,6 @@
 {
   "name": "Explorer's Fold",
-  "name_ch": "耐用的探險者地圖",
   "description": "An old folded map with ink scribbles and magical markers, spread on a worn stone table, surrounded by rope, compass, and a dagger. An old companion patched countless times yet never fails.",
-  "description_ch": "一張帶有墨水塗鴉和魔法標記的舊摺疊地圖，被攤開在磨損的石桌上，旁邊放著繩索、指南針和一把匕首。縫補無數次卻從不出錯的老夥伴。",
   "image": "https://www.dungeondelvers.xyz/images/relic/relic-2.png",
   "attributes": [
     {

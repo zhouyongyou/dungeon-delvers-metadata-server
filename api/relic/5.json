@@ -1,8 +1,6 @@
 {
   "name": "Abyssal Loop",
-  "name_ch": "深淵之輪",
   "description": "A burning chain blade inscribed with lava runes, suspended above a molten altar, surrounded by raging hellfire and glowing ground fissures. Forged from molten lava, it requires life as fuel.",
-  "description_ch": "一把刻有熔岩符文的燃燒鏈刃，懸浮於一座熔融的祭壇之上，周圍環繞著熊熊的地獄之火與發光的地面裂縫。以熔岩熔鍊而成的鏈刃，需以生命作燃料。",
   "image": "https://www.dungeondelvers.xyz/images/relic/relic-5.png",
   "attributes": [
     {
