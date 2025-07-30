@@ -1,0 +1,15 @@
+{
+  "name": "VIP Membership",
+  "description": "An exclusive VIP membership NFT that grants special privileges and access to premium features in the Dungeon Delvers ecosystem.",
+  "image": "https://www.dungeondelvers.xyz/images/vip/vip.png",
+  "attributes": [
+    {
+      "trait_type": "Category",
+      "value": "VIP"
+    },
+    {
+      "trait_type": "Membership Level",
+      "value": "Premium"
+    }
+  ]
+} 
