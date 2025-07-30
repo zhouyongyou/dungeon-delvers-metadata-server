@@ -296,12 +296,19 @@ function createProvider() {
   }
 }
 
-// VIP Staking 合約 ABI（只需要 getVipLevel 函數）
+// VIP Staking 合約 ABI（需要 getVipLevel 和 ownerOf 函數）
 const VIP_STAKING_ABI = [
   {
     "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
     "name": "getVipLevel",
     "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "tokenId", "type": "uint256"}],
+    "name": "ownerOf",
+    "outputs": [{"internalType": "address", "name": "", "type": "address"}],
     "stateMutability": "view",
     "type": "function"
   }
@@ -402,6 +409,55 @@ const GRAPHQL_QUERIES = {
 // =================================================================
 
 // VIP 等級讀取函數（帶緩存和容錯）
+/**
+ * 根據 VIP tokenId 自動獲取 owner 和等級
+ */
+async function getVipDataByTokenId(tokenId) {
+  try {
+    // 確保 provider 存在
+    if (!provider) {
+      provider = createProvider();
+    }
+
+    // 創建合約實例
+    const vipContract = new ethers.Contract(
+      CONTRACTS.vip,
+      VIP_STAKING_ABI,
+      provider
+    );
+
+    console.log(`🔍 查詢 VIP #${tokenId} 的 owner...`);
+    
+    // 1. 先獲取 NFT 的 owner
+    const owner = await vipContract.ownerOf(tokenId);
+    console.log(`✅ VIP #${tokenId} owner: ${owner}`);
+    
+    // 2. 獲取該 owner 的 VIP 等級
+    const level = await vipContract.getVipLevel(owner);
+    const vipLevel = Number(level);
+    
+    console.log(`✅ VIP 等級獲取成功: ${owner} -> Level ${vipLevel}`);
+
+    // 緩存結果（30 分鐘）
+    const cacheKey = `vip-data-${tokenId}`;
+    const data = { owner, level: vipLevel };
+    vipLevelCache.set(cacheKey, data);
+
+    return data;
+    
+  } catch (error) {
+    console.error(`❌ 獲取 VIP #${tokenId} 數據失敗:`, error.message);
+    
+    // 如果是 tokenId 不存在的錯誤，返回 null
+    if (error.message?.includes('nonexistent token') || error.message?.includes('invalid token')) {
+      return null;
+    }
+    
+    // 其他錯誤，返回默認數據
+    return { owner: null, level: 0 };
+  }
+}
+
 async function getVipLevel(userAddress) {
   if (!userAddress || !ethers.isAddress(userAddress)) {
     console.warn(`❌ 無效的地址格式: ${userAddress}`);
@@ -1318,20 +1374,33 @@ app.get('/api/:type/:tokenId', async (req, res) => {
     
     if (!nftData) {
       try {
-        // VIP 特殊處理：從合約讀取等級
+        // VIP 特殊處理：自動從合約讀取 owner 和等級
         if (type === 'vip' || type === 'vipstaking') {
           console.log(`🎯 處理 VIP metadata: ${tokenId}`);
           
-          // VIP NFT 的 tokenId 就是用戶地址，但我們需要從 owner 參數獲取
-          // 如果沒有 owner 參數，VIP 無法顯示等級
-          let vipLevel = 0;
-          let userAddress = owner;
+          // 檢查緩存
+          const cacheKey = `vip-data-${tokenId}`;
+          let vipData = vipLevelCache.get(cacheKey);
           
-          if (userAddress && ethers.isAddress(userAddress)) {
-            vipLevel = await getVipLevel(userAddress);
-            console.log(`✅ VIP 等級獲取成功: ${userAddress} -> Level ${vipLevel}`);
-          } else {
-            console.warn(`⚠️ VIP metadata 缺少有效的 owner 參數，無法讀取等級`);
+          if (!vipData) {
+            // 自動從合約獲取 owner 和等級
+            vipData = await getVipDataByTokenId(tokenId);
+          }
+          
+          if (!vipData) {
+            // Token 不存在
+            nftData = {
+              error: 'Token not found',
+              message: `VIP NFT #${tokenId} does not exist`
+            };
+            return res.status(404).json(nftData);
+          }
+          
+          const { owner: nftOwner, level: vipLevel } = vipData;
+          
+          // 如果 URL 中有 owner 參數，驗證是否匹配
+          if (owner && owner.toLowerCase() !== nftOwner?.toLowerCase()) {
+            console.warn(`⚠️ URL owner 參數 (${owner}) 與實際 owner (${nftOwner}) 不匹配`);
           }
           
           // 生成 VIP metadata
@@ -1351,14 +1420,26 @@ app.get('/api/:type/:tokenId', async (req, res) => {
                 max_value: 10
               }] : []),
               { trait_type: 'Chain', value: 'BSC' },
-              { trait_type: 'Data Source', value: vipLevel > 0 ? 'Contract' : 'Static' },
-              ...(userAddress ? [{ trait_type: 'Owner', value: userAddress }] : [])
+              { trait_type: 'Data Source', value: 'Contract Auto-Query' },
+              { trait_type: 'Owner', value: nftOwner }
             ],
-            source: vipLevel > 0 ? 'contract' : 'static',
-            metadata_status: 'final'
+            source: 'contract',
+            metadata_status: 'final',
+            // 額外的元數據
+            id: tokenId,
+            contractAddress: CONTRACTS.vip,
+            type: 'vip',
+            external_url: `${FRONTEND_DOMAIN}/nft/vip/${tokenId}`,
+            okx_optimized: true,
+            marketplace_compatibility: 'unified',
+            charset: 'UTF-8',
+            collection: {
+              name: 'Dungeon Delvers',
+              family: 'Dungeon Delvers NFT'
+            }
           };
           
-          console.log(`✅ VIP metadata 生成完成: Level ${vipLevel}`);
+          console.log(`✅ VIP metadata 生成完成: ${nftOwner} Level ${vipLevel}`);
         }
         // 先嘗試從 subgraph 獲取資料
         else if (['hero', 'relic', 'party'].includes(type)) {
