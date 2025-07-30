@@ -12,7 +12,6 @@ const fs = require('fs');
 const path = require('path');
 const { getRarityFromMapping } = require('./rarityMapping');
 const { getRarityFromContract } = require('./contractReader');
-const { MarketplaceAdapter } = require('./adapters/MarketplaceAdapter');
 const configLoader = require('./configLoader');
 require('dotenv').config();
 
@@ -449,6 +448,141 @@ function readJSONFile(filePath) {
     console.error(`Error reading JSON file ${filePath}:`, error);
     return null;
   }
+}
+
+// 標準化 metadata（原 OKX 適配器功能）
+function standardizeMetadata(metadata, type, tokenId) {
+  // Ensure attributes exist
+  if (!metadata.attributes) {
+    metadata.attributes = [];
+  }
+
+  // Process each attribute
+  metadata.attributes = metadata.attributes.map(attr => {
+    const adapted = { ...attr };
+
+    // Handle Rarity - MUST be numeric
+    if (attr.trait_type === 'Rarity') {
+      // 如果稀有度為 null 或 undefined，不包含此屬性
+      if (attr.value === null || attr.value === undefined || attr.value === 'Unknown') {
+        return null; // 將在後面過濾掉
+      }
+      adapted.value = normalizeRarity(attr.value);
+      adapted.display_type = 'number';
+      adapted.max_value = 5;
+    }
+    
+    // Handle other numeric attributes
+    else if (isNumericAttribute(attr.trait_type)) {
+      adapted.value = ensureNumeric(attr.value, 0);
+      adapted.display_type = 'number';
+      
+      // Add specific max values for known attributes
+      if (attr.trait_type === 'Power' || attr.trait_type === 'Capacity') {
+        adapted.max_value = 9999;
+      }
+    }
+    
+    // Keep string attributes as-is
+    return adapted;
+  }).filter(attr => attr !== null); // 過濾掉 null 值
+
+  // Ensure Token ID is present and numeric
+  const hasTokenId = metadata.attributes.some(attr => attr.trait_type === 'Token ID');
+  if (!hasTokenId && tokenId) {
+    metadata.attributes.push({
+      trait_type: 'Token ID',
+      value: parseInt(tokenId),
+      display_type: 'number'
+    });
+  }
+
+  // 如果沒有稀有度，添加狀態說明
+  const hasRarity = metadata.attributes.some(attr => attr.trait_type === 'Rarity');
+  if (!hasRarity) {
+    metadata.attributes.push({
+      trait_type: 'Status',
+      value: 'Data Syncing',
+      display_type: 'string'
+    });
+    
+    // 添加 BSC 鏈標識
+    metadata.attributes.push({
+      trait_type: 'Chain',
+      value: 'BSC',
+      display_type: 'string'
+    });
+  }
+  
+  // Ensure HTTPS image URL
+  metadata.image = ensureHttpsUrl(metadata.image);
+  
+  // Add external_url for NFT detail page navigation
+  if (!metadata.external_url) {
+    metadata.external_url = `${FRONTEND_DOMAIN}/nft/${type}/${tokenId}`;
+  }
+
+  // Add animation_url if applicable
+  if (metadata.animation_url) {
+    metadata.animation_url = ensureHttpsUrl(metadata.animation_url);
+  }
+
+  // Market compatibility metadata
+  metadata.okx_optimized = true;
+  metadata.marketplace_compatibility = 'unified';
+  metadata.charset = 'UTF-8';
+
+  // Add collection info if missing
+  if (!metadata.collection) {
+    metadata.collection = {
+      name: 'Dungeon Delvers',
+      family: 'Dungeon Delvers NFT'
+    };
+  }
+
+  return metadata;
+}
+
+// Helper functions
+function normalizeRarity(rarity) {
+  if (typeof rarity === 'number') return Math.max(1, Math.min(5, rarity));
+  
+  const rarityMap = {
+    'common': 1,
+    'uncommon': 2,
+    'rare': 2,
+    'epic': 3,
+    'legendary': 4,
+    'mythic': 5,
+    'mythical': 5
+  };
+  
+  const normalized = rarityMap[String(rarity).toLowerCase()];
+  return normalized || 1;
+}
+
+function isNumericAttribute(traitType) {
+  const numericTraits = [
+    'Power', 'Capacity', 'Total Power', 'Total Capacity',
+    'Token ID', 'Heroes Count', 'Level', 'Experience'
+  ];
+  return numericTraits.includes(traitType);
+}
+
+function ensureNumeric(value, defaultValue = 0) {
+  const num = parseInt(value);
+  return !isNaN(num) ? num : defaultValue;
+}
+
+function ensureHttpsUrl(url, baseUrl = FRONTEND_DOMAIN) {
+  if (!url) return '';
+  
+  if (url.startsWith('https://')) return url;
+  if (url.startsWith('http://')) return url.replace('http://', 'https://');
+  if (url.startsWith('//')) return 'https:' + url;
+  if (url.startsWith('/')) return baseUrl + url;
+  
+  return url;
 }
 
 // 生成標準 NFT 名稱（英文格式）
@@ -1223,32 +1357,10 @@ app.get('/api/:type/:tokenId', async (req, res) => {
       }
     }
     
-    // Detect marketplace and apply appropriate adapter
-    const detectedMarketplace = MarketplaceAdapter.detectMarketplace(req.headers);
-    console.log(`🎯 Detected marketplace: ${detectedMarketplace} for ${type} #${tokenId}`);
+    // Standardize metadata for all markets (originally OKX-specific)
+    nftData = standardizeMetadata(nftData, type, tokenId);
     
-    // Create and apply marketplace-specific adapter
-    const adapter = MarketplaceAdapter.create(detectedMarketplace, nftData, {
-      type,
-      tokenId,
-      contractAddress: CONTRACTS[type],
-      frontendDomain: FRONTEND_DOMAIN
-    });
-    
-    const adaptedMetadata = adapter.adapt();
-    
-    // Validate adapted metadata in development
-    if (process.env.NODE_ENV === 'development' && adapter.validate) {
-      const validation = adapter.validate();
-      if (!validation.valid) {
-        console.error(`❌ Metadata validation errors:`, validation.errors);
-      }
-      if (validation.warnings?.length > 0) {
-        console.warn(`⚠️ Metadata validation warnings:`, validation.warnings);
-      }
-    }
-    
-    res.json(adaptedMetadata);
+    res.json(nftData);
   } catch (error) {
     res.status(500).json({
       error: 'Failed to fetch NFT',
