@@ -458,6 +458,63 @@ async function getVipDataByTokenId(tokenId) {
   }
 }
 
+// 獲取玩家檔案數據 (playerprofile)
+async function getPlayerProfileData(tokenId) {
+  console.log(`🔍 獲取玩家檔案 #${tokenId} 數據...`);
+  
+  try {
+    // 確保 provider 存在
+    if (!provider) {
+      provider = createProvider();
+    }
+
+    // 創建合約實例
+    const { playerProfileABI } = require('./abis');
+    const profileContract = new ethers.Contract(
+      CONTRACTS.playerprofile,
+      playerProfileABI,
+      provider
+    );
+
+    // 1. 先獲取 NFT 的 owner
+    const owner = await profileContract.ownerOf(tokenId);
+    console.log(`✅ Profile #${tokenId} owner: ${owner}`);
+    
+    // 2. 獲取玩家的經驗值和等級
+    const experience = await profileContract.getExperience(owner);
+    const level = await profileContract.getLevel(owner);
+    
+    // 3. 獲取 profileData（如果有額外數據）
+    let profileDataResult = null;
+    try {
+      profileDataResult = await profileContract.profileData(tokenId);
+    } catch (profileDataError) {
+      console.warn(`無法獲取 profileData: ${profileDataError.message}`);
+    }
+    
+    const profileData = {
+      owner,
+      experience: Number(experience),
+      level: Number(level),
+      adventures: 0 // 目前沒有這個欄位，設為 0
+    };
+    
+    console.log(`✅ 玩家檔案數據獲取成功:`, profileData);
+    return profileData;
+    
+  } catch (error) {
+    console.error(`❌ 獲取玩家檔案 #${tokenId} 數據失敗:`, error.message);
+    
+    // 如果是 tokenId 不存在的錯誤，返回 null
+    if (error.message?.includes('nonexistent token') || error.message?.includes('invalid token')) {
+      return null;
+    }
+    
+    // 其他錯誤，返回默認數據
+    return { owner: null, experience: 0, level: 1, adventures: 0 };
+  }
+}
+
 async function getVipLevel(userAddress) {
   if (!userAddress || !ethers.isAddress(userAddress)) {
     console.warn(`❌ 無效的地址格式: ${userAddress}`);
@@ -880,6 +937,30 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
             max_value: 25
           });
         }
+      } else if (type === 'playerprofile') {
+        // 嘗試從合約獲取玩家檔案數據
+        try {
+          const profileData = await getPlayerProfileData(tokenId);
+          if (profileData) {
+            additionalAttributes.push({
+              trait_type: 'Experience',
+              value: profileData.experience,
+              display_type: 'number'
+            });
+            additionalAttributes.push({
+              trait_type: 'Level',
+              value: profileData.level,
+              display_type: 'number'
+            });
+            additionalAttributes.push({
+              trait_type: 'Total Adventures',
+              value: profileData.adventures || 0,
+              display_type: 'number'
+            });
+          }
+        } catch (profileError) {
+          console.warn(`無法從合約獲取玩家檔案數據:`, profileError.message);
+        }
       }
     }
   } catch (error) {
@@ -891,6 +972,9 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   if (type === 'vip' || type === 'vipstaking') {
     // VIP 使用固定圖片，因為等級需要從合約讀取
     imageUrl = `${FRONTEND_DOMAIN}/images/vip/vip-1.png`;
+  } else if (type === 'playerprofile') {
+    // 玩家檔案使用固定圖片
+    imageUrl = `${FRONTEND_DOMAIN}/images/profile/profile-1.png`;
   } else if (type === 'party' && totalPower) {
     // Party 使用基於戰力的圖片
     imageUrl = getPartyImageByPower(totalPower);
@@ -903,10 +987,14 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   const baseData = {
     name: (type === 'vip' || type === 'vipstaking') 
       ? `VIP #${tokenId}` 
+      : (type === 'playerprofile')
+      ? `Player Profile #${tokenId}`
       : (rarity ? generateEnhancedNFTName(type, tokenId, rarity, totalPower) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`),
     description: (type === 'vip' || type === 'vipstaking')
       ? "Dungeon Delvers VIP - Exclusive membership with staking benefits. VIP level is determined by staked amount."
-      : (hasSubgraphData ? "Dungeon Delvers NFT" : "This NFT's data is currently unavailable. Please try again later."),
+      : (type === 'playerprofile')
+      ? "Dungeon Delvers Player Profile - Soul-bound achievement NFT tracking your journey through the dungeons."
+      : (hasSubgraphData ? "Dungeon Delvers NFT - 從區塊鏈獲取的即時資料" : "This NFT's data is currently unavailable. Please try again later."),
     image: imageUrl,
     attributes: [
       { trait_type: "Token ID", value: parseInt(tokenId), display_type: "number" },
