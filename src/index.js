@@ -1336,9 +1336,25 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             cache.set(cacheKey, nftData, 60);
             console.log(`Caching placeholder ${type} #${tokenId} for 1 minute`);
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 完整數據快取 10 分鐘（內部緩存可以更長）
-            cache.set(cacheKey, nftData, 600);
-            console.log(`Caching complete NFT ${type} #${tokenId} for 10 minutes`);
+            // 根據 NFT 穩定性決定內部緩存時間
+            const tokenIdNum = parseInt(tokenId);
+            const isVeryOldNft = tokenIdNum <= 1000;
+            const isOldNft = tokenIdNum <= 5000;
+            
+            let cacheTime, description;
+            if (isVeryOldNft) {
+              cacheTime = 7200; // 2 小時（極穩定）
+              description = '2 hours (very stable)';
+            } else if (isOldNft) {
+              cacheTime = 3600; // 1 小時（穩定）
+              description = '1 hour (stable)';
+            } else {
+              cacheTime = 600;  // 10 分鐘（新 NFT）
+              description = '10 minutes (new)';
+            }
+            
+            cache.set(cacheKey, nftData, cacheTime);
+            console.log(`Caching complete NFT ${type} #${tokenId} for ${description}`);
           } else {
             // 其他數據快取 5 分鐘
             cache.set(cacheKey, nftData, 300);
@@ -1353,8 +1369,21 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             res.set('Cache-Control', 'public, max-age=120');
             res.set('X-Refresh-After', '120');
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 完整數據：可以緩存 30 分鐘（平衡及時性和效能）
-            res.set('Cache-Control', 'public, max-age=1800');
+            // 根據 NFT 年齡決定緩存時間
+            const tokenIdNum = parseInt(tokenId);
+            const isVeryOldNft = tokenIdNum <= 1000; // 前 1000 個是早期 NFT
+            const isOldNft = tokenIdNum <= 5000;     // 前 5000 個是穩定 NFT
+            
+            if (isVeryOldNft) {
+              // 早期 NFT：24 小時緩存（數據非常穩定）
+              res.set('Cache-Control', 'public, max-age=86400');
+            } else if (isOldNft) {
+              // 穩定 NFT：4 小時緩存
+              res.set('Cache-Control', 'public, max-age=14400');
+            } else {
+              // 新 NFT：30 分鐘緩存（可能還有變動）
+              res.set('Cache-Control', 'public, max-age=1800');
+            }
           } else {
             // 其他數據：標準緩存
             res.set('Cache-Control', 'public, max-age=600');
