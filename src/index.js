@@ -1448,6 +1448,13 @@ app.get('/api/sync-status', async (req, res) => {
   }
 });
 
+// Profile NFT 的特殊路由（為了匹配合約的 tokenURI）
+app.get('/api/profile/:tokenId', async (req, res) => {
+  // 重定向到正確的 playerprofile 端點
+  const { tokenId } = req.params;
+  return res.redirect(301, `/api/playerprofile/${tokenId}`);
+});
+
 // 獲取特定 NFT（優化版）
 app.get('/api/:type/:tokenId', async (req, res) => {
   try {
