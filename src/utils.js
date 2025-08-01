@@ -287,7 +287,7 @@ export const fallbackMetadata = (tokenId, type) => {
     hero: { name: 'Hero', description: 'A brave hero from the world of Dungeon Delvers.', image: 'https://dungeondelvers.xyz/images/hero/hero-1.png' },
     relic: { name: 'Relic', description: 'An ancient relic imbued with mysterious powers.', image: 'https://dungeondelvers.xyz/images/relic/relic-1.png' },
     party: { name: 'Party', description: 'A brave party of delvers, united for a common goal.', image: 'https://dungeondelvers.xyz/images/party/party.png' },
-    profile: { name: 'Profile', description: 'A soul-bound achievement token for Dungeon Delvers.', image: 'https://dungeondelvers.xyz/assets/images/collections/profile-logo.png' },
+    profile: { name: 'Dungeon Delvers Profile', description: 'A soul-bound achievement token for Dungeon Delvers.', image: 'https://dungeondelvers.xyz/images/profile/profile-1.png' },
     vip: { name: 'VIP', description: 'A soul-bound VIP card that provides in-game bonuses.', image: 'https://dungeondelvers.xyz/images/vip-placeholder.png' }
   };
   

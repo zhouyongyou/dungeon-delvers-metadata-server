@@ -1,0 +1,74 @@
+
+> dungeon-delvers-metadata-server@2.0.1 start
+> node src/index.js
+
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔧 Development mode: Serving static files locally
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x785a8b7d7b2E64c5971D8f548a45B7db3CcA5797',
+  relic: '0xaa7434e77343cd4AaE7dDea2f19Cb86232727D0d',
+  party: '0x2890F2bFe5ff4655d3096eC5521be58Eba6fAE50'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x785a8b7d7b2E64c5971D8f548a45B7db3CcA5797',
+  relic: '0xaa7434e77343cd4AaE7dDea2f19Cb86232727D0d',
+  party: '0x2890F2bFe5ff4655d3096eC5521be58Eba6fAE50',
+  vip: '0x58A16F4845BA7Fea4377399d74D50d8aeE58fde4',
+  playerprofile: '0xF1b836D09A30C433A2479a856c84e0d64DBBD973'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Every 3 minutes
+📊 Concurrency: 20-100 (adaptive)
+📦 Batch size: 50, delay: 2000ms
+🔄 Max RPC calls: 200/min
+🔧 Development mode: Local static files available at /images and /assets
+::1 - - [01/Aug/2025:08:39:58 +0000] "POST /api/cache/clear HTTP/1.1" 200 40 "-" "curl/8.7.1"
+::1 - - [01/Aug/2025:08:40:03 +0000] "GET /metadata/playerprofile/1 HTTP/1.1" 404 186 "-" "curl/8.7.1"
+::1 - - [01/Aug/2025:08:40:07 +0000] "GET /metadata/playerprofile/1 HTTP/1.1" 404 186 "-" "curl/8.7.1"
+👤 處理 PlayerProfile metadata: 1
+🔍 獲取玩家檔案 #1 數據...
+❌ 獲取玩家檔案 #1 數據失敗: Unexpected token 'export'
+✅ PlayerProfile metadata 生成完成: null Level 1 (0 EXP)
+Caching NFT playerprofile #1 for 5 minutes
+::1 - - [01/Aug/2025:08:40:12 +0000] "GET /api/playerprofile/1 HTTP/1.1" 200 1151 "-" "curl/8.7.1"
+🔥 開始預熱新 NFT...
+[The Graph] 使用去中心化版本查詢...
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+[The Graph] ✅ Studio 備用版本查詢成功
+📊 發現 0 個未緩存的 NFT
+✅ 沒有需要預熱的 NFT
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功

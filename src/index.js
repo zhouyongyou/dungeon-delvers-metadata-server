@@ -859,7 +859,7 @@ function generateEnhancedNFTName(type, tokenId, rarity, totalPower = null) {
     'party': 'Party',
     'vip': 'VIP Pass',
     'vipstaking': 'VIP Pass',
-    'playerprofile': 'Player Profile'
+    'playerprofile': 'Dungeon Delvers Profile'
   };
   
   const rarityPrefix = rarityPrefixes[validRarity] || '';
@@ -889,6 +889,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
   let additionalAttributes = [];
   let hasSubgraphData = false;
   let totalPower = null; // 用於隊伍名稱生成
+  let profileData = null; // 用於 Profile 標題生成
   
   try {
     const contractAddress = CONTRACTS[type];
@@ -940,7 +941,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
       } else if (type === 'playerprofile') {
         // 嘗試從合約獲取玩家檔案數據
         try {
-          const profileData = await getPlayerProfileData(tokenId);
+          profileData = await getPlayerProfileData(tokenId);
           if (profileData) {
             additionalAttributes.push({
               trait_type: 'Experience',
@@ -988,7 +989,7 @@ async function generateFallbackMetadata(type, tokenId, rarity = null) {
     name: (type === 'vip' || type === 'vipstaking') 
       ? `VIP #${tokenId}` 
       : (type === 'playerprofile')
-      ? `Player Profile #${tokenId}`
+      ? (profileData?.level > 1 ? `Level ${profileData.level} Dungeon Delvers Profile #${tokenId}` : `Dungeon Delvers Profile #${tokenId}`)
       : (rarity ? generateEnhancedNFTName(type, tokenId, rarity, totalPower) : `${type.charAt(0).toUpperCase() + type.slice(1)} #${tokenId}`),
     description: (type === 'vip' || type === 'vipstaking')
       ? "Dungeon Delvers VIP - Exclusive membership with staking benefits. VIP level is determined by staked amount."
@@ -1549,12 +1550,12 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           
           // 生成 PlayerProfile metadata
           nftData = {
-            name: `Player Profile #${tokenId}`,
-            description: `Dungeon Delvers Player Profile - Soul-bound achievement NFT tracking your journey through the dungeons.`,
+            name: level > 1 ? `Level ${level} Dungeon Delvers Profile #${tokenId}` : `Dungeon Delvers Profile #${tokenId}`,
+            description: `Dungeon Delvers Profile - Soul-bound achievement NFT tracking your journey through the dungeons.`,
             image: `${FRONTEND_DOMAIN}/images/profile/profile-1.png`,
             attributes: [
               { trait_type: 'Token ID', value: parseInt(tokenId), display_type: 'number' },
-              { trait_type: 'Type', value: 'Player Profile' },
+              { trait_type: 'Type', value: 'Dungeon Delvers Profile' },
               { trait_type: 'Experience', value: experience, display_type: 'number' },
               { trait_type: 'Level', value: level, display_type: 'number' },
               { trait_type: 'Total Adventures', value: adventures, display_type: 'number' },
