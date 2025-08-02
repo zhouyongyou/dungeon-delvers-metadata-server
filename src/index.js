@@ -1826,72 +1826,86 @@ app.get('/api/:type/:tokenId', async (req, res) => {
             res.set('Cache-Control', 'public, max-age=120');
             res.set('X-Refresh-After', '120');
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 基於 Token ID 和非線性鑄造模式的智能估算
-            const tokenIdNum = parseInt(tokenId);
-            
-            // 🎯 調整為十倍鑄造量的年齡估算
-            let estimatedAge;
-            if (tokenIdNum <= 1000) {
-              // 前 1000 個：假設首日爆發（幾千個/天）
-              estimatedAge = Math.max(90, 90 + tokenIdNum / 100); // 至少 90 天前，越早的 ID 越老
-            } else if (tokenIdNum <= 5000) {
-              // 1001-5000：假設首週內高峰鑄造（每天 1000-2000 個）
-              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 100); // 60-90 天前
-            } else if (tokenIdNum <= 20000) {
-              // 5001-20000：假設首月內穩定鑄造（每天 500-1000 個）
-              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 500); // 30-60 天前
-            } else if (tokenIdNum <= 50000) {
-              // 20001-50000：假設低量期（每天 100-500 個）
-              estimatedAge = Math.max(7, 30 - (tokenIdNum - 20000) / 1000); // 7-30 天前
+            // 特殊處理經常更新的 NFT 類型
+            if (type === 'playerprofile') {
+              // 玩家檔案：經驗值經常更新，使用短快取
+              res.set('Cache-Control', 'public, max-age=300'); // 5 分鐘
+              res.set('X-Cache-Level', 'dynamic-profile');
+              res.set('X-Update-Frequency', 'frequent');
+            } else if (type === 'vip' || type === 'vipstaking') {
+              // VIP：等級會變化但不頻繁，使用中等快取
+              res.set('Cache-Control', 'public, max-age=1800'); // 30 分鐘
+              res.set('X-Cache-Level', 'dynamic-vip');
+              res.set('X-Update-Frequency', 'moderate');
             } else {
-              // 50000+：假設極低量期（每天 10-100 個）
-              estimatedAge = Math.max(0, 7 - (tokenIdNum - 50000) / 100); // 0-7 天前
+              // 其他 NFT（Hero、Relic、Party）：屬性固定，使用智能快取
+              // 基於 Token ID 和非線性鑄造模式的智能估算
+              const tokenIdNum = parseInt(tokenId);
+              
+              // 🎯 調整為十倍鑄造量的年齡估算
+              let estimatedAge;
+              if (tokenIdNum <= 1000) {
+                // 前 1000 個：假設首日爆發（幾千個/天）
+                estimatedAge = Math.max(90, 90 + tokenIdNum / 100); // 至少 90 天前，越早的 ID 越老
+              } else if (tokenIdNum <= 5000) {
+                // 1001-5000：假設首週內高峰鑄造（每天 1000-2000 個）
+                estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 100); // 60-90 天前
+              } else if (tokenIdNum <= 20000) {
+                // 5001-20000：假設首月內穩定鑄造（每天 500-1000 個）
+                estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 500); // 30-60 天前
+              } else if (tokenIdNum <= 50000) {
+                // 20001-50000：假設低量期（每天 100-500 個）
+                estimatedAge = Math.max(7, 30 - (tokenIdNum - 20000) / 1000); // 7-30 天前
+              } else {
+                // 50000+：假設極低量期（每天 10-100 個）
+                estimatedAge = Math.max(0, 7 - (tokenIdNum - 50000) / 100); // 0-7 天前
+              }
+            
+              // 安全邊界檢查
+              estimatedAge = Math.max(0, estimatedAge);
+              
+              const isVeryOldNft = tokenIdNum <= 1000;    // 前 1000 個（傳奇級）
+              const isOldNft = tokenIdNum <= 5000;        // 前 5000 個（早期）
+              const isAncientNft = estimatedAge > 90;     // 超過 3 個月
+              const isMatureNft = estimatedAge > 30;      // 超過 1 個月
+              
+              let cacheSeconds, cacheLevel;
+              
+              if (isVeryOldNft && isAncientNft) {
+                // 古老傳奇 NFT：24 小時緩存（從 1 年縮短）
+                cacheSeconds = 86400; // 24 小時
+                cacheLevel = `legendary-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else if (isAncientNft) {
+                // 古老 NFT：12 小時緩存（從 6 個月縮短）
+                cacheSeconds = 43200; // 12 小時
+                cacheLevel = `ancient-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else if (isVeryOldNft && isMatureNft) {
+                // 早期成熟 NFT：6 小時緩存（從 30 天縮短）
+                cacheSeconds = 21600; // 6 小時
+                cacheLevel = `early-mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else if (isMatureNft) {
+                // 成熟 NFT：4 小時緩存（從 7 天縮短）
+                cacheSeconds = 14400; // 4 小時
+                cacheLevel = `mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else if (estimatedAge > 7) {
+                // 一週以上：2 小時緩存（從 24 小時縮短）
+                cacheSeconds = 7200; // 2 小時
+                cacheLevel = `week-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else if (estimatedAge > 1) {
+                // 一天以上：1 小時緩存（從 4 小時縮短）
+                cacheSeconds = 3600; // 1 小時
+                cacheLevel = `day-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
+              } else {
+                // 新鑄造：10 分鐘緩存（從 30 分鐘縮短）
+                cacheSeconds = 600; // 10 分鐘
+                cacheLevel = `fresh-${Math.floor(estimatedAge * 24)}h-id${tokenIdNum}`;
+              }
+              
+              res.set('Cache-Control', `public, max-age=${cacheSeconds}`);
+              res.set('X-Cache-Level', cacheLevel);
+              res.set('X-NFT-Age-Days-Estimated', Math.floor(estimatedAge).toString());
+              res.set('X-Age-Source', 'token-id-based-estimation');
             }
-            
-            // 安全邊界檢查
-            estimatedAge = Math.max(0, estimatedAge);
-            
-            const isVeryOldNft = tokenIdNum <= 1000;    // 前 1000 個（傳奇級）
-            const isOldNft = tokenIdNum <= 5000;        // 前 5000 個（早期）
-            const isAncientNft = estimatedAge > 90;     // 超過 3 個月
-            const isMatureNft = estimatedAge > 30;      // 超過 1 個月
-            
-            let cacheSeconds, cacheLevel;
-            
-            if (isVeryOldNft && isAncientNft) {
-              // 古老傳奇 NFT：1 年緩存
-              cacheSeconds = 31536000; // 1 年
-              cacheLevel = `legendary-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else if (isAncientNft) {
-              // 古老 NFT：6 個月緩存
-              cacheSeconds = 15552000; // 6 個月
-              cacheLevel = `ancient-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else if (isVeryOldNft && isMatureNft) {
-              // 早期成熟 NFT：30 天緩存
-              cacheSeconds = 2592000; // 30 天
-              cacheLevel = `early-mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else if (isMatureNft) {
-              // 成熟 NFT：7 天緩存
-              cacheSeconds = 604800; // 7 天
-              cacheLevel = `mature-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else if (estimatedAge > 7) {
-              // 一週以上：24 小時緩存
-              cacheSeconds = 86400; // 24 小時
-              cacheLevel = `week-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else if (estimatedAge > 1) {
-              // 一天以上：4 小時緩存
-              cacheSeconds = 14400; // 4 小時
-              cacheLevel = `day-old-${Math.floor(estimatedAge)}d-id${tokenIdNum}`;
-            } else {
-              // 新鑄造：30 分鐘緩存
-              cacheSeconds = 1800; // 30 分鐘
-              cacheLevel = `fresh-${Math.floor(estimatedAge * 24)}h-id${tokenIdNum}`;
-            }
-            
-            res.set('Cache-Control', `public, max-age=${cacheSeconds}`);
-            res.set('X-Cache-Level', cacheLevel);
-            res.set('X-NFT-Age-Days-Estimated', Math.floor(estimatedAge).toString());
-            res.set('X-Age-Source', 'token-id-based-estimation');
           } else {
             // 其他數據：標準緩存
             res.set('Cache-Control', 'public, max-age=600');
@@ -2548,6 +2562,74 @@ app.post('/api/:type/:tokenId/refresh', async (req, res) => {
   }
 });
 
+// Collection metadata endpoint
+app.get('/api/collection/:type', (req, res) => {
+  const { type } = req.params;
+  
+  const collections = {
+    hero: {
+      name: 'Dungeon Delvers Heroes',
+      description: 'Heroes are the core combat power of the adventure team in Dungeon Delvers. Each hero is a unique NFT with randomly generated power on the chain, ready to venture into the darkest dungeons.',
+      image: `${FRONTEND_DOMAIN}/images/collections/hero-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 500,
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    },
+    relic: {
+      name: 'Dungeon Delvers Relics',
+      description: 'Mystical relics that provide additional capacity for your parties. Each relic enhances your team\'s ability to carry treasures from the dungeons.',
+      image: `${FRONTEND_DOMAIN}/images/collections/relic-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 500,
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    },
+    party: {
+      name: 'Dungeon Delvers Parties',
+      description: 'A composite NFT representing a full team of heroes and relics, bundled together and ready for adventure. Parties are the main unit for undertaking expeditions.',
+      image: `${FRONTEND_DOMAIN}/images/collections/party-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 500,
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    },
+    vip: {
+      name: 'Dungeon Delvers VIP Pass',
+      description: 'Exclusive VIP membership with staking benefits. The more you stake, the higher your VIP level and the greater your rewards.',
+      image: `${FRONTEND_DOMAIN}/images/collections/vip-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 500,
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    },
+    vipstaking: {
+      name: 'Dungeon Delvers VIP Pass',
+      description: 'Exclusive VIP membership with staking benefits. The more you stake, the higher your VIP level and the greater your rewards.',
+      image: `${FRONTEND_DOMAIN}/images/collections/vip-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 500,
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    },
+    playerprofile: {
+      name: 'Dungeon Delvers Profile',
+      description: 'Soul-bound achievement NFT tracking your journey through the dungeons. Your profile records your experience and accomplishments.',
+      image: `${FRONTEND_DOMAIN}/images/collections/profile-logo.png`,
+      external_link: FRONTEND_DOMAIN,
+      seller_fee_basis_points: 0, // Soul-bound, no trading
+      fee_recipient: '0x10925A7138649C7E1794CE646182eeb5BF8ba647'
+    }
+  };
+  
+  const collection = collections[type];
+  if (!collection) {
+    return res.status(404).json({ error: 'Collection not found' });
+  }
+  
+  // Add contract address
+  collection.contract_address = CONTRACTS[type];
+  
+  // Set cache headers for collection metadata
+  res.set('Cache-Control', 'public, max-age=86400'); // 24 hours
+  res.json(collection);
+});
+
 // 根路徑
 app.get('/', async (req, res) => {
   const currentConfig = await configLoader.loadConfig();
@@ -2561,6 +2643,7 @@ app.get('/', async (req, res) => {
       'GET /health',
       'GET /api/sync-status',
       'GET /api/:type/:tokenId',
+      'GET /api/collection/:type',
       'GET /api/player/:owner/assets',
       'GET /api/stats',
       'GET /api/hot/:type',
