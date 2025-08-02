@@ -188,26 +188,8 @@ class NFTEventListener {
         timeout: 30000
       });
 
-      if (response.status === 200 && response.data.source !== 'fallback') {
-        const metadata = {
-          ...response.data,
-          static_file: true,
-          generated_at: new Date().toISOString(),
-          generated_from_event: true
-        };
-
-        // 確保目錄存在
-        const staticDir = path.join(__dirname, '../static/metadata', type);
-        await fs.mkdir(staticDir, { recursive: true });
-
-        // 寫入靜態文件
-        const filePath = path.join(staticDir, `${tokenId}.json`);
-        await fs.writeFile(filePath, JSON.stringify(metadata, null, 2));
-
-        console.log(`✅ 異步生成靜態文件完成: ${type} #${tokenId}`);
-      } else {
-        console.log(`⚠️ ${type} #${tokenId} 數據尚未穩定，暫不生成靜態文件`);
-      }
+      // 靜態文件生成已移除 - 將在生產環境大量鑄造時重新啟用
+      console.log(`📝 NFT 鑄造事件處理完成: ${type} #${tokenId}`);
 
     } catch (error) {
       console.error(`❌ 異步生成 ${type} #${tokenId} 靜態文件失敗:`, error.message);

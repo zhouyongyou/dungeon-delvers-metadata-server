@@ -2848,3 +2848,2850 @@ Contract instances initialized successfully
 ⚡ Burst trigger: 20 NFTs in 5 minutes
 🔄 Max RPC calls: 30/min (reduced from 200)
 🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #1: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #1
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:45:28 +0000] "GET /api/hero/1 HTTP/1.1" 200 804 "-" "axios/1.11.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #7: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #7
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:45:31 +0000] "GET /api/relic/7 HTTP/1.1" 200 809 "-" "axios/1.11.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:45:45 +0000] "GET /api/hero/1 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+::1 - - [02/Aug/2025:16:46:03 +0000] "GET /api/static/health HTTP/1.1" 200 438 "-" "curl/8.7.1"
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:46:11 +0000] "GET /api/hero/1 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:46:26 +0000] "GET /api/hero/1 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:46:31 +0000] "HEAD /api/hero/1 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+🔥 開始預熱新 NFT...
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+📊 發現 0 個未緩存的 NFT
+✅ 沒有需要預熱的 NFT
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #2: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:47:24 +0000] "GET /api/hero/2 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #2: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:47:32 +0000] "HEAD /api/hero/2 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #2: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:47:38 +0000] "HEAD /api/hero/2 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #2: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:48:00 +0000] "GET /api/hero/2 HTTP/1.1" 200 804 "-" "axios/1.11.0"
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #2: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:48:31 +0000] "GET /api/hero/2 HTTP/1.1" 200 804 "-" "axios/1.11.0"
+[The Graph] 使用去中心化版本查詢...
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:49:01 +0000] "GET /api/hero/1 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: hero #2
+::1 - - [02/Aug/2025:16:49:03 +0000] "GET /api/hero/2 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #3: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #3
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:07 +0000] "GET /api/hero/3 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #4: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #4
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:11 +0000] "GET /api/hero/4 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #5: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #5
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:15 +0000] "GET /api/hero/5 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #6: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #6
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:18 +0000] "GET /api/hero/6 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #7: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #7
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:22 +0000] "GET /api/hero/7 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #8: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #8
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:26 +0000] "GET /api/hero/8 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #9: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #9
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:30 +0000] "GET /api/hero/9 HTTP/1.1" 200 804 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch hero #10: Cannot read properties of undefined (reading 'hero')
+Generating placeholder for hero #10
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:33 +0000] "GET /api/hero/10 HTTP/1.1" 200 808 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #1: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #1
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:37 +0000] "GET /api/relic/1 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #2: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:41 +0000] "GET /api/relic/2 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #3: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #3
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:45 +0000] "GET /api/relic/3 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #4: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #4
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:49 +0000] "GET /api/relic/4 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #5: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #5
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:52 +0000] "GET /api/relic/5 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #6: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #6
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:49:56 +0000] "GET /api/relic/6 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: relic #7
+::1 - - [02/Aug/2025:16:49:58 +0000] "GET /api/relic/7 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #8: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #8
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:02 +0000] "GET /api/relic/8 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #9: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #9
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:05 +0000] "GET /api/relic/9 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch relic #10: Cannot read properties of undefined (reading 'relic')
+Generating placeholder for relic #10
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:09 +0000] "GET /api/relic/10 HTTP/1.1" 200 813 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #1: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #1
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:13 +0000] "GET /api/party/1 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #2: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #2
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:17 +0000] "GET /api/party/2 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #3: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #3
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:21 +0000] "GET /api/party/3 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #4: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #4
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:24 +0000] "GET /api/party/4 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #5: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #5
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:28 +0000] "GET /api/party/5 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #6: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #6
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:32 +0000] "GET /api/party/6 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #7: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #7
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:36 +0000] "GET /api/party/7 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #8: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #8
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:40 +0000] "GET /api/party/8 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #9: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #9
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:43 +0000] "GET /api/party/9 HTTP/1.1" 200 809 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+Failed to fetch party #10: Cannot read properties of undefined (reading 'party')
+Generating placeholder for party #10
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+::1 - - [02/Aug/2025:16:50:47 +0000] "GET /api/party/10 HTTP/1.1" 200 813 "-" "Static-Generator/1.0"
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: hero #5
+::1 - - [02/Aug/2025:16:50:57 +0000] "HEAD /api/hero/5 HTTP/1.1" 200 804 "-" "curl/8.7.1"
+::1 - - [02/Aug/2025:16:51:01 +0000] "GET /api/static/health HTTP/1.1" 200 438 "-" "curl/8.7.1"
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+🔥 開始預熱新 NFT...
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+📊 發現 0 個未緩存的 NFT
+✅ 沒有需要預熱的 NFT
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+⚡ 靜態文件命中: hero #1
+::1 - - [02/Aug/2025:16:58:36 +0000] "GET /api/hero/1 HTTP/1.1" 200 601 "-" "curl/8.7.1"
+⚡ 靜態文件命中: hero #2
+::1 - - [02/Aug/2025:16:58:40 +0000] "HEAD /api/hero/2 HTTP/1.1" 200 558 "-" "curl/8.7.1"
+⚡ 靜態文件命中: relic #3
+::1 - - [02/Aug/2025:16:58:45 +0000] "GET /api/relic/3 HTTP/1.1" 200 502 "-" "curl/8.7.1"
+::1 - - [02/Aug/2025:16:58:49 +0000] "GET /api/static/health HTTP/1.1" 200 438 "-" "curl/8.7.1"
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+🔥 開始預熱新 NFT...
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
+📊 發現 0 個未緩存的 NFT
+✅ 沒有需要預熱的 NFT
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+⚡ Static Files: http://localhost:3000/api/static/health
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

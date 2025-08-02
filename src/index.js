@@ -618,71 +618,9 @@ async function getVipLevel(userAddress) {
   }
 }
 
-// 靜態文件處理函數
-async function tryStaticFile(type, tokenId, res) {
-  try {
-    const staticFilePath = path.join(__dirname, '../static/metadata', type, `${tokenId}.json`);
-    
-    // 檢查靜態文件是否存在
-    const fs = require('fs').promises;
-    
-    try {
-      const staticContent = await fs.readFile(staticFilePath, 'utf8');
-      const staticMetadata = JSON.parse(staticContent);
-      
-      // 設置靜態文件響應標頭
-      res.set({
-        'Cache-Control': 'public, max-age=31536000', // 1 年緩存
-        'X-Cache-Status': 'STATIC-HIT',
-        'X-Source': 'static-file',
-        'X-File-Generated': staticMetadata.generated_at || 'unknown',
-        'X-Cache-Version': staticMetadata.cache_version || 'v1',
-        'Content-Type': 'application/json'
-      });
-      
-      // 更新靜態文件命中統計
-      if (global.staticMetrics) {
-        global.staticMetrics.hits++;
-      }
-      
-      res.json(staticMetadata);
-      console.log(`⚡ 靜態文件命中: ${type} #${tokenId}`);
-      return true;
-      
-    } catch (fileError) {
-      // 文件不存在或讀取失敗，繼續動態處理
-      if (fileError.code !== 'ENOENT') {
-        console.warn(`⚠️ 讀取靜態文件失敗: ${type} #${tokenId} - ${fileError.message}`);
-      }
-      
-      // 更新靜態文件未命中統計
-      if (global.staticMetrics) {
-        global.staticMetrics.misses++;
-      }
-      
-      return false;
-    }
-    
-  } catch (error) {
-    console.error(`❌ 靜態文件處理錯誤: ${type} #${tokenId}`, error.message);
-    
-    // 更新錯誤統計
-    if (global.staticMetrics) {
-      global.staticMetrics.errors++;
-    }
-    
-    return false;
-  }
-}
+// 移除靜態文件系統 - 將在生產環境大量鑄造時重新啟用
 
-// 初始化靜態文件統計
-global.staticMetrics = {
-  hits: 0,
-  misses: 0,
-  errors: 0,
-  enabled: true,
-  startTime: new Date().toISOString()
-};
+// 靜態文件統計已移除
 
 // GraphQL 請求函數
 async function queryGraphQL(query, variables = {}) {
@@ -1452,47 +1390,7 @@ app.get('/health', async (req, res) => {
 });
 
 // 靜態文件健康檢查
-app.get('/api/static/health', (req, res) => {
-  const metrics = global.staticMetrics || {
-    hits: 0,
-    misses: 0,
-    errors: 0,
-    enabled: false,
-    startTime: new Date().toISOString()
-  };
-
-  const totalRequests = metrics.hits + metrics.misses;
-  const hitRate = totalRequests > 0 ? (metrics.hits / totalRequests * 100).toFixed(2) : '0.00';
-  
-  res.json({
-    static_files: {
-      enabled: metrics.enabled,
-      status: 'operational',
-      metrics: {
-        hits: metrics.hits,
-        misses: metrics.misses,
-        errors: metrics.errors,
-        total_requests: totalRequests,
-        hit_rate: `${hitRate}%`,
-        hit_rate_numeric: parseFloat(hitRate)
-      },
-      performance: {
-        start_time: metrics.startTime,
-        runtime: totalRequests > 0 ? `${totalRequests} requests processed` : 'No requests yet'
-      },
-      directories: {
-        hero_static: 'static/metadata/hero/',
-        relic_static: 'static/metadata/relic/', 
-        party_static: 'static/metadata/party/'
-      }
-    },
-    recommendations: 
-      totalRequests === 0 ? ['No static files accessed yet'] :
-      parseFloat(hitRate) < 50 ? ['Consider generating more static files', 'Check if NFTs exist in static directory'] :
-      parseFloat(hitRate) > 90 ? ['Excellent static file coverage'] :
-      ['Static file coverage is good']
-  });
-});
+// 靜態文件健康檢查 API 已移除 - 將在生產環境時重新啟用
 
 // 靜態文件統計重置 
 app.post('/api/static/reset', (req, res) => {
@@ -1568,13 +1466,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid NFT type' });
     }
     
-    // 對於 Hero、Relic、Party，優先檢查靜態文件
-    if (['hero', 'relic', 'party'].includes(type)) {
-      const staticFileResult = await tryStaticFile(type, tokenId, res);
-      if (staticFileResult) {
-        return; // 靜態文件命中，直接返回
-      }
-    }
+    // 靜態文件系統已移除 - 將在生產環境大量鑄造時重新啟用
     
     const cacheKey = generateCacheKey(`${type}-${tokenId}`, { owner, rarity });
     let nftData = cache.get(cacheKey);
@@ -3381,7 +3273,7 @@ async function startServer() {
     console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
     console.log(`📦 Batch API: http://localhost:${PORT}/api/batch (POST)`);
     console.log(`🎯 VIP Level API: http://localhost:${PORT}/api/vip/:tokenId?owner=ADDRESS`);
-    console.log(`⚡ Static Files: http://localhost:${PORT}/api/static/health`);
+    // 靜態文件系統已停用
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
     console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
