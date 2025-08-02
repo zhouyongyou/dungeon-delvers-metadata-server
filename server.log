@@ -5695,3 +5695,377 @@ Contract instances initialized successfully
 🔄 Max RPC calls: 30/min (reduced from 200)
 🎧 NFT Event Listener 初始化完成
 [31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (/Users/sotadic/Documents/dungeon-delvers-metadata-server/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/sotadic/Documents/dungeon-delvers-metadata-server/src/index.js:3260:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.18.1
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (/Users/sotadic/Documents/dungeon-delvers-metadata-server/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/sotadic/Documents/dungeon-delvers-metadata-server/src/index.js:3260:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.18.1
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+🚀 開始監聽 NFT 鑄造事件...
+🎯 hero 合約事件監聽已設置: 0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0
+🎯 relic 合約事件監聽已設置: 0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366
+🎯 party 合約事件監聽已設置: 0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5
+✅ NFT 事件監聽已啟動
+🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (/Users/sotadic/Documents/dungeon-delvers-metadata-server/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/sotadic/Documents/dungeon-delvers-metadata-server/src/index.js:3260:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.18.1
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+🚀 Metadata Server v1.3.0 running on port 3000 🎯 VIP Level Support
+📍 Health check: http://localhost:3000/health
+📊 Sync status: http://localhost:3000/api/sync-status
+🎮 NFT API: http://localhost:3000/api/:type/:tokenId
+🔄 Refresh API: http://localhost:3000/api/:type/:tokenId/refresh
+👤 Player assets: http://localhost:3000/api/player/:owner/assets
+📈 Stats: http://localhost:3000/api/stats
+🔥 Hot NFTs: http://localhost:3000/api/hot/:type
+📦 Batch API: http://localhost:3000/api/batch (POST)
+🎯 VIP Level API: http://localhost:3000/api/vip/:tokenId?owner=ADDRESS
+📁 Reading JSON files from: /Users/sotadic/Documents/api
+🌐 Using full HTTPS URLs for images: https://dungeondelvers.xyz/images/
+🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)
+⚡ Cache TTL: 60s (normal), 300s (hot NFTs), 24h (preheated)
+🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)
+⚙️ Dynamic Config: https://dungeondelvers.xyz/config/v25.json
+🔥 NFT Preheat: Optimized mode - Every 30 minutes
+📊 Normal: 2 concurrency, 3000ms delay
+🚨 Burst: 12 concurrency, 500ms delay
+⚡ Burst trigger: 20 NFTs in 5 minutes
+🔄 Max RPC calls: 30/min (reduced from 200)
+🎧 NFT Event Listener 初始化完成
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node src/index.js`[39m
+Loading configuration from: file:///Users/sotadic/Documents/GitHub/DungeonDelvers/public/config/v25.json
+Loaded from local file
+Configuration loaded: Version V25
+🔄 載入配置...
+Loading contract addresses: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5'
+}
+Contract instances initialized successfully
+✅ 配置載入成功: Version V25
+📋 合約地址: {
+  hero: '0x5d71d62fAFd07C92ec677C3Ae57984576f5955f0',
+  relic: '0x5f93fCdb2ecd1A0eB758E554bfeB3A2B95581366',
+  party: '0x6B32c2EEaB24C04bF97A022B1e55943FE1E772a5',
+  vip: '0x186a89e5418645459ed0a469FF97C9d4B2ca5355',
+  playerprofile: '0xCf352E394fD2Ff27D65bB525C032a2c03Bd79AC7'
+}
+🔗 嘗試連接 BSC RPC: https://bsc-dataseed1.binance.org/
+✅ BSC Provider 初始化成功
+node:events:496
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (/Users/sotadic/Documents/dungeon-delvers-metadata-server/node_modules/express/lib/application.js:635:24)
+    at startServer (/Users/sotadic/Documents/dungeon-delvers-metadata-server/src/index.js:3260:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.18.1
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

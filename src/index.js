@@ -635,15 +635,10 @@ async function queryGraphQL(query, variables = {}) {
   // 首先嘗試去中心化版本
   try {
     console.log(`[The Graph] 使用去中心化版本查詢...`);
-    // 從 URL 中提取 API Key
+    // The Graph 去中心化端點已在 URL 中包含 API Key，不需要額外的 Authorization header
     const apiUrl = global.THE_GRAPH_API_URL || THE_GRAPH_API_URL;
-    const urlMatch = apiUrl.match(/\/api\/([a-f0-9]{32})\//);
-    const apiKey = urlMatch ? urlMatch[1] : null;
     
-    // 如果有 API Key，添加到 header
-    if (apiKey) {
-      requestConfig.headers['Authorization'] = `Bearer ${apiKey}`;
-    }
+    // 注意：不添加 Authorization header，避免與 URL 中的 API Key 衝突
     
     const response = await axios.post(apiUrl, {
       query,
