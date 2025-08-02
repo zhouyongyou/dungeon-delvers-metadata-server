@@ -78,32 +78,39 @@ const defaultRateLimiter = new RateLimiterMemory({
   blockDuration: 60, // 超限後封鎖 60 秒
 });
 
-// NFT 預緩存機制配置
+// NFT 預緩存機制配置 - 智慧型按需預熱
 const PREHEAT_CONFIG = {
-  enabled: process.env.PREHEAT_ENABLED !== 'false', // 默認啟用
-  interval: parseInt(process.env.PREHEAT_INTERVAL) || 3 * 60 * 1000, // 3 分鐘檢查一次
-  quickInterval: 30 * 1000, // 快速檢查間隔：30 秒（檢測突發鑄造）
-  lookbackMinutes: 60, // 檢查最近 60 分鐘的 NFT
-  quickLookbackMinutes: 5, // 快速檢查最近 5 分鐘
+  enabled: process.env.PREHEAT_ENABLED !== 'false',
+  mode: 'on-demand', // 改為按需預熱模式
   
-  // 動態並發控制
-  baseConcurrency: 20, // 基礎並發數
-  maxConcurrency: 100, // 最大並發數
-  batchSize: 50, // 每批處理數量
-  batchDelay: 2000, // 批次間延遲 (毫秒)
+  // 大幅減少定時檢查
+  interval: parseInt(process.env.PREHEAT_INTERVAL) || 30 * 60 * 1000, // 30 分鐘
+  quickInterval: 5 * 60 * 1000, // 5 分鐘
+  lookbackMinutes: 15, // 只檢查最近 15 分鐘
+  quickLookbackMinutes: 3, // 快速檢查只看 3 分鐘
   
-  // 智能重試機制
-  maxRetries: 3,
-  retryDelay: 5000, // 重試延遲
+  // 最小化並發數
+  baseConcurrency: 2,
+  maxConcurrency: 4,
+  batchSize: 5,
+  batchDelay: 3000, // 增加延遲到 3 秒
   
-  // 緩存策略 - ID 永不重用，可以放心長期緩存
-  newNftCacheTTL: 90 * 24 * 60 * 60, // 新 NFT 緩存 90 天（更保守，防止意外）
-  permanentCacheTTL: 365 * 24 * 60 * 60, // 確認存在的 NFT 緩存 1 年（ID 永不重用）
-  cacheTTL: 30 * 24 * 60 * 60, // 預熱數據的默認緩存 30 天
+  maxRetries: 1, // 減少重試
+  retryDelay: 10000,
   
-  // 負載控制
-  maxRpcCallsPerMinute: 200, // 每分鐘最多 RPC 調用數
-  enableAdaptiveConcurrency: true, // 自適應並發控制
+  // 按需預熱配置
+  onDemandEnabled: true,       // 啟用按需預熱
+  onDemandDelay: 2000,        // 用戶請求後 2 秒開始預熱
+  priorityTypes: ['hero', 'relic', 'party'], // 優先預熱：英雄、聖物、隊伍
+  skipTypes: ['vip', 'vipstaking', 'playerprofile'], // 跳過預熱：VIP 和個人檔案
+  
+  // 智能緩存策略
+  newNftCacheTTL: 24 * 60 * 60,
+  permanentCacheTTL: 7 * 24 * 60 * 60,
+  cacheTTL: 12 * 60 * 60,
+  
+  maxRpcCallsPerMinute: 30, // 進一步降低
+  enableAdaptiveConcurrency: false,
 };
 
 const serviceRateLimiter = new RateLimiterMemory({
@@ -178,19 +185,31 @@ const rateLimiterMiddleware = async (req, res, next) => {
 
 app.use(rateLimiterMiddleware);
 
-// 快取配置
+// 統一緩存配置 - 優化版
 const cache = new NodeCache({ 
-  stdTTL: 60, // 1分鐘（減少快取時間以提供更及時的更新）
-  checkperiod: 30, // 30秒檢查一次
-  maxKeys: 1000 // 最大快取項目
+  stdTTL: 300, // 預設 5 分鐘（合理的平衡點）
+  checkperiod: 120, // 2 分鐘檢查一次（減少 CPU 消耗）
+  maxKeys: 2000, // 增加容量（合併了 3 個緩存）
+  useClones: false // 提升性能，不複製對象
 });
 
-// 熱門 NFT 快取
-const hotNftCache = new NodeCache({ 
-  stdTTL: 300, // 5分鐘（減少快取時間）
-  checkperiod: 60, // 1分鐘檢查一次
-  maxKeys: 100 // 最大快取項目
-});
+// 緩存 TTL 策略
+const CACHE_TTL = {
+  hero: 24 * 60 * 60,        // 24小時（靜態數據）
+  relic: 24 * 60 * 60,       // 24小時（靜態數據）
+  party: 24 * 60 * 60,       // 24小時（靜態數據，變化數據已移除）
+  vip: 30 * 60,              // 30分鐘（會變化）
+  vipstaking: 30 * 60,       // 30分鐘（會變化）
+  playerprofile: 5 * 60,     // 5分鐘（頻繁變化）
+  
+  // 特殊狀態
+  indexing: 2 * 60,          // 2分鐘（正在索引）
+  placeholder: 1 * 60,       // 1分鐘（佔位符）
+  
+  // 系統數據
+  config: 5 * 60,            // 5分鐘（配置數據）
+  stats: 5 * 60,             // 5分鐘（統計數據）
+};
 
 // =================================================================
 // Section: 配置常量
@@ -314,8 +333,7 @@ const VIP_STAKING_ABI = [
   }
 ];
 
-// VIP 等級緩存（30 分鐘）
-const vipLevelCache = new NodeCache({ stdTTL: 1800 });
+// VIP 等級緩存已整合到統一緩存中
 
 // 添加NFT市場API配置（BSC鏈優先）
 const NFT_MARKET_APIS = {
@@ -441,7 +459,7 @@ async function getVipDataByTokenId(tokenId) {
     // 緩存結果（30 分鐘）
     const cacheKey = `vip-data-${tokenId}`;
     const data = { owner, level: vipLevel };
-    vipLevelCache.set(cacheKey, data);
+    cache.set(cacheKey, data, CACHE_TTL.vip);
 
     return data;
     
@@ -523,7 +541,7 @@ async function getVipLevel(userAddress) {
 
   // 檢查快取
   const cacheKey = `vip-level-${userAddress.toLowerCase()}`;
-  const cachedLevel = vipLevelCache.get(cacheKey);
+  const cachedLevel = cache.get(cacheKey);
   if (cachedLevel !== undefined) {
     console.log(`🎯 VIP 等級快取命中: ${userAddress} -> Level ${cachedLevel}`);
     return cachedLevel;
@@ -551,7 +569,7 @@ async function getVipLevel(userAddress) {
     console.log(`✅ VIP 等級讀取成功: ${userAddress} -> Level ${vipLevel}`);
 
     // 緩存結果（30 分鐘）
-    vipLevelCache.set(cacheKey, vipLevel);
+    cache.set(cacheKey, vipLevel, CACHE_TTL.vip);
 
     return vipLevel;
 
@@ -576,7 +594,7 @@ async function getVipLevel(userAddress) {
         const vipLevel = Number(level);
         
         console.log(`✅ VIP 等級重試成功: ${userAddress} -> Level ${vipLevel}`);
-        vipLevelCache.set(cacheKey, vipLevel);
+        cache.set(cacheKey, vipLevel, CACHE_TTL.vip);
         return vipLevel;
         
       } catch (retryError) {
@@ -585,7 +603,7 @@ async function getVipLevel(userAddress) {
     }
 
     // 返回默認值 0，並緩存短時間（5 分鐘）避免重複嘗試
-    vipLevelCache.set(cacheKey, 0, 300);
+    cache.set(cacheKey, 0, CACHE_TTL.vip);
     return 0;
   }
 }
@@ -1222,7 +1240,7 @@ app.get('/health', async (req, res) => {
     memory: process.memoryUsage(),
     cache: {
       size: cache.keys().length,
-      hotNftSize: hotNftCache.keys().length,
+      totalCacheSize: cache.keys().length,
       cacheTTL: '60s',
       hotCacheTTL: '300s'
     },
@@ -1358,45 +1376,8 @@ function getBestRpcNode() {
 // }, 5 * 60 * 1000);
 
 // RPC 代理端點
-app.post('/api/rpc', async (req, res) => {
-  try {
-    const rpcRequest = req.body;
-    
-    // 驗證請求格式
-    if (!rpcRequest || !rpcRequest.method) {
-      return res.status(400).json({
-        error: 'Invalid RPC request format'
-      });
-    }
-    
-    // 獲取最佳節點
-    const bestNode = getBestRpcNode();
-    
-    // 轉發請求
-    const response = await axios.post(bestNode, rpcRequest, {
-      timeout: 30000,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    // 記錄成功請求
-    console.log(`📡 RPC 請求成功: ${rpcRequest.method} via ${bestNode}`);
-    
-    res.json(response.data);
-    
-  } catch (error) {
-    console.error(`❌ RPC 請求失敗: ${error.message}`);
-    
-    // 記錄錯誤但不再標記節點狀態，因為我們使用輪替機制
-    console.error(`❌ 當前節點請求失敗，下次將自動切換到另一個節點`);
-    
-    res.status(500).json({
-      error: 'RPC request failed',
-      message: error.message
-    });
-  }
-});
+// RPC 代理端點已移除 - 前端使用 Vercel API 路由
+// app.post('/api/rpc', ...) - 已棄用
 
 // RPC 節點狀態查詢 - 簡化版本
 app.get('/api/rpc/status', (req, res) => {
@@ -1476,7 +1457,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
           
           // 檢查緩存
           const cacheKey = `vip-data-${tokenId}`;
-          let vipData = vipLevelCache.get(cacheKey);
+          let vipData = cache.get(cacheKey);
           
           if (!vipData) {
             // 自動從合約獲取 owner 和等級
@@ -1707,11 +1688,25 @@ app.get('/api/:type/:tokenId', async (req, res) => {
               retry_after: 10
             };
             console.log(`Using contract data for ${type} #${tokenId} while indexing`);
+            
+            // 觸發按需預熱（僅對重要類型）
+            if (PREHEAT_CONFIG.onDemandEnabled && PREHEAT_CONFIG.priorityTypes.includes(type)) {
+              setTimeout(() => {
+                triggerOnDemandPreheat(type, tokenId);
+              }, PREHEAT_CONFIG.onDemandDelay);
+            }
           }
           
           // 如果還是沒有數據，返回占位符
           if (!nftData) {
             console.log(`No data found for ${type} #${tokenId}, returning placeholder`);
+            
+            // 觸發按需預熱（僅對重要類型）
+            if (PREHEAT_CONFIG.onDemandEnabled && PREHEAT_CONFIG.priorityTypes.includes(type)) {
+              setTimeout(() => {
+                triggerOnDemandPreheat(type, tokenId);
+              }, PREHEAT_CONFIG.onDemandDelay);
+            }
             
             // 嘗試讀取占位符文件
             const placeholderPath = path.join(JSON_BASE_PATH, type, 'placeholder.json');
@@ -1762,60 +1757,23 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         // 動態快取策略
         if (nftData) {
           if (nftData.indexing) {
-            // 正在索引的 NFT 快取 2 分鐘（配合刷新策略）
-            cache.set(cacheKey, nftData, 120);
-            console.log(`Caching indexing NFT ${type} #${tokenId} for 2 minutes`);
+            // 正在索引的 NFT 使用短期緩存
+            cache.set(cacheKey, nftData, CACHE_TTL.indexing);
+            console.log(`Caching indexing NFT ${type} #${tokenId} for ${CACHE_TTL.indexing/60} minutes`);
           } else if (nftData.source === 'placeholder') {
-            // 占位符快取 1 分鐘
-            cache.set(cacheKey, nftData, 60);
-            console.log(`Caching placeholder ${type} #${tokenId} for 1 minute`);
+            // 占位符使用短期緩存
+            cache.set(cacheKey, nftData, CACHE_TTL.placeholder);
+            console.log(`Caching placeholder ${type} #${tokenId} for ${CACHE_TTL.placeholder/60} minutes`);
           } else if (nftData.source === 'subgraph' || nftData.source === 'preheated') {
-            // 根據 Token ID 和非線性鑄造模式決定內部緩存時間
-            const tokenIdNum = parseInt(tokenId);
-            
-            // 使用相同的十倍鑄造量年齡估算邏輯
-            let estimatedAge;
-            if (tokenIdNum <= 1000) {
-              estimatedAge = Math.max(90, 90 + tokenIdNum / 100);
-            } else if (tokenIdNum <= 5000) {
-              estimatedAge = Math.max(60, 90 - (tokenIdNum - 1000) / 100);
-            } else if (tokenIdNum <= 20000) {
-              estimatedAge = Math.max(30, 60 - (tokenIdNum - 5000) / 500);
-            } else if (tokenIdNum <= 50000) {
-              estimatedAge = Math.max(7, 30 - (tokenIdNum - 20000) / 1000);
-            } else {
-              estimatedAge = Math.max(0, 7 - (tokenIdNum - 50000) / 100);
-            }
-            
-            const isVeryOldNft = tokenIdNum <= 1000;
-            
-            let cacheTime, description;
-            if (isVeryOldNft && estimatedAge > 90) {
-              cacheTime = 86400; // 24 小時（傳奇級穩定）
-              description = `24 hours (legendary, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
-            } else if (estimatedAge > 90) {
-              cacheTime = 43200; // 12 小時（古老級穩定）
-              description = `12 hours (ancient, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
-            } else if (estimatedAge > 30) {
-              cacheTime = 7200;  // 2 小時（成熟級穩定）
-              description = `2 hours (mature, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
-            } else if (estimatedAge > 7) {
-              cacheTime = 3600;  // 1 小時（週級穩定）
-              description = `1 hour (week-old, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
-            } else if (estimatedAge > 1) {
-              cacheTime = 1800;  // 30 分鐘（天級穩定）
-              description = `30 minutes (day-old, ~${Math.floor(estimatedAge)}d old, id:${tokenIdNum})`;
-            } else {
-              cacheTime = 600;   // 10 分鐘（新鮮）
-              description = `10 minutes (fresh, ~${Math.floor(estimatedAge * 24)}h old, id:${tokenIdNum})`;
-            }
-            
-            cache.set(cacheKey, nftData, cacheTime);
-            console.log(`Caching complete NFT ${type} #${tokenId} for ${description}`);
+            // 使用統一的 TTL 策略，根據 NFT 類型決定緩存時間
+            const ttl = CACHE_TTL[type] || CACHE_TTL.hero; // 默認使用 hero 的 TTL
+            // 簡化的緩存策略：直接根據 NFT 類型使用統一 TTL
+            cache.set(cacheKey, nftData, ttl);
+            console.log(`Caching complete NFT ${type} #${tokenId} for ${ttl/3600} hours`);
           } else {
-            // 其他數據快取 5 分鐘
-            cache.set(cacheKey, nftData, 300);
-            console.log(`Caching NFT ${type} #${tokenId} for 5 minutes`);
+            // 其他數據使用預設 TTL
+            cache.set(cacheKey, nftData, ttl);
+            console.log(`Caching NFT ${type} #${tokenId} for ${ttl/3600} hours`);
           }
         }
         
@@ -2048,10 +2006,7 @@ app.get('/api/:type/:tokenId', async (req, res) => {
         // 快取 1 分鐘
         cache.set(cacheKey, nftData, 60);
         
-        // 如果是熱門 NFT，加入熱門快取
-        if (parseInt(tokenId) <= 100) {
-          hotNftCache.set(cacheKey, nftData, 300);
-        }
+        // 移除熱門 NFT 特殊處理以簡化架構
         
       } catch (error) {
         console.error(`Failed to fetch ${type} #${tokenId}:`, error.message);
@@ -2195,47 +2150,13 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // 熱門 NFT 端點
-app.get('/api/hot/:type', async (req, res) => {
-  try {
-    const { type } = req.params;
-    const { limit = 10 } = req.query;
-    
-    if (!['hero', 'relic', 'party'].includes(type)) {
-      return res.status(400).json({ error: 'Invalid NFT type' });
-    }
-    
-    const cacheKey = `hot-${type}-${limit}`;
-    let hotNfts = hotNftCache.get(cacheKey);
-    
-    if (!hotNfts) {
-      // 從快取中獲取熱門 NFT
-      const allKeys = hotNftCache.keys().filter(key => key.includes(`${type}-`));
-      const nfts = allKeys.slice(0, parseInt(limit)).map(key => hotNftCache.get(key));
-      
-      hotNfts = {
-        nfts,
-        source: 'cache',
-        lastUpdated: new Date().toISOString()
-      };
-      
-      // 快取 10 分鐘
-      hotNftCache.set(cacheKey, hotNfts, 600);
-    }
-    
-    res.json(hotNfts);
-  } catch (error) {
-    res.status(500).json({
-      error: 'Failed to fetch hot NFTs',
-      message: error.message
-    });
-  }
-});
+// 熱門 NFT 端點已移除以簡化架構
+// app.get('/api/hot/:type', ...) - 已移除
 
 // 清除快取端點（僅開發環境）
 if (process.env.NODE_ENV === 'development') {
   app.post('/api/cache/clear', (req, res) => {
     cache.flushAll();
-    hotNftCache.flushAll();
     res.json({ message: 'Cache cleared successfully' });
   });
 }
@@ -2533,7 +2454,7 @@ app.post('/api/:type/:tokenId/refresh', async (req, res) => {
     
     // 清除快取
     cache.del(cacheKey);
-    hotNftCache.del(cacheKey);
+    // 熱門緩存已移除
     
     // 嘗試從市場獲取最新資料
     try {
@@ -2981,7 +2902,7 @@ async function preheatSingleNFT(nft) {
       
       // 如果是熱門 NFT，也加入熱門緩存
       if (parseInt(nft.tokenId) <= 1000) {
-        hotNftCache.set(cacheKey, metadata, cacheTime);
+        // 熱門緩存已移除，統一使用主緩存
       }
       
       return true;
@@ -2999,6 +2920,40 @@ async function preheatSingleNFT(nft) {
     }
     
     throw error;
+  }
+}
+
+// 按需預熱單個 NFT
+async function triggerOnDemandPreheat(type, tokenId) {
+  try {
+    console.log(`🎯 按需預熱: ${type} #${tokenId}`);
+    
+    // 檢查是否已經在緩存中
+    const cacheKey = generateCacheKey(`${type}-${tokenId}`, {});
+    if (cache.get(cacheKey)) {
+      console.log(`⚡ ${type} #${tokenId} 已在緩存中，跳過預熱`);
+      return;
+    }
+    
+    // 檢查是否為跳過類型
+    if (PREHEAT_CONFIG.skipTypes.includes(type)) {
+      console.log(`⏭️ ${type} #${tokenId} 屬於跳過類型，不進行預熱`);
+      return;
+    }
+    
+    // 執行預熱
+    const nft = {
+      type,
+      tokenId,
+      createdAt: Date.now(), // 當前時間作為創建時間
+      retries: 0
+    };
+    
+    await preheatSingleNFT(nft);
+    console.log(`✅ 按需預熱完成: ${type} #${tokenId}`);
+    
+  } catch (error) {
+    console.error(`❌ 按需預熱失敗: ${type} #${tokenId}`, error.message);
   }
 }
 
@@ -3110,21 +3065,23 @@ async function startServer() {
     console.log(`🎯 Priority: OKX > Metadata Server (OKX is the only active BSC NFT marketplace)`);
     console.log(`⚙️ Dynamic Config: ${process.env.CONFIG_URL || 'https://dungeondelvers.xyz/config/v15.json'}`);
     
-    // 啟動預熱機制
+    // 優化後的預熱機制
     if (PREHEAT_CONFIG.enabled) {
-      console.log(`🔥 NFT Preheat: Every ${PREHEAT_CONFIG.interval/60000} minutes`);
-      console.log(`📊 Concurrency: ${PREHEAT_CONFIG.baseConcurrency}-${PREHEAT_CONFIG.maxConcurrency} (adaptive)`);
-      console.log(`📦 Batch size: ${PREHEAT_CONFIG.batchSize}, delay: ${PREHEAT_CONFIG.batchDelay}ms`);
-      console.log(`🔄 Max RPC calls: ${PREHEAT_CONFIG.maxRpcCallsPerMinute}/min`);
+      console.log(`🔥 NFT Preheat: Optimized mode - Every ${PREHEAT_CONFIG.interval/60000} minutes`);
+      console.log(`📊 Concurrency: ${PREHEAT_CONFIG.baseConcurrency}-${PREHEAT_CONFIG.maxConcurrency} (reduced from 20-100)`);
+      console.log(`📦 Batch size: ${PREHEAT_CONFIG.batchSize} (reduced from 50)`);
+      console.log(`🔄 Max RPC calls: ${PREHEAT_CONFIG.maxRpcCallsPerMinute}/min (reduced from 200)`);
       
-      // 立即執行一次完整預熱（服務器啟動後）
-      setTimeout(() => preheatNewNFTs(true), 30000); // 30 秒後開始完整檢查
+      // 延遲啟動，減少啟動負載
+      setTimeout(() => preheatNewNFTs(true), 60000); // 60 秒後開始
       
-      // 定期執行完整檢查
+      // 降低頻率的定期檢查
       setInterval(() => preheatNewNFTs(true), PREHEAT_CONFIG.interval);
       
-      // 每 30 秒快速檢查最近 5 分鐘的鑄造
+      // 降低頻率的快速檢查
       setInterval(quickPreheatCheck, PREHEAT_CONFIG.quickInterval);
+    } else {
+      console.log(`⚡ Performance Mode: Preheat disabled, using on-demand caching only`);
     }
     
     if (process.env.NODE_ENV === 'development') {
