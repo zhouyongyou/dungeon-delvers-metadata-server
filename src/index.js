@@ -104,6 +104,16 @@ const PREHEAT_CONFIG = {
   priorityTypes: ['hero', 'relic', 'party'], // 優先預熱：英雄、聖物、隊伍
   skipTypes: ['vip', 'vipstaking', 'playerprofile'], // 跳過預熱：VIP 和個人檔案
   
+  // 突發鑄造檢測與處理
+  burstDetection: {
+    enabled: true,
+    threshold: 20,              // 5分鐘內超過20個新NFT視為突發
+    timeWindow: 5 * 60 * 1000,  // 5分鐘時間窗口
+    emergencyConcurrency: 12,   // 突發時提升並發到12
+    emergencyDuration: 10 * 60 * 1000, // 突發模式持續10分鐘
+    reducedDelay: 500,          // 突發時減少延遲到0.5秒
+  },
+  
   // 智能緩存策略
   newNftCacheTTL: 24 * 60 * 60,
   permanentCacheTTL: 7 * 24 * 60 * 60,
@@ -608,6 +618,72 @@ async function getVipLevel(userAddress) {
   }
 }
 
+// 靜態文件處理函數
+async function tryStaticFile(type, tokenId, res) {
+  try {
+    const staticFilePath = path.join(__dirname, '../static/metadata', type, `${tokenId}.json`);
+    
+    // 檢查靜態文件是否存在
+    const fs = require('fs').promises;
+    
+    try {
+      const staticContent = await fs.readFile(staticFilePath, 'utf8');
+      const staticMetadata = JSON.parse(staticContent);
+      
+      // 設置靜態文件響應標頭
+      res.set({
+        'Cache-Control': 'public, max-age=31536000', // 1 年緩存
+        'X-Cache-Status': 'STATIC-HIT',
+        'X-Source': 'static-file',
+        'X-File-Generated': staticMetadata.generated_at || 'unknown',
+        'X-Cache-Version': staticMetadata.cache_version || 'v1',
+        'Content-Type': 'application/json'
+      });
+      
+      // 更新靜態文件命中統計
+      if (global.staticMetrics) {
+        global.staticMetrics.hits++;
+      }
+      
+      res.json(staticMetadata);
+      console.log(`⚡ 靜態文件命中: ${type} #${tokenId}`);
+      return true;
+      
+    } catch (fileError) {
+      // 文件不存在或讀取失敗，繼續動態處理
+      if (fileError.code !== 'ENOENT') {
+        console.warn(`⚠️ 讀取靜態文件失敗: ${type} #${tokenId} - ${fileError.message}`);
+      }
+      
+      // 更新靜態文件未命中統計
+      if (global.staticMetrics) {
+        global.staticMetrics.misses++;
+      }
+      
+      return false;
+    }
+    
+  } catch (error) {
+    console.error(`❌ 靜態文件處理錯誤: ${type} #${tokenId}`, error.message);
+    
+    // 更新錯誤統計
+    if (global.staticMetrics) {
+      global.staticMetrics.errors++;
+    }
+    
+    return false;
+  }
+}
+
+// 初始化靜態文件統計
+global.staticMetrics = {
+  hits: 0,
+  misses: 0,
+  errors: 0,
+  enabled: true,
+  startTime: new Date().toISOString()
+};
+
 // GraphQL 請求函數
 async function queryGraphQL(query, variables = {}) {
   const requestConfig = {
@@ -666,6 +742,125 @@ async function queryGraphQL(query, variables = {}) {
       throw new Error(`所有 GraphQL 端點都失敗 - 主要: ${primaryError.message}, 備用: ${fallbackError.message}`);
     }
   }
+}
+
+// GraphQL 批量查詢函數 - 優化預熱系統性能
+async function queryGraphQLBatch(nftIds, batchSize = 20) {
+  if (!Array.isArray(nftIds) || nftIds.length === 0) {
+    return {};
+  }
+
+  console.log(`📦 [GraphQL Batch] 批量查詢 ${nftIds.length} 個 NFT (batch size: ${batchSize})`);
+  
+  const results = {};
+  const batches = [];
+  
+  // 將 NFT IDs 分組
+  for (let i = 0; i < nftIds.length; i += batchSize) {
+    batches.push(nftIds.slice(i, i + batchSize));
+  }
+
+  // 並行處理每個批次
+  const batchPromises = batches.map(async (batch, batchIndex) => {
+    try {
+      const batchQuery = generateBatchQuery(batch);
+      console.log(`📦 [GraphQL Batch] 執行批次 ${batchIndex + 1}/${batches.length} (${batch.length} 個 NFT)`);
+      
+      const batchData = await queryGraphQL(batchQuery);
+      
+      // 處理批次結果
+      batch.forEach(nftId => {
+        const nftData = extractNftFromBatchResult(batchData, nftId);
+        if (nftData) {
+          results[nftId] = nftData;
+        }
+      });
+      
+      console.log(`✅ [GraphQL Batch] 批次 ${batchIndex + 1} 完成，獲得 ${Object.keys(results).length - (batchIndex * batchSize)} 個有效結果`);
+      
+    } catch (error) {
+      console.error(`❌ [GraphQL Batch] 批次 ${batchIndex + 1} 失敗:`, error.message);
+      // 繼續其他批次，不中斷整個過程
+    }
+  });
+
+  await Promise.allSettled(batchPromises);
+  
+  console.log(`🎯 [GraphQL Batch] 批量查詢完成，共獲得 ${Object.keys(results).length}/${nftIds.length} 個有效結果`);
+  return results;
+}
+
+// 生成批量查詢語句
+function generateBatchQuery(nftIds) {
+  const heroIds = nftIds.map(id => `"${id}"`).join(', ');
+  const relicIds = nftIds.map(id => `"${id}"`).join(', ');
+  const partyIds = nftIds.map(id => `"${id}"`).join(', ');
+
+  return `
+    query GetBatchNfts {
+      heroes(where: { id_in: [${heroIds}] }, first: 1000) {
+        id
+        tokenId
+        owner { id }
+        power
+        rarity
+        createdAt
+        contractAddress
+      }
+      relics(where: { id_in: [${relicIds}] }, first: 1000) {
+        id
+        tokenId
+        owner { id }
+        capacity
+        rarity
+        createdAt
+        contractAddress
+      }
+      parties(where: { id_in: [${partyIds}] }, first: 1000) {
+        id
+        tokenId
+        owner { id }
+        totalPower
+        totalCapacity
+        partyRarity
+        createdAt
+        contractAddress
+        heroIds
+        relicIds
+        heros { tokenId power rarity }
+        relics { tokenId capacity rarity }
+        fatigueLevel
+        provisionsRemaining
+        cooldownEndsAt
+        unclaimedRewards
+      }
+    }
+  `;
+}
+
+// 從批量結果中提取特定 NFT 數據
+function extractNftFromBatchResult(batchData, nftId) {
+  if (!batchData) return null;
+
+  // 檢查 heroes
+  if (batchData.heroes) {
+    const hero = batchData.heroes.find(h => h.id === nftId || h.tokenId === nftId);
+    if (hero) return { type: 'hero', data: hero };
+  }
+
+  // 檢查 relics
+  if (batchData.relics) {
+    const relic = batchData.relics.find(r => r.id === nftId || r.tokenId === nftId);
+    if (relic) return { type: 'relic', data: relic };
+  }
+
+  // 檢查 parties
+  if (batchData.parties) {
+    const party = batchData.parties.find(p => p.id === nftId || p.tokenId === nftId);
+    if (party) return { type: 'party', data: party };
+  }
+
+  return null;
 }
 
 // 測試模式：根據 tokenId 模擬稀有度
@@ -1256,149 +1451,76 @@ app.get('/health', async (req, res) => {
   });
 });
 
-// =================================================================
-// Section: RPC 代理服務 (已棄用 - 前端現在使用 Vercel API 路由)
-// =================================================================
+// 靜態文件健康檢查
+app.get('/api/static/health', (req, res) => {
+  const metrics = global.staticMetrics || {
+    hits: 0,
+    misses: 0,
+    errors: 0,
+    enabled: false,
+    startTime: new Date().toISOString()
+  };
 
-// 註釋掉 RPC 代理相關代碼，因為前端已經使用 Vercel 的 /api/rpc
-/*
-// Alchemy API Keys 池 - 從環境變數讀取
-const ALCHEMY_API_KEYS = [
-  process.env.ALCHEMY_API_KEY_1,
-  process.env.ALCHEMY_API_KEY_2,
-  process.env.ALCHEMY_API_KEY_3,
-  process.env.ALCHEMY_API_KEY_4,
-  process.env.ALCHEMY_API_KEY_5,
-  // 向後兼容舊的環境變數名稱
-  process.env.ALCHEMY_BSC_MAINNET_RPC_URL?.replace('https://bnb-mainnet.g.alchemy.com/v2/', ''),
-].filter(Boolean); // 移除 null/undefined 值
-
-// 確保至少有一個 API Key
-if (ALCHEMY_API_KEYS.length === 0) {
-  console.error('❌ 錯誤：未配置 Alchemy API Keys！');
-  console.error('請在環境變數中設置 ALCHEMY_API_KEY_1, ALCHEMY_API_KEY_2 等');
-}
-
-// API Key 輪替索引
-let currentApiKeyIndex = 0;
-
-// 獲取下一個 API Key
-function getNextAlchemyUrl() {
-  const apiKey = ALCHEMY_API_KEYS[currentApiKeyIndex];
-  currentApiKeyIndex = (currentApiKeyIndex + 1) % ALCHEMY_API_KEYS.length;
-  return `https://bnb-mainnet.g.alchemy.com/v2/${apiKey}`;
-}
-
-// BSC RPC 節點池 - 只使用 Alchemy 私人節點
-const BSC_RPC_NODES = [
-  // 所有 Alchemy 節點（輪替使用）
-  ...ALCHEMY_API_KEYS.map(key => `https://bnb-mainnet.g.alchemy.com/v2/${key}`),
-  // 環境變數中的額外私人節點
-  process.env.ALCHEMY_BSC_MAINNET_RPC_URL,
-  process.env.BSC_MAINNET_RPC_URL,
-].filter(url => url && url.includes('alchemy.com')); // 只保留 Alchemy 節點
-
-// 驗證是否有可用的私人節點
-if (BSC_RPC_NODES.length === 0) {
-  console.error('❌ 致命錯誤：沒有配置任何 Alchemy RPC 節點！');
-  console.error('請設置以下環境變數：');
-  console.error('- ALCHEMY_API_KEY_1');
-  console.error('- ALCHEMY_API_KEY_2');
-  console.error('- ALCHEMY_API_KEY_3');
-  console.error('- ALCHEMY_API_KEY_4');
-  console.error('或者：');
-  console.error('- ALCHEMY_BSC_MAINNET_RPC_URL');
-  process.exit(1); // 無私人節點時直接退出
-}
-
-console.log(`✅ 已配置 ${BSC_RPC_NODES.length} 個 Alchemy 私人節點`);
-*/
-
-// RPC 節點健康狀態 - 已棄用，現在使用輪替機制
-// const rpcHealthStatus = new Map();
-
-// 初始化 RPC 健康狀態 - 已棄用
-// BSC_RPC_NODES.forEach(node => {
-//   rpcHealthStatus.set(node, { healthy: true, lastCheck: Date.now(), latency: 0 });
-// });
-
-// RPC 健康檢查 - 已棄用，不再需要
-// async function checkRpcHealth(rpcUrl) {
-//   const start = Date.now();
-//   try {
-//     const response = await axios.post(rpcUrl, {
-//       jsonrpc: '2.0',
-//       method: 'eth_blockNumber',
-//       params: [],
-//       id: 1,
-//     }, { timeout: 5000 });
-//     
-//     const latency = Date.now() - start;
-//     const healthy = response.data && response.data.result;
-//     
-//     rpcHealthStatus.set(rpcUrl, {
-//       healthy: !!healthy,
-//       lastCheck: Date.now(),
-//       latency,
-//       blockNumber: healthy ? parseInt(response.data.result, 16) : null
-//     });
-//     
-//     return { healthy: !!healthy, latency };
-//   } catch (error) {
-//     rpcHealthStatus.set(rpcUrl, {
-//       healthy: false,
-//       lastCheck: Date.now(),
-//       latency: Date.now() - start,
-//       error: error.message
-//     });
-//     return { healthy: false, latency: Date.now() - start };
-//   }
-// }
-
-// 註釋掉 RPC 代理相關功能，因為前端已經使用 Vercel 的 /api/rpc
-/*
-// 獲取最佳 RPC 節點 - 簡化版本，只使用輪替的 Alchemy 節點
-function getBestRpcNode() {
-  // 直接使用輪替的 Alchemy URL
-  const alchemyUrl = getNextAlchemyUrl();
-  console.log(`🎯 使用輪替 Alchemy 節點 #${currentApiKeyIndex}`); // 不再顯示完整 URL 以保護 API key
-  return alchemyUrl;
-}
-
-// 定期健康檢查（每5分鐘）- 已註釋，因為現在完全使用 RPC 代理
-// setInterval(async () => {
-//   console.log('🔍 執行 RPC 節點健康檢查...');
-//   const promises = BSC_RPC_NODES.map(checkRpcHealth);
-//   await Promise.all(promises);
-//   
-//   const healthyCount = Array.from(rpcHealthStatus.values()).filter(s => s.healthy).length;
-//   console.log(`✅ RPC 健康檢查完成: ${healthyCount}/${BSC_RPC_NODES.length} 節點健康`);
-// }, 5 * 60 * 1000);
-
-// RPC 代理端點
-// RPC 代理端點已移除 - 前端使用 Vercel API 路由
-// app.post('/api/rpc', ...) - 已棄用
-
-// RPC 節點狀態查詢 - 簡化版本
-app.get('/api/rpc/status', (req, res) => {
+  const totalRequests = metrics.hits + metrics.misses;
+  const hitRate = totalRequests > 0 ? (metrics.hits / totalRequests * 100).toFixed(2) : '0.00';
+  
   res.json({
-    summary: {
-      total: ALCHEMY_API_KEYS.length,
-      mode: 'round-robin',
-      currentIndex: currentApiKeyIndex,
-      message: '使用 Alchemy API Keys 輪替機制'
+    static_files: {
+      enabled: metrics.enabled,
+      status: 'operational',
+      metrics: {
+        hits: metrics.hits,
+        misses: metrics.misses,
+        errors: metrics.errors,
+        total_requests: totalRequests,
+        hit_rate: `${hitRate}%`,
+        hit_rate_numeric: parseFloat(hitRate)
+      },
+      performance: {
+        start_time: metrics.startTime,
+        runtime: totalRequests > 0 ? `${totalRequests} requests processed` : 'No requests yet'
+      },
+      directories: {
+        hero_static: 'static/metadata/hero/',
+        relic_static: 'static/metadata/relic/', 
+        party_static: 'static/metadata/party/'
+      }
     },
-    nodes: ALCHEMY_API_KEYS.map((_, index) => ({
-      index,
-      status: 'active',
-      type: 'alchemy-private'
-    })),
-    proxyEnabled: true,
-    healthCheckDisabled: true,
-    note: '已移除公共節點健康檢查，完全使用 RPC 代理'
+    recommendations: 
+      totalRequests === 0 ? ['No static files accessed yet'] :
+      parseFloat(hitRate) < 50 ? ['Consider generating more static files', 'Check if NFTs exist in static directory'] :
+      parseFloat(hitRate) > 90 ? ['Excellent static file coverage'] :
+      ['Static file coverage is good']
   });
 });
-*/
+
+// 靜態文件統計重置 
+app.post('/api/static/reset', (req, res) => {
+  if (global.staticMetrics) {
+    const oldStats = { ...global.staticMetrics };
+    global.staticMetrics = {
+      hits: 0,
+      misses: 0,
+      errors: 0,
+      enabled: true,
+      startTime: new Date().toISOString()
+    };
+    
+    res.json({
+      message: 'Static file metrics reset successfully',
+      previous_stats: oldStats,
+      new_stats: global.staticMetrics
+    });
+  } else {
+    res.status(400).json({ error: 'Static metrics not initialized' });
+  }
+});
+
+// =================================================================
+// Section: API 路由
+// =================================================================
+
+// RPC 代理服務已完全移除 - 前端使用 Vercel API 路由
 
 // 同步狀態 API
 app.get('/api/sync-status', async (req, res) => {
@@ -1436,7 +1558,7 @@ app.get('/api/profile/:tokenId', async (req, res) => {
   return res.redirect(301, `/api/playerprofile/${tokenId}`);
 });
 
-// 獲取特定 NFT（優化版）
+// 獲取特定 NFT（靜態文件優化版）
 app.get('/api/:type/:tokenId', async (req, res) => {
   try {
     const { type, tokenId } = req.params;
@@ -1444,6 +1566,14 @@ app.get('/api/:type/:tokenId', async (req, res) => {
     
     if (!['hero', 'relic', 'party', 'vip', 'vipstaking', 'playerprofile'].includes(type)) {
       return res.status(400).json({ error: 'Invalid NFT type' });
+    }
+    
+    // 對於 Hero、Relic、Party，優先檢查靜態文件
+    if (['hero', 'relic', 'party'].includes(type)) {
+      const staticFileResult = await tryStaticFile(type, tokenId, res);
+      if (staticFileResult) {
+        return; // 靜態文件命中，直接返回
+      }
     }
     
     const cacheKey = generateCacheKey(`${type}-${tokenId}`, { owner, rarity });
@@ -2617,6 +2747,14 @@ let preheatStats = {
   avgProcessingTime: 0
 };
 
+// 突發鑄造檢測狀態
+let burstDetectionState = {
+  recentMints: [], // 最近的鑄造記錄
+  inBurstMode: false,
+  burstModeStartTime: null,
+  lastBurstCheck: Date.now()
+};
+
 // RPC 調用速率控制
 let rpcCallHistory = [];
 
@@ -2793,15 +2931,18 @@ async function preheatNewNFTs(isFullCheck = true) {
     }
 
     // 計算自適應並發數
-    const failureRate = preheatStats.processed > 0 ? preheatStats.failed / preheatStats.processed : 0;
-    const currentConcurrency = getAdaptiveConcurrency(failureRate, preheatStats.avgProcessingTime);
+    // 突發鑄造檢測與動態配置
+    const isBurstMode = detectBurstMinting(recentNFTs);
+    const processingConfig = getCurrentProcessingConfig();
     
-    console.log(`⚙️ 使用並發數: ${currentConcurrency} (失敗率: ${(failureRate * 100).toFixed(1)}%)`);
+    console.log(`🔄 處理 ${recentNFTs.length} 個新 NFT`);
+    console.log(`⚙️ 模式: ${isBurstMode ? '🚨 突發處理' : '📊 正常處理'}`);
+    console.log(`⚙️ 並發數: ${processingConfig.concurrency}, 批次: ${processingConfig.batchSize}, 延遲: ${processingConfig.batchDelay}ms`);
 
-    // 分批處理
+    // 分批處理 - 使用動態批次大小
     const batches = [];
-    for (let i = 0; i < recentNFTs.length; i += PREHEAT_CONFIG.batchSize) {
-      batches.push(recentNFTs.slice(i, i + PREHEAT_CONFIG.batchSize));
+    for (let i = 0; i < recentNFTs.length; i += processingConfig.batchSize) {
+      batches.push(recentNFTs.slice(i, i + processingConfig.batchSize));
     }
 
     let totalProcessed = 0;
@@ -2811,44 +2952,30 @@ async function preheatNewNFTs(isFullCheck = true) {
       const batch = batches[batchIndex];
       console.log(`📦 處理批次 ${batchIndex + 1}/${batches.length} (${batch.length} 個 NFT)`);
 
-      // 分組並發處理
-      const chunks = [];
-      for (let i = 0; i < batch.length; i += currentConcurrency) {
-        chunks.push(batch.slice(i, i + currentConcurrency));
+      // 檢查 RPC 速率限制
+      if (!checkRpcRateLimit()) {
+        console.warn('⚠️ RPC 速率限制，等待 10 秒...');
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        continue;
       }
 
-      for (const chunk of chunks) {
-        // 檢查 RPC 速率限制
-        if (!checkRpcRateLimit()) {
-          console.warn('⚠️ RPC 速率限制，等待 10 秒...');
-          await new Promise(resolve => setTimeout(resolve, 10000));
-          continue;
+      // 使用 GraphQL 批量查詢優化性能
+      const batchResults = await preheatBatchWithGraphQL(batch);
+      
+      // 統計結果
+      batchResults.forEach(result => {
+        if (result.success) {
+          totalProcessed++;
+          console.log(`✅ 預熱成功: ${result.type} #${result.tokenId}`);
+        } else {
+          totalFailed++;
+          console.warn(`❌ 預熱失敗: ${result.type} #${result.tokenId}: ${result.error}`);
         }
+      });
 
-        const chunkPromises = chunk.map(async (nft) => {
-          return preheatSingleNFT(nft);
-        });
-
-        const results = await Promise.allSettled(chunkPromises);
-        
-        results.forEach((result, index) => {
-          if (result.status === 'fulfilled') {
-            if (result.value) {
-              totalProcessed++;
-              console.log(`✅ 預熱成功: ${chunk[index].type} #${chunk[index].tokenId}`);
-            } else {
-              totalFailed++;
-            }
-          } else {
-            totalFailed++;
-            console.warn(`❌ 預熱失敗: ${chunk[index].type} #${chunk[index].tokenId}: ${result.reason}`);
-          }
-        });
-
-        // 批次間延遲
-        if (batchIndex < batches.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, PREHEAT_CONFIG.batchDelay));
-        }
+      // 批次間延遲 - 使用動態配置
+      if (batchIndex < batches.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, processingConfig.batchDelay));
       }
     }
 
@@ -2863,6 +2990,139 @@ async function preheatNewNFTs(isFullCheck = true) {
   } catch (error) {
     console.error('❌ 預熱過程失敗:', error.message);
     preheatStats.failed++;
+  }
+}
+
+// GraphQL 批量預熱函數 - 性能優化版本
+async function preheatBatchWithGraphQL(nftBatch) {
+  console.log(`🚀 [GraphQL Batch Preheat] 開始批量預熱 ${nftBatch.length} 個 NFT`);
+  
+  try {
+    // 將 NFT 按類型分組
+    const nftIdsByType = { hero: [], relic: [], party: [] };
+    const nftMap = new Map();
+    
+    nftBatch.forEach(nft => {
+      const nftId = `${nft.contractAddress.toLowerCase()}-${nft.tokenId}`;
+      nftIdsByType[nft.type].push(nftId);
+      nftMap.set(nftId, nft);
+    });
+
+    // 收集所有需要查詢的 NFT IDs
+    const allNftIds = [...nftIdsByType.hero, ...nftIdsByType.relic, ...nftIdsByType.party];
+    
+    if (allNftIds.length === 0) {
+      return [];
+    }
+
+    // 執行批量 GraphQL 查詢
+    const graphqlResults = await queryGraphQLBatch(allNftIds, 15); // 較小的批量大小避免超時
+    
+    // 處理每個 NFT
+    const results = [];
+    
+    for (const nft of nftBatch) {
+      const nftId = `${nft.contractAddress.toLowerCase()}-${nft.tokenId}`;
+      
+      try {
+        let rarity = null;
+        let metadata = null;
+        
+        // 首先嘗試從 GraphQL 結果獲取稀有度
+        const graphqlData = graphqlResults[nftId];
+        if (graphqlData && graphqlData.data) {
+          if (nft.type === 'hero' && graphqlData.data.rarity) {
+            rarity = graphqlData.data.rarity;
+          } else if (nft.type === 'relic' && graphqlData.data.rarity) {
+            rarity = graphqlData.data.rarity;
+          } else if (nft.type === 'party' && graphqlData.data.partyRarity) {
+            rarity = graphqlData.data.partyRarity;
+          }
+        }
+        
+        // 如果 GraphQL 沒有稀有度，回退到合約查詢
+        if (!rarity) {
+          console.log(`⚠️ [GraphQL Batch] ${nft.type} #${nft.tokenId} 稀有度缺失，回退到合約查詢`);
+          recordRpcCall();
+          rarity = await getRarityFromContract(nft.type, nft.tokenId);
+        }
+        
+        if (rarity) {
+          metadata = await generateMetadata(nft.type, nft.tokenId, rarity);
+          const cacheKey = generateCacheKey(`${nft.type}-${nft.tokenId}`, {});
+          
+          // 根據 NFT 年齡決定緩存時間
+          const nftAge = Date.now() - nft.createdAt;
+          const isNewNFT = nftAge < (30 * 24 * 60 * 60 * 1000); // 30 天內算新 NFT
+          
+          const cacheTime = isNewNFT ? PREHEAT_CONFIG.newNftCacheTTL : PREHEAT_CONFIG.permanentCacheTTL;
+          
+          cache.set(cacheKey, {
+            ...metadata,
+            cached: Date.now(),
+            source: 'preheated-batch',
+            permanent: !isNewNFT
+          }, cacheTime);
+          
+          results.push({
+            success: true,
+            type: nft.type,
+            tokenId: nft.tokenId,
+            rarity,
+            cached: true
+          });
+        } else {
+          results.push({
+            success: false,
+            type: nft.type,
+            tokenId: nft.tokenId,
+            error: '無法獲取稀有度'
+          });
+        }
+        
+      } catch (error) {
+        console.error(`❌ [GraphQL Batch] ${nft.type} #${nft.tokenId} 處理失敗:`, error.message);
+        results.push({
+          success: false,
+          type: nft.type,
+          tokenId: nft.tokenId,
+          error: error.message
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.success).length;
+    console.log(`🎯 [GraphQL Batch Preheat] 完成: ${successCount}/${nftBatch.length} 成功`);
+    
+    return results;
+    
+  } catch (error) {
+    console.error(`💥 [GraphQL Batch Preheat] 批量預熱失敗:`, error.message);
+    
+    // 錯誤時回退到單個處理
+    console.log(`🔄 [GraphQL Batch Preheat] 回退到單個處理模式`);
+    const fallbackResults = [];
+    
+    for (const nft of nftBatch) {
+      try {
+        const success = await preheatSingleNFT(nft);
+        fallbackResults.push({
+          success,
+          type: nft.type,
+          tokenId: nft.tokenId,
+          error: success ? null : '單個處理也失敗'
+        });
+      } catch (fallbackError) {
+        fallbackResults.push({
+          success: false,
+          type: nft.type,
+          tokenId: nft.tokenId,
+          error: fallbackError.message
+        });
+      }
+    }
+    
+    return fallbackResults;
   }
 }
 
@@ -2921,6 +3181,69 @@ async function preheatSingleNFT(nft) {
     
     throw error;
   }
+}
+
+// 突發鑄造檢測
+function detectBurstMinting(newNFTs) {
+  if (!PREHEAT_CONFIG.burstDetection.enabled) return false;
+  
+  const now = Date.now();
+  const config = PREHEAT_CONFIG.burstDetection;
+  
+  // 清理過期的鑄造記錄
+  burstDetectionState.recentMints = burstDetectionState.recentMints.filter(
+    mintTime => now - mintTime < config.timeWindow
+  );
+  
+  // 添加新的鑄造記錄
+  newNFTs.forEach(() => {
+    burstDetectionState.recentMints.push(now);
+  });
+  
+  // 檢查是否達到突發閾值
+  const recentCount = burstDetectionState.recentMints.length;
+  const shouldEnterBurst = recentCount >= config.threshold;
+  
+  // 檢查是否應該退出突發模式
+  if (burstDetectionState.inBurstMode) {
+    const burstDuration = now - burstDetectionState.burstModeStartTime;
+    if (burstDuration > config.emergencyDuration && recentCount < config.threshold / 2) {
+      burstDetectionState.inBurstMode = false;
+      burstDetectionState.burstModeStartTime = null;
+      console.log(`🚨➡️📊 退出突發模式: 最近${Math.floor(config.timeWindow/60000)}分鐘內只有${recentCount}個NFT`);
+      return false;
+    }
+    return true;
+  }
+  
+  // 檢查是否應該進入突發模式
+  if (shouldEnterBurst && !burstDetectionState.inBurstMode) {
+    burstDetectionState.inBurstMode = true;
+    burstDetectionState.burstModeStartTime = now;
+    console.log(`🚨 突發鑄造檢測: ${Math.floor(config.timeWindow/60000)}分鐘內發現${recentCount}個新NFT，啟動突發處理模式！`);
+    console.log(`⚡ 並發數提升: ${PREHEAT_CONFIG.baseConcurrency} → ${config.emergencyConcurrency}`);
+    console.log(`⚡ 延遲縮短: ${PREHEAT_CONFIG.batchDelay}ms → ${config.reducedDelay}ms`);
+    return true;
+  }
+  
+  return burstDetectionState.inBurstMode;
+}
+
+// 獲取當前應該使用的並發數和延遲
+function getCurrentProcessingConfig() {
+  if (burstDetectionState.inBurstMode) {
+    return {
+      concurrency: PREHEAT_CONFIG.burstDetection.emergencyConcurrency,
+      batchDelay: PREHEAT_CONFIG.burstDetection.reducedDelay,
+      batchSize: Math.min(PREHEAT_CONFIG.batchSize * 2, 10) // 突發時批次稍微增大
+    };
+  }
+  
+  return {
+    concurrency: PREHEAT_CONFIG.baseConcurrency,
+    batchDelay: PREHEAT_CONFIG.batchDelay,
+    batchSize: PREHEAT_CONFIG.batchSize
+  };
 }
 
 // 按需預熱單個 NFT
@@ -3058,6 +3381,7 @@ async function startServer() {
     console.log(`🔥 Hot NFTs: http://localhost:${PORT}/api/hot/:type`);
     console.log(`📦 Batch API: http://localhost:${PORT}/api/batch (POST)`);
     console.log(`🎯 VIP Level API: http://localhost:${PORT}/api/vip/:tokenId?owner=ADDRESS`);
+    console.log(`⚡ Static Files: http://localhost:${PORT}/api/static/health`);
     console.log(`📁 Reading JSON files from: ${JSON_BASE_PATH}`);
     console.log(`🌐 Using full HTTPS URLs for images: ${FRONTEND_DOMAIN}/images/`);
     console.log(`🔄 BSC Market integration: OKX (Primary marketplace for BSC NFTs)`);
@@ -3068,8 +3392,9 @@ async function startServer() {
     // 優化後的預熱機制
     if (PREHEAT_CONFIG.enabled) {
       console.log(`🔥 NFT Preheat: Optimized mode - Every ${PREHEAT_CONFIG.interval/60000} minutes`);
-      console.log(`📊 Concurrency: ${PREHEAT_CONFIG.baseConcurrency}-${PREHEAT_CONFIG.maxConcurrency} (reduced from 20-100)`);
-      console.log(`📦 Batch size: ${PREHEAT_CONFIG.batchSize} (reduced from 50)`);
+      console.log(`📊 Normal: ${PREHEAT_CONFIG.baseConcurrency} concurrency, ${PREHEAT_CONFIG.batchDelay}ms delay`);
+      console.log(`🚨 Burst: ${PREHEAT_CONFIG.burstDetection.emergencyConcurrency} concurrency, ${PREHEAT_CONFIG.burstDetection.reducedDelay}ms delay`);
+      console.log(`⚡ Burst trigger: ${PREHEAT_CONFIG.burstDetection.threshold} NFTs in ${PREHEAT_CONFIG.burstDetection.timeWindow/60000} minutes`);
       console.log(`🔄 Max RPC calls: ${PREHEAT_CONFIG.maxRpcCallsPerMinute}/min (reduced from 200)`);
       
       // 延遲啟動，減少啟動負載
@@ -3082,6 +3407,29 @@ async function startServer() {
       setInterval(quickPreheatCheck, PREHEAT_CONFIG.quickInterval);
     } else {
       console.log(`⚡ Performance Mode: Preheat disabled, using on-demand caching only`);
+    }
+    
+    // 初始化事件監聽器（靜態文件生成）
+    if (provider && CONTRACTS) {
+      try {
+        const NFTEventListener = require('./eventListener');
+        const eventListener = new NFTEventListener(provider, CONTRACTS, {
+          enableEventListening: true,
+          staticFileGeneration: true
+        });
+        
+        // 延遲啟動事件監聽
+        setTimeout(() => {
+          eventListener.startListening().then(() => {
+            console.log('🎧 NFT 事件監聽已啟動 - 將自動生成新鑄造 NFT 的靜態文件');
+          }).catch(error => {
+            console.warn('⚠️ NFT 事件監聽啟動失敗:', error.message);
+          });
+        }, 30000); // 30 秒後啟動事件監聽
+        
+      } catch (error) {
+        console.warn('⚠️ 事件監聽器初始化失敗:', error.message);
+      }
     }
     
     if (process.env.NODE_ENV === 'development') {

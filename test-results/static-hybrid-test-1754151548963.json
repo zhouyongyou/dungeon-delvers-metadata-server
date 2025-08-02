@@ -1,0 +1,111 @@
+{
+  "test_timestamp": "2025-08-02T16:19:08.962Z",
+  "summary": {
+    "static_file_tests": {
+      "total": 5,
+      "successful": 5,
+      "static_hits": 0
+    },
+    "dynamic_fallback_tests": {
+      "total": 3,
+      "successful": 3
+    },
+    "performance_tests": 1,
+    "api_tests": {
+      "total": 1,
+      "successful": 1
+    }
+  },
+  "details": {
+    "static_file_tests": [
+      {
+        "type": "hero",
+        "tokenId": "1",
+        "responseTime": 1865,
+        "isStaticHit": false,
+        "source": "unknown",
+        "success": true
+      },
+      {
+        "type": "hero",
+        "tokenId": "10",
+        "responseTime": 1428,
+        "isStaticHit": false,
+        "source": "unknown",
+        "success": true
+      },
+      {
+        "type": "relic",
+        "tokenId": "1",
+        "responseTime": 1100,
+        "isStaticHit": false,
+        "source": "unknown",
+        "success": true
+      },
+      {
+        "type": "relic",
+        "tokenId": "5",
+        "responseTime": 920,
+        "isStaticHit": false,
+        "source": "unknown",
+        "success": true
+      },
+      {
+        "type": "party",
+        "tokenId": "1",
+        "responseTime": 1110,
+        "isStaticHit": false,
+        "source": "unknown",
+        "success": true
+      }
+    ],
+    "dynamic_fallback_tests": [
+      {
+        "type": "hero",
+        "tokenId": "99999",
+        "responseTime": 949,
+        "source": "fallback",
+        "isStatic": false,
+        "success": true
+      },
+      {
+        "type": "relic",
+        "tokenId": "88888",
+        "responseTime": 940,
+        "source": "fallback",
+        "isStatic": false,
+        "success": true
+      },
+      {
+        "type": "party",
+        "tokenId": "77777",
+        "responseTime": 1201,
+        "source": "fallback",
+        "isStatic": false,
+        "success": true
+      }
+    ],
+    "performance_tests": [
+      {
+        "test_nft": {
+          "type": "hero",
+          "tokenId": "1"
+        },
+        "request_count": 10,
+        "avg_response_time": 1078.1,
+        "static_requests": 0,
+        "dynamic_requests": 10,
+        "static_avg_time": null,
+        "dynamic_avg_time": 1078.1
+      }
+    ],
+    "api_tests": [
+      {
+        "test": "static_file_api",
+        "success": true,
+        "hit_rate": 0,
+        "total_requests": 1
+      }
+    ]
+  }
+}
