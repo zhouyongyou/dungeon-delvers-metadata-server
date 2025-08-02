@@ -86,3 +86,7 @@ Generating placeholder for hero #1
 [The Graph] ✅ Studio 備用版本查詢成功
 📊 發現 0 個未緩存的 NFT
 ✅ 沒有需要預熱的 NFT
+[The Graph] 使用去中心化版本查詢...
+[The Graph] ❌ 去中心化版本失敗: GraphQL errors: [{"message":"auth error: missing authorization header"}]
+[The Graph] 嘗試 Studio 備用版本...
+[The Graph] ✅ Studio 備用版本查詢成功
