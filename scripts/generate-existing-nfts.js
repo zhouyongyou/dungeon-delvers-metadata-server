@@ -43,7 +43,7 @@ class ExistingNFTGenerator {
   }
 
   // 掃描已存在的 NFT（透過嘗試獲取 metadata）
-  async scanExistingNFTs(type, maxTokenId = 1000) {
+  async scanExistingNFTs(type, maxTokenId = 60) {
     console.log(`🔍 掃描已存在的 ${type} NFT (最多 ${maxTokenId} 個)...`);
     
     const existingNFTs = [];
@@ -61,9 +61,17 @@ class ExistingNFTGenerator {
           const metadata = response.data;
           
           // 檢查是否是真實數據而非占位符
-          if (metadata.source !== 'fallback' && metadata.metadata_status !== 'pending') {
+          // 如果有 Token ID 屬性且描述不是 "unavailable"，認為是有效 NFT
+          const hasTokenId = metadata.attributes?.some(attr => attr.trait_type === 'Token ID');
+          const isPlaceholder = metadata.description?.includes('currently unavailable');
+          
+          if (hasTokenId && !isPlaceholder) {
             existingNFTs.push(tokenId);
-            console.log(`✅ 發現 ${type} #${tokenId}`);
+            console.log(`✅ 發現 ${type} #${tokenId} (${metadata.source || 'dynamic'})`);
+          } else if (hasTokenId) {
+            // 有 Token ID 但是 placeholder，可能是真實 NFT 但數據同步中
+            existingNFTs.push(tokenId);
+            console.log(`🔄 發現 ${type} #${tokenId} (同步中，將生成靜態文件)`);
           } else {
             console.log(`⚠️ ${type} #${tokenId} 數據不完整，跳過`);
           }
@@ -241,9 +249,9 @@ class ExistingNFTGenerator {
 
       // 掃描已存在的 NFT
       console.log('\n🔍 第一階段：掃描已存在的 NFT');
-      const heroScan = await this.scanExistingNFTs('hero', 500);
-      const relicScan = await this.scanExistingNFTs('relic', 500);
-      const partyScan = await this.scanExistingNFTs('party', 200);
+      const heroScan = await this.scanExistingNFTs('hero', 50);
+      const relicScan = await this.scanExistingNFTs('relic', 50);
+      const partyScan = await this.scanExistingNFTs('party', 50);
 
       // 生成靜態文件
       console.log('\n🏭 第二階段：生成靜態文件');
