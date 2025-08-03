@@ -1461,6 +1461,28 @@ app.get('/api/:type/:tokenId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid NFT type' });
     }
     
+    // 特殊處理: unrevealed 請求
+    if (tokenId === 'unrevealed') {
+      const unrevealedPath = path.join(__dirname, '..', 'api', type, 'unrevealed.json');
+      if (fs.existsSync(unrevealedPath)) {
+        const unrevealedData = JSON.parse(fs.readFileSync(unrevealedPath, 'utf8'));
+        console.log(`🎭 返回 ${type} 未揭示 metadata`);
+        return res.json(unrevealedData);
+      } else {
+        console.warn(`⚠️ 未找到 ${type} 的 unrevealed.json`);
+        // 返回默認的未揭示 metadata
+        return res.json({
+          name: `Unrevealed ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+          description: "This NFT is being revealed. Please wait...",
+          image: `https://dungeondelvers.xyz/images/${type}/${type}-unrevealed.png`,
+          attributes: [
+            { trait_type: "Status", value: "Unrevealed" },
+            { trait_type: "Reveal Required", value: "Yes" }
+          ]
+        });
+      }
+    }
+    
     // 靜態文件系統已移除 - 將在生產環境大量鑄造時重新啟用
     
     const cacheKey = generateCacheKey(`${type}-${tokenId}`, { owner, rarity });
