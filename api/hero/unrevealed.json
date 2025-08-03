@@ -1,0 +1,20 @@
+{
+  "name": "Unrevealed Hero",
+  "description": "This hero is being revealed. Complete the reveal process within 3 minutes to discover its rarity and power! If you don't reveal in time, you'll need to request a refund.",
+  "image": "https://dungeondelvers.xyz/images/hero/hero-unrevealed.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Unrevealed"
+    },
+    {
+      "trait_type": "Reveal Required",
+      "value": "Yes"
+    },
+    {
+      "trait_type": "Time Limit",
+      "value": "3 minutes"
+    }
+  ],
+  "external_url": "https://dungeondelvers.xyz/reveal-guide"
+}

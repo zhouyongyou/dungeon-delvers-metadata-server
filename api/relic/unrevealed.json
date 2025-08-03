@@ -1,0 +1,20 @@
+{
+  "name": "Unrevealed Relic",
+  "description": "This relic's true nature is hidden. Reveal it within 3 minutes to discover its capacity!",
+  "image": "https://dungeondelvers.xyz/images/relic/relic-unrevealed.png",
+  "attributes": [
+    {
+      "trait_type": "Status",
+      "value": "Unrevealed"
+    },
+    {
+      "trait_type": "Reveal Required",
+      "value": "Yes"
+    },
+    {
+      "trait_type": "Time Limit",
+      "value": "3 minutes"
+    }
+  ],
+  "external_url": "https://dungeondelvers.xyz/reveal-guide"
+}
