@@ -1,5 +1,5 @@
 // V25 Contract Configuration for Backend
-// Generated on 2025-08-04T10:07:33.058Z
+// Generated on 2025-08-03T15:57:58.211Z
 // DO NOT EDIT MANUALLY - Use v25-sync-all.js to update
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
     // NFT Contracts
     HERO: '0x6DEb5Ade2F6BEe8294A4b7f37cE372152109E2db',
     RELIC: '0xcfB83d8545D68b796a236290b3C1bc7e4A140B11',
-    PARTY: '0x18bF1eE489CD0D8bfb006b4110bfe0Bb7459bE69',
+    PARTY: '0xabCD5DDa5bd9D73CD70D4F316827383e92f7b551',
     
     // Game Contracts
     DUNGEONMASTER: '0xd06470d4C6F62F6747cf02bD2b2De0981489034F',
@@ -24,7 +24,7 @@ module.exports = {
     PLAYERPROFILE: '0x0f5932e89908400a5AfDC306899A2987b67a3155',
     
     // Feature Contracts
-    VIPSTAKING: '0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C',
+    VIPSTAKING: '0x18bF1eE489CD0D8bfb006b4110bfe0Bb7459bE69',
     ALTAROFASCENSION: '0xE043ef6Ce183C218F8f9d9a144eD4A06cF379686',
     
     // External
