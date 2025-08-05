@@ -1,11 +1,10 @@
-/**
- * V25 Contract Configuration for Backend
- * Generated on 2025-08-05T18:48:18.179Z
- * DO NOT EDIT MANUALLY - Use sync-system to update
- */
+// V25 Contract Configuration for Backend
+// Generated on 2025-08-05T17:45:54.345Z
+// DO NOT EDIT MANUALLY - Use v25-sync-all.js to update
 
-const contracts = {
-  bsc: {
+module.exports = {
+  // BSC Mainnet Contracts
+  contracts: {
     // Core Contracts
     DUNGEONCORE: '0x1a959ACcb898AdD61C959f2C93Abe502D0e1D34a',
     ORACLE: '0xf8CE896aF39f95a9d5Dd688c35d381062263E25a',
@@ -30,23 +29,15 @@ const contracts = {
     
     // External
     DUNGEONMASTERWALLET: '0x10925A7138649C7E1794CE646182eeb5BF8ba647',
-    
-    // Network Info
-    NETWORK_ID: 56,
-    NETWORK_NAME: 'BSC Mainnet',
-    VERSION: 'V25'
+  },
+  
+  // Contract version for tracking
+  version: 'V25',
+  
+  // Network configuration
+  network: {
+    chainId: 56,
+    name: 'BSC Mainnet',
+    rpcUrl: process.env.BSC_RPC_URL || 'https://bsc-dataseed.binance.org/'
   }
-};
-
-// Helper function to get contract address
-const getContractAddress = (contractName) => {
-  return contracts.bsc[contractName] || null;
-};
-
-// Export for CommonJS
-module.exports = {
-  contracts,
-  getContractAddress,
-  CONTRACT_VERSION: 'V25',
-  DEPLOYMENT_BLOCK: 56184733
 };
