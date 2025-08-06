@@ -1,5 +1,5 @@
 {
-  "version": "V25",
+  "version": "V26",
   "network": {
     "name": "BSC Mainnet",
     "chainId": 56,
@@ -19,22 +19,21 @@
     "VIPSTAKING": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
     "PLAYERPROFILE": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
     "ALTAROFASCENSION": "0x095559778C0BAA2d8FA040Ab0f8752cF07779D33",
-    "VRFMANAGER": "0xFac10cd51981ED3aE85a05c5CFF6ab5b8e145038",
-    "USD": "0x7C67Af4EBC6651c95dF78De11cfe325660d935FE",
-    "DUNGEONMASTERWALLET": "0x10925A7138649C7E1794CE646182eeb5BF8ba647"
+    "VRFMANAGER": "0xD062785C376560A392e1a5F1b25ffb35dB5b67bD",
+    "USD": "0x7C67Af4EBC6651c95dF78De11cfe325660d935FE"
   },
   "subgraph": {
-    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.7",
-    "version": "v3.6.7"
+    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.6",
+    "version": "v3.6.6"
   },
   "services": {
     "subgraph": {
-      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.7",
+      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.6",
       "id": "dungeon-delvers"
     },
     "metadataServer": {
       "url": "https://dungeon-delvers-metadata-server.vercel.app"
     }
   },
-  "lastUpdated": "2025-08-06T16:15:09.395Z"
+  "lastUpdated": "2025-08-06T12:55:06.057Z"
 }
