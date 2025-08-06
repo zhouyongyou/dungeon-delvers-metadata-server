@@ -22,17 +22,17 @@
     "USD": "0x7C67Af4EBC6651c95dF78De11cfe325660d935FE"
   },
   "subgraph": {
-    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.5",
-    "version": "v3.6.5"
+    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.1",
+    "version": "v3.6.1"
   },
   "services": {
     "subgraph": {
-      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.5",
+      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.1",
       "id": "dungeon-delvers"
     },
     "metadataServer": {
       "url": "https://dungeon-delvers-metadata-server.vercel.app"
     }
   },
-  "lastUpdated": "2025-08-06T10:04:10.767Z"
+  "lastUpdated": "2025-08-05T18:48:18.180Z"
 }
