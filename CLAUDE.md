@@ -22,26 +22,89 @@ DungeonDelvers 的 Node.js 後端服務，提供 NFT metadata、遊戲邏輯和 
 - **區塊鏈**: ethers.js v6
 - **部署**: Render
 
-## 🔄 配置管理 (參考主導航)
+## 🔄 統一配置管理系統
 
-> **詳細說明請參考**: `~/MASTER-CLAUDE.md` 中的統一配置管理系統
+### 🎯 重要：後端配置由合約項目統一管理
+後端**不應該**直接編輯合約配置文件，所有合約相關配置由合約項目自動同步。
 
-### 後端專案環境變數
+### 📍 配置文件位置
+- **主配置來源**：`/Users/sotadic/Documents/DungeonDelversContracts/.env.v25`
+- **後端配置文件**：`/Users/sotadic/Documents/dungeon-delvers-metadata-server/config/contracts.json` （自動生成）
+
+### 🚀 配置同步流程
+
+#### 當需要更新合約地址時：
 ```bash
-# 必須環境變數
+# ❌ 錯誤：不要直接編輯後端合約配置
+# vim /Users/sotadic/Documents/dungeon-delvers-metadata-server/config/contracts.json
+
+# ✅ 正確：編輯主配置文件
+vim /Users/sotadic/Documents/DungeonDelversContracts/.env.v25
+
+# ✅ 然後執行同步
+cd /Users/sotadic/Documents/DungeonDelversContracts
+node scripts/ultimate-config-system.js sync
+```
+
+#### 同步後重啟後端服務器：
+```bash
+# 本地開發
+cd /Users/sotadic/Documents/dungeon-delvers-metadata-server
+npm run dev
+
+# 或生產環境會自動重啟
+```
+
+### 📋 自動同步的配置內容
+- ✅ **合約地址**：所有合約地址轉換為 camelCase 格式
+- ✅ **網路配置**：鏈 ID、RPC URL
+- ✅ **VRF 配置**：完整的 VRF 設定參數
+- ✅ **服務端點**：子圖 URL 和版本信息
+- ✅ **部署信息**：版本標籤、部署時間、起始區塊
+
+### 🔍 驗證配置正確性
+```bash
+# 檢查後端配置是否與主配置一致
+cd /Users/sotadic/Documents/DungeonDelversContracts
+node scripts/ultimate-config-system.js validate
+```
+
+### 🛠️ 後端專用環境變數
+以下配置**不會**被自動同步，需要手動維護：
+```bash
+# .env 文件 - 後端服務專用配置
 NODE_ENV=production
 CORS_ORIGIN=https://dungeondelvers.xyz,https://www.dungeondelvers.xyz
 FRONTEND_DOMAIN=https://dungeondelvers.xyz
+PORT=3000  # Render 自動設定
 
 # 可選配置
 CONFIG_URL=https://dungeondelvers.xyz/config/v25.json  # CDN 配置位置
-PORT=3000  # Render 自動設定
+LOG_LEVEL=info
+MAX_CACHE_SIZE=1000
 ```
 
-### 動態配置載入
-- 使用 `configLoader.js` 自動從 CDN 載入合約地址
-- 5分鐘緩存 + 環境變數備份
-- `/api/config/refresh` 手動刷新機制
+### ⚡ 動態配置載入
+後端使用以下機制載入配置：
+- **JSON 配置讀取**：`config/contracts.json` 提供合約地址和網路配置
+- **環境變數覆蓋**：支援環境變數覆蓋 JSON 配置
+- **緩存機制**：5分鐘緩存 + 自動重新載入
+- **健康檢查**：`/api/config/status` 端點顯示配置狀態
+
+### 🔄 配置刷新機制
+```bash
+# 手動刷新配置（開發時使用）
+curl -X POST http://localhost:3000/api/config/refresh
+
+# 檢查配置狀態
+curl http://localhost:3000/api/config/status
+```
+
+### 🚨 關鍵提醒
+1. **永遠不要**手動編輯 `config/contracts.json` 合約地址
+2. **配置變更後**重啟後端服務器或調用刷新 API
+3. **部署前**確保 `npm start` 成功啟動
+4. **生產環境**配置變更會觸發服務自動重啟
 
 ## 📚 API 端點設計
 

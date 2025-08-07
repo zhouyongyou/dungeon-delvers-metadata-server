@@ -1,28 +1,32 @@
 {
   "network": "bsc",
   "chainId": 56,
-  "rpcUrl": "https://bsc-dataseed1.binance.org/",
+  "rpcUrl": "https://bnb-mainnet.g.alchemy.com/v2/F7E3-HDwgUHDQvdICnFv_",
   "contracts": {
+    "dungeonStorage": "0x539AC926C6daE898f2C843aF8C59Ff92B4b3B468",
+    "dungeonMaster": "0xc0bbae55cf9245f76628d2c5299cd6fa35cd102a",
     "hero": "0x671d937b171e2ba2c4dc23c133b07e4449f283ef",
     "relic": "0x42bf1bd8fc5a8dfdd0e97de131246ec0e3ec73da",
-    "party": "0x28A85D14e0F87d6eD04e21c30992Df8B3e9434E3",
-    "dungeonmaster": "0xc0bbae55cf9245f76628d2c5299cd6fa35cd102a",
-    "dungeonstorage": "0x539AC926C6daE898f2C843aF8C59Ff92B4b3B468",
     "altarOfAscension": "0xa86749237d4631ad92ba859d0b0df4770f6147ba",
-    "playervault": "0x62Bce9aF5E2C47b13f62A2e0fCB1f9C7AfaF8787",
-    "playerprofile": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
-    "vipstaking": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
-    "vrfManagerV2Plus": "0x980d224ec4d198d94f34a8af76a19c00dabe2436",
-    "dungeoncore": "0x8a2D2b1961135127228EdD71Ff98d6B097915a13",
+    "party": "0x28A85D14e0F87d6eD04e21c30992Df8B3e9434E3",
+    "dungeonCore": "0x8a2D2b1961135127228EdD71Ff98d6B097915a13",
+    "playerVault": "0x62Bce9aF5E2C47b13f62A2e0fCB1f9C7AfaF8787",
+    "playerProfile": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
+    "vipStaking": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
     "oracle": "0xf8CE896aF39f95a9d5Dd688c35d381062263E25a",
-    "soulshard": "0x97B2C2a9A11C7b6A020b4bAEaAd349865eaD0bcF",
+    "soulShard": "0x97B2C2a9A11C7b6A020b4bAEaAd349865eaD0bcF",
     "usd": "0x7C67Af4EBC6651c95dF78De11cfe325660d935FE",
-    "uniswap_pool": "0x1e5Cd5F386Fb6F39cD8788675dd3A5ceB6521C82"
+    "uniswapPool": "0x1e5Cd5F386Fb6F39cD8788675dd3A5ceB6521C82",
+    "vrfManagerV2Plus": "0x980d224ec4d198d94f34a8af76a19c00dabe2436"
   },
   "vrf": {
-    "subscriptionId": "29062",
-    "coordinator": "0xd691f04bc0C9a24Edb78af9E005Cf85768F694C9",
-    "keyHash": "0x130dba50ad435d4ecc214aad0d5820474137bd68e7e77724144f27c3c377d3d4"
+    "coordinatorAddress": "0xDA3b641D438362C440Ac5458c57e00a712b66700",
+    "subscriptionId": "114131353280130458891383141995968474440293173552039681622016393393251650814328",
+    "keyHash": "0x130dba50ad435d4ecc214aad0d5820474137bd68e7e77724144f27c3c377d3d4",
+    "callbackGasLimit": "2500000",
+    "requestConfirmations": "3",
+    "numWords": "1",
+    "mode": "subscription"
   },
   "subgraph": {
     "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.8.2",
@@ -30,7 +34,7 @@
   },
   "deployment": {
     "version": "V25",
-    "date": "2025-08-07T22:00:00.000Z",
+    "date": "2025-08-07T22:00:00Z",
     "startBlock": "56771885"
   }
 }
