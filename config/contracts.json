@@ -1,7 +1,7 @@
 {
   "network": "bsc",
   "chainId": 56,
-  "rpcUrl": "https://bnb-mainnet.g.alchemy.com/v2/F7E3-HDwgUHDQvdICnFv_",
+  "rpcUrl": "https://bnb-mainnet.g.alchemy.com/v2/QzXiHWkNRovjd_EeDRqVfR9rApUDiXRp",
   "contracts": {
     "dungeonStorage": "0x539AC926C6daE898f2C843aF8C59Ff92B4b3B468",
     "dungeonMaster": "0xc0bbae55cf9245f76628d2c5299cd6fa35cd102a",
