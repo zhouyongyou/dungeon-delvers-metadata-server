@@ -1,9 +1,28 @@
 {
   "version": "V25",
-  "timestamp": "2025-08-07 14:15",
+  "timestamp": "2025-08-07 14:17",
   "network": "BSC Mainnet",
   "chainId": 56,
   "startBlock": 0,
-  "contracts": {},
-  "endpoints": {}
+  "contracts": {
+    "DUNGEONCORE": "0x8a2D2b1961135127228EdD71Ff98d6B097915a13",
+    "ORACLE": "0xf8CE896aF39f95a9d5Dd688c35d381062263E25a",
+    "HERO": "0x671d937b171e2ba2c4dc23c133b07e4449f283ef",
+    "RELIC": "0x42bf1bd8fc5a8dfdd0e97de131246ec0e3ec73da",
+    "PARTY": "0x28A85D14e0F87d6eD04e21c30992Df8B3e9434E3",
+    "DUNGEONMASTER": "0xc0bbae55cf9245f76628d2c5299cd6fa35cd102a",
+    "DUNGEONSTORAGE": "0x539AC926C6daE898f2C843aF8C59Ff92B4b3B468",
+    "ALTAROFASCENSION": "0xa86749237d4631ad92ba859d0b0df4770f6147ba",
+    "PLAYERVAULT": "0x62Bce9aF5E2C47b13f62A2e0fCB1f9C7AfaF8787",
+    "PLAYERPROFILE": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
+    "VIPSTAKING": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
+    "SOULSHARD": "0x97B2C2a9A11C7b6A020b4bAEaAd349865eaD0bcF",
+    "USD": "0x7C67Af4EBC6651c95dF78De11cfe325660d935FE",
+    "VRFMANAGER": "0x980d224ec4d198d94f34a8af76a19c00dabe2436"
+  },
+  "endpoints": {
+    "subgraph": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.8.1",
+    "backend": "https://dungeon-delvers-metadata-server.onrender.com",
+    "rpc": "https://bsc-dataseed1.binance.org/"
+  }
 }
