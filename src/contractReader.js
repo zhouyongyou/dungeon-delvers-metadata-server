@@ -39,9 +39,9 @@ async function initializeContracts() {
   try {
     const config = await configLoader.loadConfig();
     
-    CONTRACTS.hero = config.contracts.HERO_ADDRESS || config.contracts.HERO;
-    CONTRACTS.relic = config.contracts.RELIC_ADDRESS || config.contracts.RELIC;
-    CONTRACTS.party = config.contracts.PARTY_ADDRESS || config.contracts.PARTY;
+    CONTRACTS.hero = config.contracts.HERO || config.contracts.Hero || config.contracts.HERO_ADDRESS;
+    CONTRACTS.relic = config.contracts.RELIC || config.contracts.Relic || config.contracts.RELIC_ADDRESS;
+    CONTRACTS.party = config.contracts.PARTY || config.contracts.Party || config.contracts.PARTY_ADDRESS;
     
     console.log('Loading contract addresses:', CONTRACTS);
     
