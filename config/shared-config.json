@@ -24,17 +24,19 @@
     "DUNGEONMASTERWALLET": "0x10925A7138649C7E1794CE646182eeb5BF8ba647"
   },
   "subgraph": {
-    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.7",
-    "version": "v3.6.7"
+    "studio": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.8.1",
+    "decentralized": "https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs",
+    "version": "v3.8.1"
   },
   "services": {
     "subgraph": {
-      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.6.7",
+      "url": "https://api.studio.thegraph.com/query/115633/dungeon-delvers---bsc/v3.8.1",
+      "decentralizedUrl": "https://gateway.thegraph.com/api/f6c1aba78203cfdf0cc732eafe677bdd/subgraphs/id/Hmwr7XYgzVzsUb9dw95gSGJ1Vof6qYypuvCxynzinCjs",
       "id": "dungeon-delvers"
     },
     "metadataServer": {
-      "url": "https://dungeon-delvers-metadata-server.vercel.app"
+      "url": "https://dungeon-delvers-metadata-server.onrender.com"
     }
   },
-  "lastUpdated": "2025-08-06T16:15:09.395Z"
+  "lastUpdated": "2025-08-07T14:19:38.000Z"
 }
