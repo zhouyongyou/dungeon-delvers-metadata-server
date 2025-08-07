@@ -12,7 +12,7 @@
     "playervault": "0x62Bce9aF5E2C47b13f62A2e0fCB1f9C7AfaF8787",
     "playerprofile": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
     "vipstaking": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
-    "vrfManagerV2Plus": "0x980d224ec4d198d94f34a8af76a19c00dabe2436",
+    "vrfManagerV2Plus": "0x84b1ffc7b0839906ba1ecf510ed3a74481b8438e",
     "dungeoncore": "0x8a2D2b1961135127228EdD71Ff98d6B097915a13",
     "oracle": "0xf8CE896aF39f95a9d5Dd688c35d381062263E25a",
     "soulshard": "0x97B2C2a9A11C7b6A020b4bAEaAd349865eaD0bcF",
@@ -30,7 +30,7 @@
   },
   "deployment": {
     "version": "V25",
-    "date": "2025-08-07T15:47:12.102Z",
+    "date": "2025-08-07T17:11:54.502Z",
     "startBlock": "56757876"
   }
 }
