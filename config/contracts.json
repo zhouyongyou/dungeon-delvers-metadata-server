@@ -3,12 +3,12 @@
   "chainId": 56,
   "rpcUrl": "https://bsc-dataseed1.binance.org/",
   "contracts": {
-    "hero": "0x671d937b171e2ba2c4dc23c133b07e4449f283ef",
-    "relic": "0x42bf1bd8fc5a8dfdd0e97de131246ec0e3ec73da",
+    "hero": "0x96Df76BfbB0C9832482Ec9231d8ff8951637f1C2",
+    "relic": "0xC7E24bF50d6E7623866ebABfE0dC97fB585e363E",
     "party": "0x28A85D14e0F87d6eD04e21c30992Df8B3e9434E3",
-    "dungeonmaster": "0xc0bbae55cf9245f76628d2c5299cd6fa35cd102a",
-    "dungeonstorage": "0x539AC926C6daE898f2C843aF8C59Ff92B4b3B468",
-    "altarOfAscension": "0xa86749237d4631ad92ba859d0b0df4770f6147ba",
+    "dungeonmaster": "0x395358733F69572C5744b561Ba61F0e16F32A571",
+    "dungeonstorage": "0x5D5D75a0bEF0Ce708d59749c0D9ba1a59fC24Cbb",
+    "altarOfAscension": "0xe8b35bCDb5155DEBC7aaEE300560e2331EBF026e",
     "playervault": "0x62Bce9aF5E2C47b13f62A2e0fCB1f9C7AfaF8787",
     "playerprofile": "0x0f5932e89908400a5AfDC306899A2987b67a3155",
     "vipstaking": "0xC0D8C84e28E5BcfC9cBD109551De53BA04e7328C",
@@ -30,7 +30,7 @@
   },
   "deployment": {
     "version": "V25",
-    "date": "2025-08-07T18:28:10.288Z",
+    "date": "2025-08-07T19:33:58.630Z",
     "startBlock": "56757876"
   }
 }
